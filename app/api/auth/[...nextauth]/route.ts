@@ -3,19 +3,35 @@ import Google from "next-auth/providers/google";
 import Facebook from "next-auth/providers/facebook";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/db";
-import * as schema from "@/db/schema";
+// import * as schema from "@/db/schema";
 
 export const authOptions = {
-  adapter: DrizzleAdapter(db, { schema }),
-  providers: [Google, Facebook],
+  adapter: DrizzleAdapter(db),
+  providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    }),
+    Facebook({
+      clientId: process.env.FACEBOOK_CLIENT_ID || "",
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET || "",
+    }),
+  ],
   session: { strategy: "jwt" as const },
   callbacks: {
-    async session({ session, token }: any) {
+    async session({ session, token }: { session: { user?: { id?: string } & Record<string, unknown>; expires?: string }, token: { sub?: string } }) {
       if (session.user && token.sub) session.user.id = token.sub;
-      return session;
+      // Ensure the returned object matches the Session type (must include expires)
+      return {
+        ...session,
+        user: session.user,
+        expires: session.expires,
+      };
     },
   },
 };
 
-const handler = NextAuth(authOptions as any);
+import type { AuthOptions } from "next-auth";
+
+const handler = NextAuth(authOptions as AuthOptions);
 export { handler as GET, handler as POST };
