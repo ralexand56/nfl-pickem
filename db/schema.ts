@@ -14,9 +14,9 @@ export const users = pgTable(
   {
     id: varchar("id", { length: 191 }).primaryKey(),
     name: text("name"),
-    email: text("email").notNull(),
+    email: text("email"),
+    emailVerified: timestamp("emailVerified", { withTimezone: true }),
     image: text("image"),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
   (t) => [{ emailIdx: uniqueIndex("users_email_idx").on(t.email) }]
 );
@@ -69,8 +69,6 @@ export const weeklyTiebreakers = pgTable(
     },
   ]
 );
-
-
 
 export type InsertUser = typeof users.$inferInsert;
 export type SelectUser = typeof users.$inferSelect;

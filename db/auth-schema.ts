@@ -6,15 +6,8 @@ import {
   integer,
   primaryKey,
 } from "drizzle-orm/pg-core";
-
-/** Users */
-export const users = pgTable("users", {
-  id: varchar("id", { length: 191 }).primaryKey(),
-  name: text("name"),
-  email: text("email"),
-  emailVerified: timestamp("emailVerified", { withTimezone: true }),
-  image: text("image"),
-});
+// Import or define the users table before referencing it below
+import { users } from "./schema"; // Adjust the path as needed
 
 /** OAuth Accounts */
 export const accounts = pgTable(
