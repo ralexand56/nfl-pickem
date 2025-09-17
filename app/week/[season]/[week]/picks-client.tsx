@@ -2,6 +2,42 @@
 import { useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 
+// Extend the session user type to include 'id'
+import type { DefaultSession } from "next-auth";
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+    } & DefaultSession["user"];
+  }
+}
+
+type Game = {
+  id: string;
+  date: string;
+  homeTeam: string;
+  awayTeam: string;
+  homeScore: number;
+  awayScore: number;
+  status: string;
+};
+
+type Pick = {
+  id: string;
+  userId: string;
+  gameId: string;
+  pick: "HOME" | "AWAY";
+};
+
+type Tiebreaker = {
+  id: string;
+  userId: string;
+  season: number;
+  week: number;
+  mnfTotalPointsGuess: number;
+};
+
 export default function PicksClient({
   games,
   allPicks,
@@ -9,17 +45,17 @@ export default function PicksClient({
   season,
   week,
 }: {
-  games: any[];
-  allPicks: any[];
-  tiebreakers: any[];
+  games: Game[];
+  allPicks: Pick[];
+  tiebreakers: Tiebreaker[];
   season: number;
   week: number;
 }) {
   const { data: session } = useSession();
   const uid = session?.user?.id;
-  const [pending, start] = useTransition();
+  const [_, start] = useTransition();
   const [myTB, setMyTB] = useState<number | "">(
-    tiebreakers.find((t: any) => t.userId === uid)?.mnfTotalPointsGuess ?? ""
+    tiebreakers.find((t) => t.userId === uid)?.mnfTotalPointsGuess ?? ""
   );
 
   const myPicks = Object.fromEntries(
@@ -56,10 +92,16 @@ export default function PicksClient({
           Monday Night Tiebreaker (total points)
         </h3>
         <div className="flex gap-2 items-center">
+          <label htmlFor="mnf-tiebreaker" className="sr-only">
+            Monday Night Tiebreaker Total Points
+          </label>
           <input
+            id="mnf-tiebreaker"
             type="number"
             className="border rounded-lg px-3 py-2"
             value={myTB}
+            placeholder="Enter total points"
+            title="Monday Night Tiebreaker Total Points"
             onChange={(e) =>
               setMyTB(e.target.value === "" ? "" : Number(e.target.value))
             }

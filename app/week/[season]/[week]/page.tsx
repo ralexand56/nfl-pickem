@@ -8,8 +8,8 @@ export default async function WeekPage({
 }: {
   params: { season: string; week: string };
 }) {
-  const season = Number(params.season);
-  const week = Number(params.week);
+  const season = Number(await params.season);
+  const week = Number(await params.week);
 
   try {
     const gs = await db
@@ -39,9 +39,21 @@ export default async function WeekPage({
 
     return (
       <PicksClient
-        games={gs}
-        allPicks={allPicks}
-        tiebreakers={tbs}
+        games={gs.map((g) => ({
+          ...g,
+          date: g.date instanceof Date ? g.date.toISOString() : g.date,
+          homeScore: g.homeScore === null ? 0 : g.homeScore,
+          awayScore: g.awayScore === null ? 0 : g.awayScore,
+        }))}
+        allPicks={allPicks.map((pick) => ({
+          ...pick,
+          id: String(pick.id),
+          pick: pick.pick === "HOME" ? "HOME" : "AWAY",
+        }))}
+        tiebreakers={tbs.map((tb) => ({
+          ...tb,
+          id: String(tb.id),
+        }))}
         season={season}
         week={week}
       />
