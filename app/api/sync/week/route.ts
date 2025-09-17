@@ -11,16 +11,7 @@ export async function POST(req: Request) {
     await db
       .insert(games)
       .values({
-        id: g.id,
-        season: g.season,
-        week: g.week,
-        date: new Date(g.date),
-        homeTeam: g.homeTeam,
-        awayTeam: g.awayTeam,
-        status: g.status,
-        homeScore: g.homeScore ?? null,
-        awayScore: g.awayScore ?? null,
-        isMondayNight: g.isMondayNight ?? false,
+        ...g,
       })
       .onConflictDoUpdate({
         target: games.id,

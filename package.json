@@ -10,9 +10,12 @@
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.10.0",
+    "@neondatabase/serverless": "^1.0.1",
     "@vercel/postgres": "^0.10.0",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.2",
     "drizzle-orm": "^0.44.5",
+    "neondatabase": "^0.0.1-security",
     "next": "15.5.3",
     "next-auth": "^4.24.11",
     "react": "19.1.0",

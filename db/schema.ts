@@ -18,7 +18,7 @@ export const users = pgTable(
     image: text("image"),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
-  (t) => ({ emailIdx: uniqueIndex("users_email_idx").on(t.email) })
+  (t) => [{ emailIdx: uniqueIndex("users_email_idx").on(t.email) }]
 );
 
 export const games = pgTable("games", {
@@ -43,12 +43,14 @@ export const picks = pgTable(
     pick: text("pick").notNull(), // "HOME" | "AWAY"
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
-  (t) => ({
-    userGameUnique: uniqueIndex("picks_user_game_unique").on(
-      t.userId,
-      t.gameId
-    ),
-  })
+  (t) => [
+    {
+      userGameUnique: uniqueIndex("picks_user_game_unique").on(
+        t.userId,
+        t.gameId
+      ),
+    },
+  ]
 );
 
 export const weeklyTiebreakers = pgTable(
@@ -61,7 +63,20 @@ export const weeklyTiebreakers = pgTable(
     mnfTotalPointsGuess: integer("mnf_total_points_guess").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
-  (t) => ({
-    uniq: uniqueIndex("uniq_user_season_week").on(t.userId, t.season, t.week),
-  })
+  (t) => [
+    {
+      uniq: uniqueIndex("uniq_user_season_week").on(t.userId, t.season, t.week),
+    },
+  ]
 );
+
+
+
+export type InsertUser = typeof users.$inferInsert;
+export type SelectUser = typeof users.$inferSelect;
+export type InsertGame = typeof games.$inferInsert;
+export type SelectGame = typeof games.$inferSelect;
+export type InsertPick = typeof picks.$inferInsert;
+export type SelectPick = typeof picks.$inferSelect;
+export type InsertWeeklyTiebreaker = typeof weeklyTiebreakers.$inferInsert;
+export type SelectWeeklyTiebreaker = typeof weeklyTiebreakers.$inferSelect;

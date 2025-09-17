@@ -39,21 +39,9 @@ export default async function WeekPage({
 
     return (
       <PicksClient
-        games={gs.map((g) => ({
-          ...g,
-          date: g.date instanceof Date ? g.date.toISOString() : g.date,
-          homeScore: g.homeScore === null ? 0 : g.homeScore,
-          awayScore: g.awayScore === null ? 0 : g.awayScore,
-        }))}
-        allPicks={allPicks.map((pick) => ({
-          ...pick,
-          id: String(pick.id),
-          pick: pick.pick === "HOME" ? "HOME" : "AWAY",
-        }))}
-        tiebreakers={tbs.map((tb) => ({
-          ...tb,
-          id: String(tb.id),
-        }))}
+        games={gs}
+        allPicks={allPicks}
+        tiebreakers={tbs}
         season={season}
         week={week}
       />

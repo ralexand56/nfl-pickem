@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 
 // Extend the session user type to include 'id'
 import type { DefaultSession } from "next-auth";
+import { SelectGame, SelectPick, SelectWeeklyTiebreaker } from "@/db/schema";
 
 declare module "next-auth" {
   interface Session {
@@ -13,31 +14,6 @@ declare module "next-auth" {
   }
 }
 
-type Game = {
-  id: string;
-  date: string;
-  homeTeam: string;
-  awayTeam: string;
-  homeScore: number;
-  awayScore: number;
-  status: string;
-};
-
-type Pick = {
-  id: string;
-  userId: string;
-  gameId: string;
-  pick: "HOME" | "AWAY";
-};
-
-type Tiebreaker = {
-  id: string;
-  userId: string;
-  season: number;
-  week: number;
-  mnfTotalPointsGuess: number;
-};
-
 export default function PicksClient({
   games,
   allPicks,
@@ -45,9 +21,9 @@ export default function PicksClient({
   season,
   week,
 }: {
-  games: Game[];
-  allPicks: Pick[];
-  tiebreakers: Tiebreaker[];
+  games: SelectGame[];
+  allPicks: SelectPick[];
+  tiebreakers: SelectWeeklyTiebreaker[];
   season: number;
   week: number;
 }) {
@@ -118,8 +94,16 @@ export default function PicksClient({
       <div className="grid gap-3">
         {games.map((g) => {
           const mine = myPicks[g.id] as "HOME" | "AWAY" | undefined;
-          const homeWon = g.status === "final" && g.homeScore > g.awayScore;
-          const awayWon = g.status === "final" && g.awayScore > g.homeScore;
+          const homeWon =
+            g.status === "final" &&
+            g.homeScore !== null &&
+            g.awayScore !== null &&
+            g.homeScore > g.awayScore;
+          const awayWon =
+            g.status === "final" &&
+            g.homeScore !== null &&
+            g.awayScore !== null &&
+            g.awayScore > g.homeScore;
           return (
             <div key={g.id} className="border rounded-xl p-4">
               <div className="flex justify-between items-center">

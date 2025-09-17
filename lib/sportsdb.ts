@@ -1,3 +1,5 @@
+import { SelectGame } from "@/db/schema";
+
 const base = process.env.THESPORTSDB_API_BASE!; // e.g. https://www.thesportsdb.com/api/v1/json
 const key = process.env.THESPORTSDB_API_KEY!; // free test key "123" ok for dev
 
@@ -20,16 +22,16 @@ export async function fetchWeekEvents(season: number, week: number) {
   return all.filter((e: SportsDbEvent) => Number(e.intRound) === week);
 }
 
-export function normalizeGame(e: SportsDbEvent) {
+export function normalizeGame(e: SportsDbEvent): SelectGame {
   const dateIso = `${e.dateEvent}T${e.strTime || "00:00:00"}Z`;
   const d = new Date(dateIso);
   return {
-    id: e.idEvent,
+    id: e.idEvent as string || "", // sometimes it's idGame
     season: Number(e.strSeason) || Number(e.intSeason) || d.getUTCFullYear(),
     week: Number(e.intRound),
-    date: d.toISOString(),
-    homeTeam: e.strHomeTeam,
-    awayTeam: e.strAwayTeam,
+    date: d,
+    homeTeam: typeof e.strHomeTeam === "string" ? e.strHomeTeam : "",
+    awayTeam: typeof e.strAwayTeam === "string" ? e.strAwayTeam : "",
     status:
       e.intHomeScore != null && e.intAwayScore != null ? "final" : "scheduled",
     homeScore: e.intHomeScore != null ? Number(e.intHomeScore) : null,
