@@ -1,0 +1,140 @@
+"use client";
+import { useSession } from "next-auth/react";
+import { useState, useTransition } from "react";
+
+export default function PicksClient({
+  games,
+  allPicks,
+  tiebreakers,
+  season,
+  week,
+}: {
+  games: any[];
+  allPicks: any[];
+  tiebreakers: any[];
+  season: number;
+  week: number;
+}) {
+  const { data: session } = useSession();
+  const uid = session?.user?.id;
+  const [pending, start] = useTransition();
+  const [myTB, setMyTB] = useState<number | "">(
+    tiebreakers.find((t: any) => t.userId === uid)?.mnfTotalPointsGuess ?? ""
+  );
+
+  const myPicks = Object.fromEntries(
+    allPicks.filter((p) => p.userId === uid).map((p) => [p.gameId, p.pick])
+  );
+
+  async function pick(gameId: string, pick: "HOME" | "AWAY") {
+    start(async () => {
+      await fetch("/api/picks", {
+        method: "POST",
+        body: JSON.stringify({ gameId, pick }),
+      });
+      location.reload();
+    });
+  }
+
+  async function saveTB() {
+    if (myTB === "") return;
+    await fetch("/api/tiebreaker", {
+      method: "POST",
+      body: JSON.stringify({ season, week, mnfTotalPointsGuess: Number(myTB) }),
+    });
+    location.reload();
+  }
+
+  return (
+    <div className="max-w-5xl mx-auto p-6">
+      <h2 className="text-2xl font-semibold mb-4">
+        Week {week} · {season}
+      </h2>
+
+      <div className="rounded-xl border mb-6 p-4">
+        <h3 className="font-semibold mb-2">
+          Monday Night Tiebreaker (total points)
+        </h3>
+        <div className="flex gap-2 items-center">
+          <input
+            type="number"
+            className="border rounded-lg px-3 py-2"
+            value={myTB}
+            onChange={(e) =>
+              setMyTB(e.target.value === "" ? "" : Number(e.target.value))
+            }
+          />
+          <button
+            onClick={saveTB}
+            className="rounded-lg px-4 py-2 bg-[--color-brand] text-white"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+
+      <div className="grid gap-3">
+        {games.map((g) => {
+          const mine = myPicks[g.id] as "HOME" | "AWAY" | undefined;
+          const homeWon = g.status === "final" && g.homeScore > g.awayScore;
+          const awayWon = g.status === "final" && g.awayScore > g.homeScore;
+          return (
+            <div key={g.id} className="border rounded-xl p-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <div className="text-sm text-gray-500">
+                    {new Date(g.date).toLocaleString()}
+                  </div>
+                  <div className="font-semibold">
+                    {g.awayTeam} @ {g.homeTeam}
+                  </div>
+                  {g.status === "final" && (
+                    <div className="text-sm mt-1">
+                      Final: {g.awayScore} - {g.homeScore}
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    disabled={!uid}
+                    onClick={() => pick(g.id, "AWAY")}
+                    className={`px-3 py-2 rounded-lg border ${
+                      mine === "AWAY" ? "bg-black text-white" : ""
+                    } ${awayWon ? "ring-2 ring-green-500" : ""}`}
+                  >
+                    {g.awayTeam}
+                  </button>
+                  <button
+                    disabled={!uid}
+                    onClick={() => pick(g.id, "HOME")}
+                    className={`px-3 py-2 rounded-lg border ${
+                      mine === "HOME" ? "bg-black text-white" : ""
+                    } ${homeWon ? "ring-2 ring-green-500" : ""}`}
+                  >
+                    {g.homeTeam}
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-3 text-sm">
+                <span className="font-medium">All picks:</span>{" "}
+                {allPicks
+                  .filter((p) => p.gameId === g.id)
+                  .map((p) => (
+                    <span
+                      key={p.id}
+                      className={`inline-block px-2 py-1 rounded-full border mx-1 ${
+                        p.userId === uid ? "bg-gray-100" : ""
+                      }`}
+                    >
+                      {p.userId.slice(0, 6)}: {p.pick}
+                    </span>
+                  ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
