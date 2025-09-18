@@ -1,6 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 // Extend the session user type to include 'id'
 import type { DefaultSession } from "next-auth";
@@ -35,12 +35,21 @@ export default function PicksClient({
   const { data: session } = useSession();
 
   const uid = session?.user?.id;
+
   const [pending, start] = useTransition();
   const [myTB, setMyTB] = useState<number | "">(
     tiebreakers.find((t) => t.userId === uid)?.mnfTotalPointsGuess ?? ""
   );
 
-  console.log(session, myTB, tiebreakers, uid);
+  useEffect(() => {
+    setMyTB(
+      tiebreakers.find((t) => t.userId === uid)?.mnfTotalPointsGuess ?? ""
+    );
+
+    return () => {
+      setMyTB("");
+    };
+  }, [tiebreakers, uid]);
 
   const myPicks = Object.fromEntries(
     allPicks
@@ -102,74 +111,78 @@ export default function PicksClient({
       </div>
 
       <div className="grid gap-3">
-        {games.map((g) => {
-          const mine = myPicks[g.id] as "HOME" | "AWAY" | undefined;
-          const homeWon =
-            g.status === "final" &&
-            g.homeScore !== null &&
-            g.awayScore !== null &&
-            g.homeScore > g.awayScore;
-          const awayWon =
-            g.status === "final" &&
-            g.homeScore !== null &&
-            g.awayScore !== null &&
-            g.awayScore > g.homeScore;
-          return (
-            <div key={g.id} className="border rounded-xl p-4">
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="text-sm text-gray-500">
-                    {new Date(g.date).toLocaleString()}
-                  </div>
-                  <div className="font-semibold">
-                    {g.awayTeam} @ {g.homeTeam}
-                  </div>
-                  {g.status === "final" && (
-                    <div className="text-sm mt-1">
-                      Final: {g.awayScore} - {g.homeScore}
+        {games
+          .sort((a, b) => a.date.getTime() - b.date.getTime())
+          .map((g) => {
+            const mine = myPicks[g.id] as "HOME" | "AWAY" | undefined;
+            const homeWon =
+              g.status === "final" &&
+              g.homeScore !== null &&
+              g.awayScore !== null &&
+              g.homeScore > g.awayScore;
+            const awayWon =
+              g.status === "final" &&
+              g.homeScore !== null &&
+              g.awayScore !== null &&
+              g.awayScore > g.homeScore;
+            return (
+              <div key={g.id} className="border rounded-xl p-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <div className="text-sm text-gray-500">
+                      {new Date(g.date).toLocaleString()}
                     </div>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    disabled={!uid || g.status === "final" || pending}
-                    onClick={() => pick(g.id, "AWAY")}
-                    className={`px-3 py-2 rounded-lg border ${
-                      mine === "AWAY" ? "bg-black text-white" : ""
-                    } ${awayWon ? "ring-2 ring-green-500" : ""}`}
-                  >
-                    {g.awayTeam}
-                  </button>
-                  <button
-                    disabled={!uid || g.status === "final" || pending}
-                    onClick={() => pick(g.id, "HOME")}
-                    className={`px-3 py-2 rounded-lg border ${
-                      mine === "HOME" ? "bg-black text-white" : ""
-                    } ${homeWon ? "ring-2 ring-green-500" : ""}`}
-                  >
-                    {g.homeTeam}
-                  </button>
-                </div>
-              </div>
-
-              <div className="mt-3 text-sm">
-                <span className="font-medium">All picks:</span>{" "}
-                {allPicks
-                  .filter((p) => p.picks.gameId === g.id)
-                  .map((p) => (
-                    <span
-                      key={p.picks.id}
-                      className={`inline-block px-2 py-1 rounded-full border mx-1 ${
-                        p.picks.userId === uid ? "bg-gray-100" : ""
-                      }`}
+                    <div className="font-semibold">
+                      {g.awayTeam} @ {g.homeTeam}{" "}
+                      {g.isMondayNight && "(tiebreaker)"}
+                    </div>
+                    {g.status === "final" && (
+                      <div className="text-sm mt-1">
+                        Final: {g.awayScore} - {g.homeScore}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      disabled={!uid || g.status === "final" || pending}
+                      onClick={() => pick(g.id, "AWAY")}
+                      className={`px-3 py-2 rounded-lg border ${
+                        mine === "AWAY" ? "bg-black text-white" : ""
+                      } ${awayWon ? "ring-2 ring-green-500" : ""}`}
                     >
-                      {(p.users.name ?? "Unknown").slice(0, 6)}: {p.picks.pick}
-                    </span>
-                  ))}
+                      {g.awayTeam}
+                    </button>
+                    <button
+                      disabled={!uid || g.status === "final" || pending}
+                      onClick={() => pick(g.id, "HOME")}
+                      className={`px-3 py-2 rounded-lg border ${
+                        mine === "HOME" ? "bg-black text-white" : ""
+                      } ${homeWon ? "ring-2 ring-green-500" : ""}`}
+                    >
+                      {g.homeTeam}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mt-3 text-sm">
+                  <span className="font-medium">All picks:</span>{" "}
+                  {allPicks
+                    .filter((p) => p.picks.gameId === g.id)
+                    .map((p) => (
+                      <span
+                        key={p.picks.id}
+                        className={`inline-block px-2 py-1 rounded-full border mx-1 ${
+                          p.picks.userId === uid ? "bg-gray-100" : ""
+                        }`}
+                      >
+                        {(p.users.name ?? "Unknown").slice(0, 6)}:{" "}
+                        {p.picks.pick}
+                      </span>
+                    ))}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
     </div>
   );

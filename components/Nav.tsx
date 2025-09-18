@@ -16,7 +16,6 @@ export default function Nav() {
 
   const currentSeason = 2025;
   const currentWeek = 3;
-  console.log(session, user);
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b">
