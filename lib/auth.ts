@@ -8,7 +8,7 @@ type SessionWithId = Session & {
 };
 
 export async function requireSession() {
-  const session = (await getServerSession(authOptions)) as SessionWithId;
+  const session = (await getServerSession(authOptions as AuthOptions)) as SessionWithId;
   if (!session?.user?.id) throw new Error("Unauthorized");
   return session;
 }
