@@ -4,7 +4,6 @@ import Facebook from "next-auth/providers/facebook";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/db";
 import {
-  users,
   accounts,
   sessions,
   verificationTokens,
@@ -58,6 +57,7 @@ export const authOptions = {
 };
 
 import type { AuthOptions } from "next-auth";
+import { users } from "@/db/schema";
 
 const handler = NextAuth(authOptions as AuthOptions);
 export { handler as GET, handler as POST };
