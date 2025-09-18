@@ -6,8 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint",
-    "postinstall": "drizzle-kit push --force"
+    "lint": "eslint"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.10.0",
