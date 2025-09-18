@@ -1,20 +1,22 @@
 import { db } from "@/db";
-import { games, picks, weeklyTiebreakers } from "@/db/schema";
+import { games, picks, weeklyTiebreakers, users } from "@/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import { scoreUser } from "@/lib/scoring";
+import { getUserMap } from "@/lib/sportsdb";
 
 export default async function Leaderboard({
   params,
 }: {
   params: { season: string; week: string };
 }) {
-  const season = Number(params.season);
-  const week = Number(params.week);
+  const { season, week } = await params;
+  const seasonNumber = Number(season);
+  const weekNumber = Number(week);
 
   const gs = await db
     .select()
     .from(games)
-    .where(and(eq(games.season, season), eq(games.week, week)));
+    .where(and(eq(games.season, seasonNumber), eq(games.week, weekNumber)));
   const ps = await db
     .select()
     .from(picks)
@@ -29,11 +31,12 @@ export default async function Leaderboard({
     .from(weeklyTiebreakers)
     .where(
       and(
-        eq(weeklyTiebreakers.season, season),
-        eq(weeklyTiebreakers.week, week)
+        eq(weeklyTiebreakers.season, seasonNumber),
+        eq(weeklyTiebreakers.week, weekNumber)
       )
     );
 
+  const userMap = await getUserMap();
   const userIds = Array.from(new Set(ps.map((p) => p.userId)));
   const rows = userIds
     .map((uid) => ({
@@ -55,7 +58,7 @@ export default async function Leaderboard({
         <div className="mb-6 p-4 rounded-xl border bg-green-50">
           <div className="font-semibold">Winner:</div>
           <div>
-            {winner.uid.slice(0, 6)} · {winner.correct} correct{" "}
+            {userMap[winner.uid].slice(0, 6)} · {winner.correct} correct{" "}
             {winner.tieDistance != null ? `(TB +${winner.tieDistance})` : ""}
           </div>
         </div>
@@ -71,7 +74,7 @@ export default async function Leaderboard({
         <tbody>
           {rows.map((r) => (
             <tr key={r.uid} className="bg-white">
-              <td className="p-2">{r.uid.slice(0, 6)}</td>
+              <td className="p-2">{userMap[r.uid].slice(0, 6)}</td>
               <td className="p-2">{r.correct}</td>
               <td className="p-2">{r.tieDistance ?? "—"}</td>
             </tr>

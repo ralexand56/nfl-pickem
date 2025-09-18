@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { games, picks, weeklyTiebreakers } from "@/db/schema";
+import { games, picks, weeklyTiebreakers, users } from "@/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import PicksClient from "./picks-client";
 
@@ -8,18 +8,19 @@ export default async function WeekPage({
 }: {
   params: { season: string; week: string };
 }) {
-  const season = Number(await params.season);
-  const week = Number(await params.week);
-
+  const { season, week } = await params;
+  const seasonNumber = Number(season);
+  const weekNumber = Number(week);
   try {
     const gs = await db
       .select()
       .from(games)
-      .where(and(eq(games.season, season), eq(games.week, week)));
+      .where(and(eq(games.season, seasonNumber), eq(games.week, weekNumber)));
 
     const allPicks = await db
       .select()
       .from(picks)
+      .innerJoin(users, eq(picks.userId, users.id))
       .where(
         inArray(
           picks.gameId,
@@ -32,8 +33,8 @@ export default async function WeekPage({
       .from(weeklyTiebreakers)
       .where(
         and(
-          eq(weeklyTiebreakers.season, season),
-          eq(weeklyTiebreakers.week, week)
+          eq(weeklyTiebreakers.season, seasonNumber),
+          eq(weeklyTiebreakers.week, weekNumber)
         )
       );
 
@@ -42,8 +43,8 @@ export default async function WeekPage({
         games={gs}
         allPicks={allPicks}
         tiebreakers={tbs}
-        season={season}
-        week={week}
+        season={seasonNumber}
+        week={weekNumber}
       />
     );
   } catch (error) {

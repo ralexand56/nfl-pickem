@@ -4,7 +4,12 @@ import { useState, useTransition } from "react";
 
 // Extend the session user type to include 'id'
 import type { DefaultSession } from "next-auth";
-import { SelectGame, SelectPick, SelectWeeklyTiebreaker } from "@/db/schema";
+import {
+  SelectGame,
+  SelectUser,
+  SelectPick,
+  SelectWeeklyTiebreaker,
+} from "@/db/schema";
 
 declare module "next-auth" {
   interface Session {
@@ -22,20 +27,25 @@ export default function PicksClient({
   week,
 }: {
   games: SelectGame[];
-  allPicks: SelectPick[];
+  allPicks: { picks: SelectPick; users: SelectUser }[];
   tiebreakers: SelectWeeklyTiebreaker[];
   season: number;
   week: number;
 }) {
   const { data: session } = useSession();
+
   const uid = session?.user?.id;
-  const [_, start] = useTransition();
+  const [pending, start] = useTransition();
   const [myTB, setMyTB] = useState<number | "">(
     tiebreakers.find((t) => t.userId === uid)?.mnfTotalPointsGuess ?? ""
   );
 
+  console.log(session, myTB, tiebreakers, uid);
+
   const myPicks = Object.fromEntries(
-    allPicks.filter((p) => p.userId === uid).map((p) => [p.gameId, p.pick])
+    allPicks
+      .filter((p) => p.picks.userId === uid)
+      .map((p) => [p.picks.gameId, p.picks.pick])
   );
 
   async function pick(gameId: string, pick: "HOME" | "AWAY") {
@@ -60,7 +70,7 @@ export default function PicksClient({
   return (
     <div className="max-w-5xl mx-auto p-6">
       <h2 className="text-2xl font-semibold mb-4">
-        Week {week} · {season}
+        Week {week} · {season} {pending && "(updating...)"}
       </h2>
 
       <div className="rounded-xl border mb-6 p-4">
@@ -84,7 +94,7 @@ export default function PicksClient({
           />
           <button
             onClick={saveTB}
-            className="rounded-lg px-4 py-2 bg-[--color-brand] text-white"
+            className="rounded-lg px-4 py-2 bg-black text-white"
           >
             Save
           </button>
@@ -122,7 +132,7 @@ export default function PicksClient({
                 </div>
                 <div className="flex gap-2">
                   <button
-                    disabled={!uid}
+                    disabled={!uid || g.status === "final" || pending}
                     onClick={() => pick(g.id, "AWAY")}
                     className={`px-3 py-2 rounded-lg border ${
                       mine === "AWAY" ? "bg-black text-white" : ""
@@ -131,7 +141,7 @@ export default function PicksClient({
                     {g.awayTeam}
                   </button>
                   <button
-                    disabled={!uid}
+                    disabled={!uid || g.status === "final" || pending}
                     onClick={() => pick(g.id, "HOME")}
                     className={`px-3 py-2 rounded-lg border ${
                       mine === "HOME" ? "bg-black text-white" : ""
@@ -145,15 +155,15 @@ export default function PicksClient({
               <div className="mt-3 text-sm">
                 <span className="font-medium">All picks:</span>{" "}
                 {allPicks
-                  .filter((p) => p.gameId === g.id)
+                  .filter((p) => p.picks.gameId === g.id)
                   .map((p) => (
                     <span
-                      key={p.id}
+                      key={p.picks.id}
                       className={`inline-block px-2 py-1 rounded-full border mx-1 ${
-                        p.userId === uid ? "bg-gray-100" : ""
+                        p.picks.userId === uid ? "bg-gray-100" : ""
                       }`}
                     >
-                      {p.userId.slice(0, 6)}: {p.pick}
+                      {(p.users.name ?? "Unknown").slice(0, 6)}: {p.picks.pick}
                     </span>
                   ))}
               </div>

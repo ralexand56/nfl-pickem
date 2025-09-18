@@ -4,7 +4,7 @@ import Nav from "@/components/Nav";
 import SessionProvider from "./providers";
 
 export const metadata: Metadata = {
-  title: "NFL Pick’em",
+  title: "Alexander NFL Pick’em",
   description: "Weekly NFL pick’em with Google/Facebook login",
 };
 

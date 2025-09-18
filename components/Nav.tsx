@@ -15,14 +15,15 @@ export default function Nav() {
   const user = session?.user as User;
 
   const currentSeason = 2025;
-  const currentWeek = 1;
+  const currentWeek = 3;
+  console.log(session, user);
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b">
       <nav className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/" className="font-bold text-lg">
-            NFL Pick’em
+            Alexander NFL Pick’em
           </Link>
           <div className="hidden sm:flex items-center gap-3 text-sm text-gray-600">
             <Link href="/" className="hover:underline">

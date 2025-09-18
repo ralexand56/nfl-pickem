@@ -58,13 +58,12 @@ export const picks = pgTable(
   ]
 );
 
+// db/schema.ts
 export const weeklyTiebreakers = pgTable(
   "weekly_tiebreakers",
   {
     id: serial("id").primaryKey(),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
+    userId: varchar("user_id", { length: 191 }).notNull(),
     season: integer("season").notNull(),
     week: integer("week").notNull(),
     mnfTotalPointsGuess: integer("mnf_total_points_guess").notNull(),
