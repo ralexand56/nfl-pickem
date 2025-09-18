@@ -1,3 +1,4 @@
+// db/schema.ts
 import {
   pgTable,
   serial,
@@ -7,20 +8,22 @@ import {
   timestamp,
   boolean,
   uniqueIndex,
+  uuid,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
-export const users = pgTable(
-  "users",
-  {
-    id: varchar("id", { length: 191 }).primaryKey(),
-    name: text("name"),
-    email: text("email"),
-    emailVerified: timestamp("emailVerified", { withTimezone: true }),
-    image: text("image"),
-  },
-  (t) => [{ emailIdx: uniqueIndex("users_email_idx").on(t.email) }]
-);
+// --- USERS (UUID with default + emailVerified) ---
+export const users = pgTable("users", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  name: text("name"),
+  email: text("email").unique(),
+  emailVerified: timestamp("emailVerified", { withTimezone: true }),
+  image: text("image"),
+});
 
+// --- Your app tables (reference users.id as UUID) ---
 export const games = pgTable("games", {
   id: varchar("id", { length: 64 }).primaryKey(),
   season: integer("season").notNull(),
@@ -38,9 +41,11 @@ export const picks = pgTable(
   "picks",
   {
     id: serial("id").primaryKey(),
-    userId: varchar("user_id", { length: 191 }).notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     gameId: varchar("game_id", { length: 64 }).notNull(),
-    pick: text("pick").notNull(), // "HOME" | "AWAY"
+    pick: text("pick").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
   (t) => [
@@ -57,7 +62,9 @@ export const weeklyTiebreakers = pgTable(
   "weekly_tiebreakers",
   {
     id: serial("id").primaryKey(),
-    userId: varchar("user_id", { length: 191 }).notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     season: integer("season").notNull(),
     week: integer("week").notNull(),
     mnfTotalPointsGuess: integer("mnf_total_points_guess").notNull(),
@@ -69,6 +76,8 @@ export const weeklyTiebreakers = pgTable(
     },
   ]
 );
+
+// (your types can remain as-is)
 
 export type InsertUser = typeof users.$inferInsert;
 export type SelectUser = typeof users.$inferSelect;

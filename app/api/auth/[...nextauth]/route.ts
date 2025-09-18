@@ -1,18 +1,11 @@
+// app/api/auth/[...nextauth]/route.ts
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import Facebook from "next-auth/providers/facebook";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/db";
-import {
-  accounts,
-  sessions,
-  verificationTokens,
-} from "@/db/auth-schema";
-// import * as schema from "@/db/schema";
-console.log(process.env.GOOGLE_CLIENT_ID);
-console.log(process.env.GOOGLE_CLIENT_SECRET);
-console.log(process.env.FACEBOOK_CLIENT_ID);
-console.log(process.env.FACEBOOK_CLIENT_SECRET);
+import { users } from "@/db/schema";
+import { accounts, sessions, verificationTokens } from "@/db/auth-schema";
 
 export const authOptions = {
   adapter: DrizzleAdapter(db, {
@@ -23,41 +16,30 @@ export const authOptions = {
   }),
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
     Facebook({
-      clientId: process.env.FACEBOOK_CLIENT_ID || "",
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET || "",
+      clientId: process.env.FACEBOOK_CLIENT_ID!,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
     }),
   ],
-  session: { strategy: "jwt" as const },
+  session: { strategy: "jwt" },
   callbacks: {
     async session({
       session,
       token,
     }: {
-      session: {
-        user?: { id?: string } & Record<string, unknown>;
-        expires?: string;
-      };
-      token: { sub?: string };
+      session: import("next-auth").Session;
+      token: import("next-auth/jwt").JWT;
     }) {
-      if (session.user && token.sub) session.user.id = token.sub;
-      // Ensure the returned object matches the Session type (must include expires)
-      const newSession = {
-        ...session,
-        user: session.user,
-        expires: session.expires,
-      };
-      console.log("SESSION CALLBACK", { session, token, newSession });
-      return { ...newSession };
+      if (session.user && token.sub) session.user.id = token.sub; // UUID string
+      return session;
     },
   },
 };
 
-import type { AuthOptions } from "next-auth";
-import { users } from "@/db/schema";
+import type { NextAuthOptions } from "next-auth";
 
-const handler = NextAuth(authOptions as AuthOptions);
+const handler = NextAuth(authOptions as NextAuthOptions);
 export { handler as GET, handler as POST };

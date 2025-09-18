@@ -1,19 +1,19 @@
+// db/auth-schema.ts
 import {
   pgTable,
   text,
-  varchar,
   timestamp,
   integer,
   primaryKey,
+  uuid,
+  varchar,
 } from "drizzle-orm/pg-core";
-// Import or define the users table before referencing it below
-import { users } from "./schema"; // Adjust the path as needed
+import { users } from "./schema"; // <-- path ok since users is defined there
 
-/** OAuth Accounts */
 export const accounts = pgTable(
   "accounts",
   {
-    userId: varchar("userId", { length: 191 })
+    userId: uuid("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     type: varchar("type", { length: 255 }).notNull(),
@@ -34,18 +34,16 @@ export const accounts = pgTable(
   ]
 );
 
-/** Database sessions (only if you use database session strategy) */
 export const sessions = pgTable("sessions", {
   sessionToken: varchar("sessionToken", { length: 255 }).primaryKey(),
-  userId: varchar("userId", { length: 191 })
+  userId: uuid("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   expires: timestamp("expires", { withTimezone: true }).notNull(),
 });
 
-/** Email/Magic-link tokens (only if you use magic links) */
 export const verificationTokens = pgTable(
-  "verificationToken",
+  "verificationTokens",
   {
     identifier: varchar("identifier", { length: 255 }).notNull(),
     token: varchar("token", { length: 255 }).notNull(),
