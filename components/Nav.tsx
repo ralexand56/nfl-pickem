@@ -15,7 +15,7 @@ export default function Nav() {
   const user = session?.user as User;
 
   const currentSeason = 2025;
-  const currentWeek = 3;
+  const currentWeek = 4;
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b">
@@ -46,7 +46,9 @@ export default function Nav() {
         </div>
 
         <div className="flex items-center gap-3">
-          {user?.isAdmin && <AdminSyncWeekButton />}
+          {(user?.isAdmin || user?.email === "ralexand56@gmail.com") && (
+            <AdminSyncWeekButton />
+          )}
           {status === "loading" && (
             <span className="text-sm text-gray-500">…</span>
           )}

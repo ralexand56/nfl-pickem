@@ -1,6 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 
+const base = process.env.THESPORTSDB_API_BASE!; // e.g. https://www.thesportsdb.com/api/v1/json
+const key = process.env.THESPORTSDB_API_KEY!; // free test key "123" ok for dev
+
 export default function AdminSyncWeekButton() {
   const [seasonWeek, setSeasonWeek] = useState<{
     season: number;
@@ -10,7 +13,7 @@ export default function AdminSyncWeekButton() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch("/api/active-week")
+    fetch(`${base}/api/active-week`)
       .then((r) => r.json())
       .then(setSeasonWeek)
       .catch(() => setSeasonWeek(null));
