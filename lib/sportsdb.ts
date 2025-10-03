@@ -58,3 +58,19 @@ export function normalizeGame(e: SportsDbEvent): SelectGame {
     isMondayNight: dtEastern.weekday === 1, // 1 = Monday in luxon
   };
 }
+
+// lib/nflWeek.ts
+export async function getCurrentNflWeek(): Promise<number | null> {
+  try {
+    const res = await fetch(
+      "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard",
+      { next: { revalidate: 60 } } // cache for 60s
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    // Typical shape includes data.week.number (undocumented; can change)
+    return data?.week?.number ?? null;
+  } catch {
+    return null;
+  }
+}

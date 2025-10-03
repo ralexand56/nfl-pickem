@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import AdminSyncWeekButton from "@/components/AdminSyncWeekButton";
+import { getCurrentNflWeek } from "@/lib/sportsdb";
+import React from "react";
 
 type User = {
   name?: string | null;
@@ -12,10 +14,20 @@ type User = {
 
 export default function Nav() {
   const { data: session, status } = useSession();
+  const [currentWeek, setCurrentWeek] = React.useState<number | null>(null);
   const user = session?.user as User;
 
   const currentSeason = 2025;
-  const currentWeek = 4;
+
+  React.useEffect(() => {
+    async function fetchWeek() {
+      const week = await getCurrentNflWeek();
+      if (week) setCurrentWeek(week);
+    }
+    fetchWeek();
+  }, []);
+
+  if (currentWeek == null) return null; // still loading
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b">
