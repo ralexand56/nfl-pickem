@@ -2,8 +2,7 @@
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import AdminSyncWeekButton from "@/components/AdminSyncWeekButton";
-import { getCurrentNflWeek } from "@/lib/sportsdb";
-import React from "react";
+import React, { useEffect } from "react";
 
 type User = {
   name?: string | null;
@@ -19,12 +18,18 @@ export default function Nav() {
 
   const currentSeason = 2025;
 
-  React.useEffect(() => {
-    async function fetchWeek() {
-      const week = await getCurrentNflWeek();
-      if (week) setCurrentWeek(week);
-    }
-    fetchWeek();
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch('/api/current-week', { cache: 'no-store' });
+        const j = await r.json();
+        if (!cancelled) setCurrentWeek(j.week ?? null);
+      } catch {
+        if (!cancelled) setCurrentWeek(null);
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   if (currentWeek == null) return null; // still loading

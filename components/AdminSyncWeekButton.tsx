@@ -13,10 +13,19 @@ export default function AdminSyncWeekButton() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch(`${base}/api/active-week`)
-      .then((r) => r.json())
-      .then(setSeasonWeek)
-      .catch(() => setSeasonWeek(null));
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch("/api/current-week", { cache: "no-store" });
+        const j = await r.json();
+        if (!cancelled) setSeasonWeek({ season: 2025, week: j.week ?? null });
+      } catch {
+        if (!cancelled) setSeasonWeek(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function syncNow() {
