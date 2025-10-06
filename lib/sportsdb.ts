@@ -5,19 +5,26 @@ import { db } from "@/db";
 const base = process.env.THESPORTSDB_API_BASE!; // e.g. https://www.thesportsdb.com/api/v1/json
 const key = process.env.THESPORTSDB_API_KEY!; // free test key "123" ok for dev
 
-export async function fetchSeasonEvents(season: number) {
-  // NFL league id on TheSportsDB is 4391 /schedule/league/4391/2023-2024
+export async function fetchSeasonEvents(
+  season: number,
+  opts?: { noStore?: boolean }
+) {
   const url = `${base}/schedule/league/4391/${season}`;
-  const res = await fetch(url, {
+  const init: RequestInit & {
+    next?: { revalidate?: number };
+    cache?: RequestCache;
+  } = {
     method: "GET",
-    headers: {
-      "X-API-KEY": key,
-      Accept: "application/json",
-    },
-    next: { revalidate: 600 },
-  });
+    headers: { "X-API-KEY": key, Accept: "application/json" },
+  };
+  if (opts?.noStore) {
+    init.cache = "no-store";
+  } else {
+    init.next = { revalidate: 600 }; // your current behavior
+  }
 
-  if (!res.ok) throw new Error("SportsDB error");
+  const res = await fetch(url, init);
+  if (!res.ok) throw new Error(`SportsDB error ${res.status}`);
   const json = await res.json();
   return json.schedule ?? [];
 }

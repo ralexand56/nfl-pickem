@@ -3,7 +3,9 @@
         "luxon",
         "neondatabase",
         "nextauth",
+        "sportsdb",
         "thedatadb",
-        "THESPORTSDB"
+        "THESPORTSDB",
+        "upserts"
     ]
 }

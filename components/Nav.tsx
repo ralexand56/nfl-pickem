@@ -22,21 +22,23 @@ export default function Nav() {
     let cancelled = false;
     (async () => {
       try {
-        const r = await fetch('/api/current-week', { cache: 'no-store' });
+        const r = await fetch("/api/current-week", { cache: "no-store" });
         const j = await r.json();
         if (!cancelled) setCurrentWeek(j.week ?? null);
       } catch {
         if (!cancelled) setCurrentWeek(null);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   if (currentWeek == null) return null; // still loading
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b">
-      <nav className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <nav className="flex-col sm:flex-row max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/" className="font-bold text-lg">
             Alexander NFL Pick’em
@@ -61,11 +63,10 @@ export default function Nav() {
             )}
           </div>
         </div>
-
-        <div className="flex items-center gap-3">
-          {(user?.isAdmin || user?.email === "ralexand56@gmail.com") && (
+        <div className="flex-col flex items-center gap-3">
+          {/* {(user?.isAdmin || user?.email === "ralexand56@gmail.com") && (
             <AdminSyncWeekButton />
-          )}
+          )} */}
           {status === "loading" && (
             <span className="text-sm text-gray-500">…</span>
           )}
@@ -98,6 +99,25 @@ export default function Nav() {
               </button>
             </div>
           )}
+          <div className="sm:hidden flex justify-between items-center gap-3 text-sm text-gray-600">
+            <Link href="/" className="hover:underline">
+              Weeks
+            </Link>
+            <Link
+              href={`/week/${currentSeason}/${currentWeek}/leaderboard`}
+              className="hover:underline"
+            >
+              Leaderboard
+            </Link>
+            {user && (
+              <Link
+                href={`/week/${currentSeason}/${currentWeek}`}
+                className="hover:underline"
+              >
+                My Picks
+              </Link>
+            )}
+          </div>
         </div>
       </nav>
     </header>
