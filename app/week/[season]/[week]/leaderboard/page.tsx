@@ -70,7 +70,7 @@ export default async function Leaderboard({
           <tr className="text-left text-sm text-gray-500">
             <th>User</th>
             <th>Correct</th>
-            <th>Tiebreak Number</th>
+            <th>Tiebreak</th>
             <th>Tiebreaker Diff</th>
           </tr>
         </thead>
