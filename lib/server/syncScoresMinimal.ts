@@ -47,7 +47,6 @@ export async function syncScoresMinimal({
   const schedule: SportsDbEvent[] = await fetchSeasonEvents(seasonYear, {
     noStore: force,
   });
-  console.log({schedule})
   const rows = Number.isFinite(week)
     ? schedule.filter((e) => Number(e.intRound ?? 0) === week)
     : schedule;

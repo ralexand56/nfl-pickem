@@ -51,8 +51,6 @@ export default async function Leaderboard({
 
   const winner = rows[0];
 
-  console.log({ season, week, rows });
-
   return (
     <main className="max-w-3xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Week {week} Leaderboard</h1>
