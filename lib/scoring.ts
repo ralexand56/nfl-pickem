@@ -45,5 +45,6 @@ export function scoreUser(
     const actualTotal = mnf.homeScore! + mnf.awayScore!;
     tieDistance = Math.abs(actualTotal - tiebreaker.mnfTotalPointsGuess);
   }
-  return { correct, tieDistance };
+  const tb = tiebreaker ? tiebreaker.mnfTotalPointsGuess : null;
+  return { correct, tieDistance, tb };
 }

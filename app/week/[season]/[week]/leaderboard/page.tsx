@@ -51,6 +51,8 @@ export default async function Leaderboard({
 
   const winner = rows[0];
 
+  console.log({ season, week, rows });
+
   return (
     <main className="max-w-3xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Week {week} Leaderboard</h1>
@@ -68,7 +70,8 @@ export default async function Leaderboard({
           <tr className="text-left text-sm text-gray-500">
             <th>User</th>
             <th>Correct</th>
-            <th>Tiebreaker Δ</th>
+            <th>Tiebreak Number</th>
+            <th>Tiebreaker Diff</th>
           </tr>
         </thead>
         <tbody>
@@ -76,6 +79,7 @@ export default async function Leaderboard({
             <tr key={r.uid} className="bg-white">
               <td className="p-2">{userMap[r.uid].slice(0, 6)}</td>
               <td className="p-2">{r.correct}</td>
+              <td className="p-2">{r.tb}</td>
               <td className="p-2">{r.tieDistance ?? "—"}</td>
             </tr>
           ))}
