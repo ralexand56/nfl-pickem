@@ -2,7 +2,7 @@
 import "server-only";
 import { db } from "@/db";
 import { games } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, ne, inArray } from "drizzle-orm";
 import { fetchSeasonEvents } from "@/lib/sportsdb";
 
 type SportsDbEvent = {
@@ -29,11 +29,8 @@ const mapStatus = (
 };
 
 /**
- * Update ONLY status, homeScore, awayScore for rows that already exist.
- * - seasonLabel: "2025-2026" (SportsDB)
- * - seasonYear: 2025 (your DB season)
- * - week: optional filter to reduce work (recommended)
- * - force: fetch with cache: 'no-store' (for admin refresh)
+ * Update ONLY status, homeScore, awayScore for games that are final in the API.
+ * Skip games that are already final in our database.
  */
 export async function syncScoresMinimal({
   seasonYear,
@@ -44,42 +41,60 @@ export async function syncScoresMinimal({
   week?: number;
   force?: boolean;
 }) {
+  // 1. Fetch ALL events from API
   const schedule: SportsDbEvent[] = await fetchSeasonEvents(seasonYear, {
     noStore: force,
   });
-  const rows = Number.isFinite(week)
+  const apiEvents = Number.isFinite(week)
     ? schedule.filter((e) => Number(e.intRound ?? 0) === week)
     : schedule;
 
-  let updates = 0,
-    skipped = 0,
-    missing = 0;
+  // 2. Filter API events to only those that are FINAL
+  const finalApiEvents = apiEvents.filter(
+    (e) => mapStatus(e.strStatus) === "final"
+  );
 
-  for (const e of rows) {
+  if (finalApiEvents.length === 0) {
+    return { ok: true, updates: 0, skipped: 0, missing: 0, scanned: 0 };
+  }
+
+  // 3. Get game IDs that are final in API
+  const finalGameIds = finalApiEvents.map((e) => e.idEvent);
+
+  // 4. Get games from database that are NOT already final
+  const nonFinalGamesInDb = await db
+    .select({
+      id: games.id,
+      status: games.status,
+      homeScore: games.homeScore,
+      awayScore: games.awayScore,
+    })
+    .from(games)
+    .where(
+      and(
+        eq(games.season, seasonYear),
+        inArray(games.id, finalGameIds),
+        ne(games.status, "final") // Only get games that aren't already final
+      )
+    );
+
+  // 5. Create lookup map
+  const gameMap = new Map(nonFinalGamesInDb.map((g) => [g.id, g]));
+
+  // 6. Process only final API events that have non-final games in DB
+  const eventsToUpdate = finalApiEvents.filter((e) => gameMap.has(e.idEvent));
+
+  let updates = 0,
+    skipped = 0;
+
+  for (const e of eventsToUpdate) {
     const id = e.idEvent;
-    const status = mapStatus(e.strStatus);
     const home = toInt(e.intHomeScore);
     const away = toInt(e.intAwayScore);
 
-    // Read current values so we only write if something changed
-    const [current] = await db
-      .select({
-        status: games.status,
-        homeScore: games.homeScore,
-        awayScore: games.awayScore,
-      })
-      .from(games)
-      .where(and(eq(games.id, id), eq(games.season, seasonYear)));
-
-    if (!current) {
-      // Row doesn't exist in your DB — per your request we do NOT insert.
-      // (If you want optional insert, I can add a flag to do an upsert.)
-      missing++;
-      continue;
-    }
+    const current = gameMap.get(id)!; // We know it exists
 
     const unchanged =
-      (current.status ?? "scheduled") === status &&
       (current.homeScore ?? null) === home &&
       (current.awayScore ?? null) === away;
 
@@ -88,17 +103,28 @@ export async function syncScoresMinimal({
       continue;
     }
 
+    // Update to final status with scores
     await db
       .update(games)
       .set({
-        status,
-        homeScore: home, // can be null if provider omits score
-        awayScore: away, // "
+        status: "final",
+        homeScore: home,
+        awayScore: away,
       })
       .where(and(eq(games.id, id), eq(games.season, seasonYear)));
 
     updates++;
   }
 
-  return { ok: true, updates, skipped, missing, scanned: rows.length };
+  const alreadyFinal = finalApiEvents.length - eventsToUpdate.length;
+  const missing = finalGameIds.length - nonFinalGamesInDb.length - alreadyFinal;
+
+  return {
+    ok: true,
+    updates,
+    skipped,
+    missing,
+    alreadyFinal,
+    scanned: eventsToUpdate.length,
+  };
 }

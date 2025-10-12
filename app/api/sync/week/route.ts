@@ -4,29 +4,40 @@ import { games } from "@/db/schema";
 import { fetchWeekEvents, normalizeGame } from "@/lib/sportsdb";
 
 export async function POST(req: Request) {
-  const { season, week } = await req.json();
-  const events = await fetchWeekEvents(season, week);
-  for (const e of events) {
-    const g = normalizeGame(e);
-    await db
-      .insert(games)
-      .values({
-        ...g,
-      })
-      .onConflictDoUpdate({
-        target: games.id,
-        set: {
-          season: g.season,
-          week: g.week,
-          date: new Date(g.date),
-          homeTeam: g.homeTeam,
-          awayTeam: g.awayTeam,
-          status: g.status,
-          homeScore: g.homeScore ?? null,
-          awayScore: g.awayScore ?? null,
-          isMondayNight: g.isMondayNight ?? false,
-        },
-      });
+  try {
+    const { season, week } = await req.json();
+    
+    const events = await fetchWeekEvents(season, week);
+    
+    for (const e of events) {
+      const g = normalizeGame(e);
+      await db
+        .insert(games)
+        .values({
+          ...g,
+        })
+        .onConflictDoUpdate({
+          target: games.id,
+          set: {
+            season: g.season,
+            week: g.week,
+            date: new Date(g.date),
+            homeTeam: g.homeTeam,
+            awayTeam: g.awayTeam,
+            status: g.status,
+            homeScore: g.homeScore ?? null,
+            awayScore: g.awayScore ?? null,
+            isMondayNight: g.isMondayNight ?? false,
+          },
+        });
+    }
+    return NextResponse.json({ count: events.length });
+  } catch (error) {
+    console.error('API Error:', error);
+    const details = error instanceof Error ? error.message : String(error);
+    return NextResponse.json(
+      { error: 'Failed to sync week data', details },
+      { status: 500 }
+    );
   }
-  return NextResponse.json({ count: events.length });
 }

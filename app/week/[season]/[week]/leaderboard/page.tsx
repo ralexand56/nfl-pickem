@@ -1,8 +1,9 @@
 import { db } from "@/db";
-import { games, picks, weeklyTiebreakers, users } from "@/db/schema";
+import { games, picks, weeklyTiebreakers } from "@/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import { scoreUser } from "@/lib/scoring";
 import { getUserMap } from "@/lib/sportsdb";
+import { syncScoresMinimal } from "@/lib/server/syncScoresMinimal";
 
 export default async function Leaderboard({
   params,
@@ -13,10 +14,18 @@ export default async function Leaderboard({
   const seasonNumber = Number(season);
   const weekNumber = Number(week);
 
+  // Sync scores before loading page data
+  await syncScoresMinimal({
+    seasonYear: seasonNumber,
+    week: weekNumber,
+    force: false, // Use cache unless you want fresh data every time
+  });
+
   const gs = await db
     .select()
     .from(games)
     .where(and(eq(games.season, seasonNumber), eq(games.week, weekNumber)));
+
   const ps = await db
     .select()
     .from(picks)
