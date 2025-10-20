@@ -4,6 +4,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { scoreUser } from "@/lib/scoring";
 import { getUserMap } from "@/lib/sportsdb";
 import { syncScoresMinimal } from "@/lib/server/syncScoresMinimal";
+import Image from "next/image";
 
 export default async function Leaderboard({
   params,
@@ -67,7 +68,7 @@ export default async function Leaderboard({
         <div className="mb-6 p-4 rounded-xl border bg-green-50">
           <div className="font-semibold">Winner:</div>
           <div>
-            {userMap[winner.uid].slice(0, 6)} · {winner.correct} correct{" "}
+            {userMap[winner.uid].name.slice(0, 6)} · {winner.correct} correct{" "}
             {winner.tieDistance != null ? `(TB +${winner.tieDistance})` : ""}
           </div>
         </div>
@@ -75,6 +76,7 @@ export default async function Leaderboard({
       <table className="w-full border-separate border-spacing-y-2">
         <thead>
           <tr className="text-left text-sm text-gray-500">
+            <th> </th>
             <th>User</th>
             <th>Correct</th>
             <th>Tiebreak</th>
@@ -84,7 +86,16 @@ export default async function Leaderboard({
         <tbody>
           {rows.map((r) => (
             <tr key={r.uid} className="bg-white">
-              <td className="p-2">{userMap[r.uid].slice(0, 6)}</td>
+              <td className="p-2">
+                <Image
+                  src={userMap[r.uid].image || ""}
+                  alt={userMap[r.uid].name}
+                  width={40}
+                  height={40}
+                  className="rounded-full"
+                />
+              </td>
+              <td className="p-2">{userMap[r.uid].name.slice(0, 6)}</td>
               <td className="p-2">{r.correct}</td>
               <td className="p-2">{r.tb}</td>
               <td className="p-2">{r.tieDistance ?? "—"}</td>
