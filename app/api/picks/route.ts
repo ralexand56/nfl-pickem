@@ -31,9 +31,24 @@ export async function POST(req: Request) {
   const session = await requireSession();
   const { gameId, pick } = await req.json();
 
-  const [exists] = await db.select().from(games).where(eq(games.id, gameId));
-  if (!exists)
+  const [game] = await db.select().from(games).where(eq(games.id, gameId));
+  if (!game)
     return NextResponse.json({ error: "Unknown game" }, { status: 400 });
+
+  // Enforce cutoff: no picks after the first game of the week has started
+  const [firstGame] = await db
+    .select()
+    .from(games)
+    .where(and(eq(games.season, game.season), eq(games.week, game.week)))
+    .orderBy(games.date)
+    .limit(1);
+
+  if (firstGame && new Date().getTime() > new Date(firstGame.date).getTime()) {
+    return NextResponse.json(
+      { error: "Picks are closed for this week" },
+      { status: 403 }
+    );
+  }
 
   await db
     .insert(picks)

@@ -1,6 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 
 // Extend the session user type to include 'id'
 import type { DefaultSession } from "next-auth";
@@ -40,6 +40,7 @@ export default function PicksClient({
   const [myTB, setMyTB] = useState<number | "">(
     tiebreakers.find((t) => t.userId === uid)?.mnfTotalPointsGuess ?? ""
   );
+  const [nowMs, setNowMs] = useState<number>(Date.now());
 
   useEffect(() => {
     setMyTB(
@@ -50,6 +51,12 @@ export default function PicksClient({
       setMyTB("");
     };
   }, [tiebreakers, uid]);
+
+  // Ticking clock for live countdown
+  useEffect(() => {
+    const intervalId = setInterval(() => setNowMs(Date.now()), 1000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   const myPicks = Object.fromEntries(
     allPicks
@@ -76,11 +83,42 @@ export default function PicksClient({
     location.reload();
   }
 
+  // Determine if the cutoff (first game of the week) has passed in user's local time
+  const firstGameTimeMs = useMemo(() => {
+    if (!games.length) return null;
+    return Math.min(...games.map((g) => new Date(g.date).getTime()));
+  }, [games]);
+  const msRemaining = firstGameTimeMs == null ? null : firstGameTimeMs - nowMs;
+  const cutoffPassed = msRemaining != null ? msRemaining <= 0 : false;
+
+  function formatRemaining(ms: number) {
+    const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    const hh = String(hours).padStart(2, "0");
+    const mm = String(minutes).padStart(2, "0");
+    const ss = String(seconds).padStart(2, "0");
+    return days > 0 ? `${days}d ${hh}:${mm}:${ss}` : `${hh}:${mm}:${ss}`;
+  }
+
   return (
     <div className="max-w-5xl mx-auto p-6">
       <h2 className="text-2xl font-semibold mb-4">
         Week {week} · {season} {pending && "(updating...)"}
       </h2>
+
+      {firstGameTimeMs != null && (
+        <div className={`rounded-xl border mb-6 p-4 ${cutoffPassed ? "bg-gray-50" : "bg-yellow-50"}`}>
+          <div className="flex items-center justify-between">
+            <div className="font-semibold">{cutoffPassed ? "Picks closed" : "Time remaining to make your picks"}</div>
+            <div className="text-sm">
+              {cutoffPassed ? "00:00:00" : formatRemaining(msRemaining!)}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="rounded-xl border mb-6 p-4">
         <h3 className="font-semibold mb-2">
@@ -144,20 +182,22 @@ export default function PicksClient({
                   </div>
                   <div className="flex gap-2">
                     <button
-                      disabled={!uid || g.status === "final" || pending}
+                      disabled={!uid || g.status === "final" || pending || cutoffPassed}
                       onClick={() => pick(g.id, "AWAY")}
-                      className={`px-3 py-2 rounded-lg border ${
+                      className={`px-3 py-2 rounded-lg border cursor-pointer disabled:cursor-not-allowed ${
                         mine === "AWAY" ? "bg-black text-white" : ""
                       } ${awayWon ? "ring-2 ring-green-500" : ""}`}
+                      title={cutoffPassed ? "Picks are closed for this week" : undefined}
                     >
                       {g.awayTeam}
                     </button>
                     <button
-                      disabled={!uid || g.status === "final" || pending}
+                      disabled={!uid || g.status === "final" || pending || cutoffPassed}
                       onClick={() => pick(g.id, "HOME")}
-                      className={`px-3 py-2 rounded-lg border ${
+                      className={`px-3 py-2 rounded-lg border cursor-pointer disabled:cursor-not-allowed ${
                         mine === "HOME" ? "bg-black text-white" : ""
                       } ${homeWon ? "ring-2 ring-green-500" : ""}`}
+                      title={cutoffPassed ? "Picks are closed for this week" : undefined}
                     >
                       {g.homeTeam}
                     </button>
