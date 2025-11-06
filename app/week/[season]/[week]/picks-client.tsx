@@ -164,7 +164,7 @@ export default function PicksClient({
               g.awayScore !== null &&
               g.awayScore > g.homeScore;
             return (
-              <div key={g.id} className="border rounded-xl p-4">
+              <div key={g.id} className={`border rounded-xl p-4 ${g.isMondayNight ? "bg-gray-300" : ""}`}>
                 <div className="flex justify-between items-center">
                   <div>
                     <div className="text-sm text-gray-500">
