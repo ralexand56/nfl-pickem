@@ -117,12 +117,19 @@ export default function GamesEditor({
                     className="border rounded-xl p-4 bg-gray-50"
                   >
                     <input type="hidden" name="gameId" value={game.id} />
+                    <p className="text-xs text-gray-500 mb-4 break-all">
+                      Game ID: {game.id}
+                    </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm text-gray-600 mb-1">
+                        <label
+                          htmlFor={`away-team-${game.id}`}
+                          className="block text-sm text-gray-600 mb-1"
+                        >
                           Away Team
                         </label>
                         <input
+                          id={`away-team-${game.id}`}
                           type="text"
                           name="awayTeam"
                           defaultValue={game.awayTeam}
@@ -131,10 +138,14 @@ export default function GamesEditor({
                         />
                       </div>
                       <div>
-                        <label className="block text-sm text-gray-600 mb-1">
+                        <label
+                          htmlFor={`home-team-${game.id}`}
+                          className="block text-sm text-gray-600 mb-1"
+                        >
                           Home Team
                         </label>
                         <input
+                          id={`home-team-${game.id}`}
                           type="text"
                           name="homeTeam"
                           defaultValue={game.homeTeam}
@@ -143,10 +154,14 @@ export default function GamesEditor({
                         />
                       </div>
                       <div>
-                        <label className="block text-sm text-gray-600 mb-1">
+                        <label
+                          htmlFor={`date-${game.id}`}
+                          className="block text-sm text-gray-600 mb-1"
+                        >
                           Date & Time
                         </label>
                         <input
+                          id={`date-${game.id}`}
                           type="datetime-local"
                           name="date"
                           defaultValue={localDateString}
@@ -155,10 +170,14 @@ export default function GamesEditor({
                         />
                       </div>
                       <div>
-                        <label className="block text-sm text-gray-600 mb-1">
+                        <label
+                          htmlFor={`status-${game.id}`}
+                          className="block text-sm text-gray-600 mb-1"
+                        >
                           Status
                         </label>
                         <select
+                          id={`status-${game.id}`}
                           name="status"
                           defaultValue={game.status}
                           className="w-full border rounded-lg px-3 py-2"
@@ -171,10 +190,14 @@ export default function GamesEditor({
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm text-gray-600 mb-1">
+                        <label
+                          htmlFor={`away-score-${game.id}`}
+                          className="block text-sm text-gray-600 mb-1"
+                        >
                           Away Score
                         </label>
                         <input
+                          id={`away-score-${game.id}`}
                           type="number"
                           name="awayScore"
                           defaultValue={game.awayScore ?? ""}
@@ -183,10 +206,14 @@ export default function GamesEditor({
                         />
                       </div>
                       <div>
-                        <label className="block text-sm text-gray-600 mb-1">
+                        <label
+                          htmlFor={`home-score-${game.id}`}
+                          className="block text-sm text-gray-600 mb-1"
+                        >
                           Home Score
                         </label>
                         <input
+                          id={`home-score-${game.id}`}
                           type="number"
                           name="homeScore"
                           defaultValue={game.homeScore ?? ""}
@@ -241,6 +268,9 @@ export default function GamesEditor({
                     </div>
                     <div className="text-sm text-gray-600 mt-1">
                       {new Date(game.date).toLocaleString()}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1 break-all">
+                      Game ID: {game.id}
                     </div>
                     <div className="text-sm mt-2">
                       <span className="font-medium">Status:</span> {game.status}
