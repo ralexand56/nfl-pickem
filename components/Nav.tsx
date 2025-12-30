@@ -16,7 +16,7 @@ export default function Nav() {
   const [currentWeek, setCurrentWeek] = React.useState<number | null>(null);
   const user = session?.user as User;
 
-  const currentSeason = 2025;
+  const currentSeason = currentWeek === 18 ? 2026 : 2025;
 
   useEffect(() => {
     let cancelled = false;
