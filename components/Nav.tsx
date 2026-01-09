@@ -16,7 +16,8 @@ export default function Nav() {
   const [currentWeek, setCurrentWeek] = React.useState<number | null>(null);
   const user = session?.user as User;
 
-  const currentSeason = currentWeek === 18 ? 2026 : 2025;
+  // Weeks 18-22 are in 2026 season (Week 18 + Playoffs)
+  const currentSeason = currentWeek && currentWeek >= 18 ? 2026 : 2025;
 
   useEffect(() => {
     let cancelled = false;

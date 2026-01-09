@@ -1,10 +1,11 @@
 import { db } from "@/db";
 import { games, picks, weeklyTiebreakers } from "@/db/schema";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, desc } from "drizzle-orm";
 import { scoreUser } from "@/lib/scoring";
 import { getUserMap } from "@/lib/sportsdb";
 import { syncScoresMinimal } from "@/lib/server/syncScoresMinimal";
 import Image from "next/image";
+import WeekSelector from "./week-selector";
 
 export default async function Leaderboard({
   params,
@@ -21,6 +22,12 @@ export default async function Leaderboard({
     week: weekNumber,
     force: false, // Use cache unless you want fresh data every time
   });
+
+  // Get all available weeks for the dropdown
+  const availableWeeks = await db
+    .selectDistinct({ week: games.week, season: games.season })
+    .from(games)
+    .orderBy(desc(games.season), desc(games.week));
 
   const gs = await db
     .select()
@@ -61,9 +68,28 @@ export default async function Leaderboard({
 
   const winner = rows[0];
 
+  // Week labels for playoffs
+  const WEEK_LABELS: Record<number, string> = {
+    19: "Wild Card",
+    20: "Divisional",
+    21: "Conference",
+    22: "Super Bowl",
+  };
+
+  const getWeekLabel = (wk: number) => {
+    return WEEK_LABELS[wk] || `Week ${wk}`;
+  };
+
   return (
     <main className="max-w-3xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Week {week} Leaderboard</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold">{getWeekLabel(weekNumber)} Leaderboard</h1>
+        <WeekSelector
+          availableWeeks={availableWeeks}
+          currentSeason={seasonNumber}
+          currentWeek={weekNumber}
+        />
+      </div>
       {winner && (
         <div className="mb-6 p-4 rounded-xl border bg-green-50">
           <div className="font-semibold">Winner:</div>
