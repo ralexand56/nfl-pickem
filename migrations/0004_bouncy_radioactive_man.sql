@@ -1,0 +1,1 @@
+ALTER TABLE "games" ADD COLUMN "is_tiebreaker" boolean DEFAULT false;

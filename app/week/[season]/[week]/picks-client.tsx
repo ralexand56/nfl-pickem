@@ -122,11 +122,11 @@ export default function PicksClient({
 
       <div className="rounded-xl border mb-6 p-4">
         <h3 className="font-semibold mb-2">
-          Monday Night Tiebreaker (total points)
+          Tiebreaker (total points in last game)
         </h3>
         <div className="flex gap-2 items-center">
           <label htmlFor="mnf-tiebreaker" className="sr-only">
-            Monday Night Tiebreaker Total Points
+            Tiebreaker Total Points
           </label>
           <input
             id="mnf-tiebreaker"
@@ -134,7 +134,7 @@ export default function PicksClient({
             className="border rounded-lg px-3 py-2"
             value={myTB}
             placeholder="Enter total points"
-            title="Monday Night Tiebreaker Total Points"
+            title="Tiebreaker Total Points"
             onChange={(e) =>
               setMyTB(e.target.value === "" ? "" : Number(e.target.value))
             }
@@ -164,7 +164,7 @@ export default function PicksClient({
               g.awayScore !== null &&
               g.awayScore > g.homeScore;
             return (
-              <div key={g.id} className={`border rounded-xl p-4 ${g.isMondayNight ? "bg-gray-300" : ""}`}>
+              <div key={g.id} className={`border rounded-xl p-4 ${g.isTiebreaker ? "bg-gray-300" : ""}`}>
                 <div className="flex justify-between items-center">
                   <div>
                     <div className="text-sm text-gray-500">
@@ -172,7 +172,7 @@ export default function PicksClient({
                     </div>
                     <div className="font-semibold">
                       {g.awayTeam} @ {g.homeTeam}{" "}
-                      {g.isMondayNight && "(tiebreaker)"}
+                      {g.isTiebreaker && "(tiebreaker)"}
                     </div>
                     {g.status === "final" && (
                       <div className="text-sm mt-1">

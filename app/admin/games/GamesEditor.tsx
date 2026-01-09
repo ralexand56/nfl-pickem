@@ -231,7 +231,21 @@ export default function GamesEditor({
                             className="w-4 h-4"
                           />
                           <span className="text-sm text-gray-600">
-                            Monday Night Game (Tiebreaker)
+                            Monday Night Game
+                          </span>
+                        </label>
+                      </div>
+                      <div>
+                        <label className="flex items-center gap-2 mt-6">
+                          <input
+                            type="checkbox"
+                            name="isTiebreaker"
+                            value="true"
+                            defaultChecked={game.isTiebreaker ?? false}
+                            className="w-4 h-4"
+                          />
+                          <span className="text-sm text-gray-600">
+                            Tiebreaker Game
                           </span>
                         </label>
                       </div>
@@ -285,7 +299,15 @@ export default function GamesEditor({
                         <>
                           {" · "}
                           <span className="text-blue-600 font-medium">
-                            Monday Night (Tiebreaker)
+                            Monday Night
+                          </span>
+                        </>
+                      )}
+                      {game.isTiebreaker && (
+                        <>
+                          {" · "}
+                          <span className="text-green-600 font-medium">
+                            Tiebreaker
                           </span>
                         </>
                       )}

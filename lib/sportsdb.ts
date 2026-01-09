@@ -29,7 +29,10 @@ export async function fetchSeasonEvents(
   return json.schedule ?? [];
 }
 
-type SportsDbEvent = {
+export type SportsDbEvent = {
+  idEvent: string;
+  dateEvent: string;
+  strTime: string;
   intRound: string | number;
   [key: string]: Record<string, unknown> | string | number | null | undefined;
 };
@@ -65,6 +68,7 @@ export function normalizeGame(e: SportsDbEvent): SelectGame {
     homeScore: e.intHomeScore != null ? Number(e.intHomeScore) : null,
     awayScore: e.intAwayScore != null ? Number(e.intAwayScore) : null,
     isMondayNight: dtEastern.weekday === 1, // 1 = Monday in luxon
+    isTiebreaker: false, // Will be set by sync logic
   };
 }
 

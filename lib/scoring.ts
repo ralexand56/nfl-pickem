@@ -33,16 +33,16 @@ export function scoreUser(
     const w = winners[p.gameId];
     if (w && w === p.pick) correct++;
   }
-  const mnf = games.find(
+  const tiebreakerGame = games.find(
     (g) =>
-      g.isMondayNight &&
+      g.isTiebreaker &&
       g.status === "final" &&
       g.homeScore != null &&
       g.awayScore != null
   );
   let tieDistance: number | null = null;
-  if (mnf && tiebreaker) {
-    const actualTotal = mnf.homeScore! + mnf.awayScore!;
+  if (tiebreakerGame && tiebreaker) {
+    const actualTotal = tiebreakerGame.homeScore! + tiebreakerGame.awayScore!;
     tieDistance = Math.abs(actualTotal - tiebreaker.mnfTotalPointsGuess);
   }
   const tb = tiebreaker ? tiebreaker.mnfTotalPointsGuess : null;

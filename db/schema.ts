@@ -35,6 +35,7 @@ export const games = pgTable("games", {
   homeScore: integer("home_score"),
   awayScore: integer("away_score"),
   isMondayNight: boolean("is_monday_night").default(false),
+  isTiebreaker: boolean("is_tiebreaker").default(false),
 });
 
 export const picks = pgTable(
@@ -63,7 +64,9 @@ export const weeklyTiebreakers = pgTable(
   "weekly_tiebreakers",
   {
     id: serial("id").primaryKey(),
-    userId: varchar("user_id", { length: 191 }).notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     season: integer("season").notNull(),
     week: integer("week").notNull(),
     mnfTotalPointsGuess: integer("mnf_total_points_guess").notNull(),

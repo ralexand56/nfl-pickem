@@ -58,6 +58,15 @@ export async function syncScores({
     ? schedule.filter((e) => toInt(e.intRound) === week)
     : schedule;
 
+  // Sort rows by date to find the last game for tiebreaker
+  const sortedRows = [...rows].sort((a, b) => {
+    const dateA = new Date(a.strTimestamp ?? a.dateEvent ?? "").getTime();
+    const dateB = new Date(b.strTimestamp ?? b.dateEvent ?? "").getTime();
+    return dateB - dateA;
+  });
+
+  const lastGameId = sortedRows.length > 0 ? sortedRows[0].idEvent : null;
+
   let upserts = 0;
   for (const e of rows) {
     const wk = toInt(e.intRound, 0);
@@ -66,6 +75,7 @@ export async function syncScores({
     const aScore = e.intAwayScore != null ? toInt(e.intAwayScore) : null;
     const kickoff =
       e.strTimestamp ?? (e.dateEvent ? `${e.dateEvent}T00:00:00Z` : null);
+    const isTiebreaker = e.idEvent === lastGameId;
 
     if (
       onlyTouchMeaningful &&
@@ -88,6 +98,7 @@ export async function syncScores({
         homeScore: hScore,
         awayScore: aScore,
         isMondayNight: isMNF(e.strTimestamp, e.dateEvent),
+        isTiebreaker,
       })
       .onConflictDoUpdate({
         target: games.id,
@@ -101,6 +112,7 @@ export async function syncScores({
           homeScore: hScore,
           awayScore: aScore,
           isMondayNight: isMNF(e.strTimestamp, e.dateEvent),
+          isTiebreaker,
         },
       });
 

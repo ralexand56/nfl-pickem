@@ -19,6 +19,7 @@ export async function updateGameAction(formData: FormData): Promise<void> {
   const homeScoreRaw = formData.get("homeScore");
   const awayScoreRaw = formData.get("awayScore");
   const isMondayNight = formData.get("isMondayNight") === "true";
+  const isTiebreaker = formData.get("isTiebreaker") === "true";
 
   const homeScore = homeScoreRaw && homeScoreRaw !== "" ? Number(homeScoreRaw) : null;
   const awayScore = awayScoreRaw && awayScoreRaw !== "" ? Number(awayScoreRaw) : null;
@@ -35,6 +36,7 @@ export async function updateGameAction(formData: FormData): Promise<void> {
       homeScore,
       awayScore,
       isMondayNight,
+      isTiebreaker,
     })
     .where(eq(games.id, gameId));
 
