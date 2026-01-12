@@ -117,6 +117,8 @@ export default function GamesEditor({
                     className="border rounded-xl p-4 bg-gray-50"
                   >
                     <input type="hidden" name="gameId" value={game.id} />
+                    <input type="hidden" name="season" value={game.season} />
+                    <input type="hidden" name="week" value={game.week} />
                     <p className="text-xs text-gray-500 mb-4 break-all">
                       Game ID: {game.id}
                     </p>

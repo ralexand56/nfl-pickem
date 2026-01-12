@@ -12,7 +12,7 @@ const playoffGames = [
     id: "playoff-2026-wc-1",
     season: 2026,
     week: 19,
-    date: new Date("2026-01-10T18:30:00Z"), // Saturday 1:30 PM ET
+    date: new Date("2026-01-10T21:30:00Z"), // Saturday 4:30 PM ET / 1:30 PM PST
     homeTeam: "Carolina Panthers",
     awayTeam: "Los Angeles Rams",
     status: "scheduled" as const,
@@ -25,7 +25,7 @@ const playoffGames = [
     id: "playoff-2026-wc-2",
     season: 2026,
     week: 19,
-    date: new Date("2026-01-10T22:00:00Z"), // Saturday 5:00 PM ET
+    date: new Date("2026-01-11T01:00:00Z"), // Saturday 8:00 PM ET / 5:00 PM PST
     homeTeam: "Chicago Bears",
     awayTeam: "Green Bay Packers",
     status: "scheduled" as const,
@@ -40,7 +40,7 @@ const playoffGames = [
     id: "playoff-2026-wc-3",
     season: 2026,
     week: 19,
-    date: new Date("2026-01-11T15:00:00Z"), // Sunday 10:00 AM ET
+    date: new Date("2026-01-11T18:00:00Z"), // Sunday 1:00 PM ET / 10:00 AM PST
     homeTeam: "Jacksonville Jaguars",
     awayTeam: "Buffalo Bills",
     status: "scheduled" as const,
@@ -53,7 +53,7 @@ const playoffGames = [
     id: "playoff-2026-wc-4",
     season: 2026,
     week: 19,
-    date: new Date("2026-01-11T18:30:00Z"), // Sunday 1:30 PM ET
+    date: new Date("2026-01-11T21:30:00Z"), // Sunday 4:30 PM ET / 1:30 PM PST
     homeTeam: "Philadelphia Eagles",
     awayTeam: "San Francisco 49ers",
     status: "scheduled" as const,
@@ -66,7 +66,7 @@ const playoffGames = [
     id: "playoff-2026-wc-5",
     season: 2026,
     week: 19,
-    date: new Date("2026-01-11T22:15:00Z"), // Sunday 5:15 PM ET
+    date: new Date("2026-01-12T01:15:00Z"), // Sunday 8:15 PM ET / 5:15 PM PST
     homeTeam: "New England Patriots",
     awayTeam: "Los Angeles Chargers",
     status: "scheduled" as const,
@@ -81,7 +81,7 @@ const playoffGames = [
     id: "playoff-2026-wc-6",
     season: 2026,
     week: 19,
-    date: new Date("2026-01-12T22:15:00Z"), // Monday 5:15 PM ET (LAST GAME - TIEBREAKER)
+    date: new Date("2026-01-13T01:15:00Z"), // Monday 8:15 PM ET / 5:15 PM PST (LAST GAME - TIEBREAKER)
     homeTeam: "Pittsburgh Steelers",
     awayTeam: "Houston Texans",
     status: "scheduled" as const,
