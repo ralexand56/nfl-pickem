@@ -29,7 +29,7 @@ export default function Home() {
 
         {/* Playoff Weeks */}
         <h2 className="text-xl font-semibold mt-6 mb-2">Playoffs</h2>
-        {[19].map((week) => {
+        {[19, 20].map((week) => {
           const season = 2026;
           return (
             <a
@@ -41,7 +41,7 @@ export default function Home() {
             </a>
           );
         })}
-        {/* Add more playoff weeks after Wild Card results are known */}
+        {/* Add Conference Championship and Super Bowl after Divisional results are known */}
       </div>
     </main>
   );
