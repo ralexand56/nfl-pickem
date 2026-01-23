@@ -7,10 +7,9 @@ import { claimSquareAction, unclaimSquareAction } from "./actions";
 import type {
   SelectSuperBowlSquare,
   SelectSuperBowlSquaresConfig,
-  SelectUser,
 } from "@/db/schema";
 
-type UserMap = Record<string, SelectUser>;
+type UserMap = Record<string, { name: string; image: string | null; email: string | null }>;
 
 export default function SquaresGrid({
   squares,

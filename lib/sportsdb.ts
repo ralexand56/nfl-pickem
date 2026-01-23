@@ -45,7 +45,7 @@ export async function fetchWeekEvents(season: number, week: number) {
 export async function getUserMap() {
   const userList = await db.select().from(users);
   return Object.fromEntries(
-    userList.map((u) => [u.id, { name: u.name || "", image: u.image }])
+    userList.map((u) => [u.id, { name: u.name || "", image: u.image, email: u.email }])
   );
 }
 
