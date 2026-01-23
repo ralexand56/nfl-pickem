@@ -3,13 +3,13 @@ import "server-only";
 
 // Free ESPN example (unofficial)
 export async function getCurrentNflWeek(): Promise<number | null> {
-  // HARDCODED: Divisional Playoffs (Jan 17-18, 2026)
+  // HARDCODED: Conference Championships (Jan 25, 2026)
   // Update this manually as playoffs progress:
   // - Week 19: Wild Card (Jan 10-12)
   // - Week 20: Divisional (Jan 17-18)
-  // - Week 21: Conference (Jan 26)
+  // - Week 21: Conference Championships (Jan 25)
   // - Week 22: Super Bowl (Feb 9)
-  return 20;
+  return 21;
 
   /* eslint-disable-next-line no-unreachable */
   try {
