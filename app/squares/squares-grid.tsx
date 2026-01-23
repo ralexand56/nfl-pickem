@@ -49,7 +49,7 @@ export default function SquaresGrid({
       return;
     }
 
-    if (config.isLocked || isBoardFull) {
+    if ((config.isLocked ?? false) || isBoardFull) {
       setError("Board is locked - no more changes can be made");
       return;
     }
@@ -142,7 +142,7 @@ export default function SquaresGrid({
                   disabled={
                     pending ||
                     (isOwned && !isMine) ||
-                    config.isLocked ||
+                    (config.isLocked ?? false) ||
                     isBoardFull
                   }
                   className={`w-16 h-16 text-xs flex items-center justify-center transition-colors ${
@@ -190,12 +190,12 @@ export default function SquaresGrid({
         ))}
       </div>
 
-      {isBoardFull && !config.isLocked ? (
+      {isBoardFull && !(config.isLocked ?? false) ? (
         <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg text-sm">
           <strong>Board is Full!</strong> All 100 squares are claimed. No more
           changes can be made. Waiting for admin to assign numbers.
         </div>
-      ) : !config.isLocked ? (
+      ) : !(config.isLocked ?? false) ? (
         <div className="mt-4 p-3 bg-yellow-50 rounded-lg text-sm">
           <strong>Note:</strong> Numbers will be randomly assigned after all
           squares are filled.

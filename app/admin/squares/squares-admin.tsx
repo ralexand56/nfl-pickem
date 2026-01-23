@@ -81,7 +81,7 @@ export default function SquaresAdmin({
               value={homeTeam}
               onChange={(e) => setHomeTeam(e.target.value)}
               className="w-full border rounded-lg px-3 py-2"
-              disabled={config.isLocked}
+              disabled={config.isLocked ?? false}
             />
           </div>
           <div>
@@ -93,7 +93,7 @@ export default function SquaresAdmin({
               value={awayTeam}
               onChange={(e) => setAwayTeam(e.target.value)}
               className="w-full border rounded-lg px-3 py-2"
-              disabled={config.isLocked}
+              disabled={config.isLocked ?? false}
             />
           </div>
           <div>
@@ -105,12 +105,12 @@ export default function SquaresAdmin({
               value={pricePerSquare}
               onChange={(e) => setPricePerSquare(Number(e.target.value))}
               className="w-full border rounded-lg px-3 py-2"
-              disabled={config.isLocked}
+              disabled={config.isLocked ?? false}
             />
           </div>
           <button
             onClick={handleUpdateConfig}
-            disabled={pending || config.isLocked}
+            disabled={pending || (config.isLocked ?? false)}
             className="px-4 py-2 bg-black text-white rounded-lg disabled:opacity-50"
           >
             {pending ? "Updating..." : "Update Configuration"}
