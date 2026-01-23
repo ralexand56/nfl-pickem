@@ -54,6 +54,9 @@ export default function Nav() {
             >
               Leaderboard
             </Link>
+            <Link href="/squares" className="hover:underline">
+              Squares
+            </Link>
             {user && (
               <Link
                 href={`/week/${currentSeason}/${currentWeek}`}
@@ -109,6 +112,9 @@ export default function Nav() {
               className="hover:underline"
             >
               Leaderboard
+            </Link>
+            <Link href="/squares" className="hover:underline">
+              Squares
             </Link>
             {user && (
               <Link

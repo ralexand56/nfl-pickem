@@ -79,6 +79,40 @@ export const weeklyTiebreakers = pgTable(
   ]
 );
 
+// Super Bowl Squares
+export const superBowlSquares = pgTable(
+  "super_bowl_squares",
+  {
+    id: serial("id").primaryKey(),
+    row: integer("row").notNull(), // 0-9
+    col: integer("col").notNull(), // 0-9
+    userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+    season: integer("season").notNull(), // e.g., 2026
+    claimedAt: timestamp("claimed_at", { withTimezone: true }),
+    isPaid: boolean("is_paid").default(false),
+  },
+  (t) => [
+    {
+      rowColSeasonUnique: uniqueIndex("squares_row_col_season_unique").on(
+        t.row,
+        t.col,
+        t.season
+      ),
+    },
+  ]
+);
+
+export const superBowlSquaresConfig = pgTable("super_bowl_squares_config", {
+  id: serial("id").primaryKey(),
+  season: integer("season").notNull().unique(),
+  homeTeam: text("home_team").notNull(),
+  awayTeam: text("away_team").notNull(),
+  homeNumbers: text("home_numbers"), // JSON array of 10 numbers, e.g., "[3,0,7,1,9,4,2,8,5,6]"
+  awayNumbers: text("away_numbers"), // JSON array of 10 numbers
+  isLocked: boolean("is_locked").default(false), // Lock when numbers are assigned
+  pricePerSquare: integer("price_per_square").notNull().default(5),
+});
+
 // (your types can remain as-is)
 
 export type InsertUser = typeof users.$inferInsert;
@@ -89,3 +123,9 @@ export type InsertPick = typeof picks.$inferInsert;
 export type SelectPick = typeof picks.$inferSelect;
 export type InsertWeeklyTiebreaker = typeof weeklyTiebreakers.$inferInsert;
 export type SelectWeeklyTiebreaker = typeof weeklyTiebreakers.$inferSelect;
+export type InsertSuperBowlSquare = typeof superBowlSquares.$inferInsert;
+export type SelectSuperBowlSquare = typeof superBowlSquares.$inferSelect;
+export type InsertSuperBowlSquaresConfig =
+  typeof superBowlSquaresConfig.$inferInsert;
+export type SelectSuperBowlSquaresConfig =
+  typeof superBowlSquaresConfig.$inferSelect;
