@@ -63,8 +63,8 @@ export default function SquaresGrid({
         try {
           await unclaimSquareAction(row, col, season);
           router.refresh();
-        } catch (e: any) {
-          setError(e.message || "Failed to unclaim square");
+        } catch (e: unknown) {
+          setError(e instanceof Error ? e.message : "Failed to unclaim square");
         }
       });
       return;
@@ -82,8 +82,8 @@ export default function SquaresGrid({
       try {
         await claimSquareAction(row, col, season);
         router.refresh();
-      } catch (e: any) {
-        setError(e.message || "Failed to claim square");
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Failed to claim square");
       }
     });
   }
