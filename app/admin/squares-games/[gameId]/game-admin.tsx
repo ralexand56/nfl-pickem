@@ -10,12 +10,12 @@ import {
 } from "./actions";
 import type { SelectSuperBowlSquaresConfig } from "@/db/schema";
 
-export default function SquaresAdmin({
+export default function GameAdmin({
   config,
-  season,
+  gameId,
 }: {
   config: SelectSuperBowlSquaresConfig;
-  season: number;
+  gameId: string;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -32,7 +32,7 @@ export default function SquaresAdmin({
 
   function handleUpdateConfig() {
     startTransition(async () => {
-      await updateConfigAction(season, homeTeam, awayTeam, pricePerSquare);
+      await updateConfigAction(gameId, homeTeam, awayTeam, pricePerSquare);
       router.refresh();
     });
   }
@@ -47,7 +47,7 @@ export default function SquaresAdmin({
     }
 
     startTransition(async () => {
-      await generateNumbersAction(season);
+      await generateNumbersAction(gameId);
       router.refresh();
     });
   }
@@ -62,7 +62,7 @@ export default function SquaresAdmin({
     }
 
     startTransition(async () => {
-      await lockBoardAction(season);
+      await lockBoardAction(gameId);
       router.refresh();
     });
   }
@@ -179,10 +179,20 @@ export default function SquaresAdmin({
       {/* Link to public page */}
       <div className="border rounded-lg p-4 bg-gray-50">
         <Link
-          href="/squares"
+          href={`/squares/${gameId}`}
           className="text-blue-600 hover:underline font-semibold"
         >
           → View Public Squares Page
+        </Link>
+      </div>
+
+      {/* Back to games list */}
+      <div className="border rounded-lg p-4 bg-gray-50">
+        <Link
+          href="/admin/squares-games"
+          className="text-gray-600 hover:underline"
+        >
+          ← Back to All Games
         </Link>
       </div>
     </div>

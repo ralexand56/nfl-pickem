@@ -84,6 +84,7 @@ export const superBowlSquares = pgTable(
   "super_bowl_squares",
   {
     id: serial("id").primaryKey(),
+    gameId: text("game_id").notNull().default("default"),
     row: integer("row").notNull(), // 0-9
     col: integer("col").notNull(), // 0-9
     userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
@@ -93,10 +94,10 @@ export const superBowlSquares = pgTable(
   },
   (t) => [
     {
-      rowColSeasonUnique: uniqueIndex("squares_row_col_season_unique").on(
+      rowColGameUnique: uniqueIndex("squares_row_col_game_unique").on(
         t.row,
         t.col,
-        t.season
+        t.gameId
       ),
     },
   ]
@@ -104,13 +105,15 @@ export const superBowlSquares = pgTable(
 
 export const superBowlSquaresConfig = pgTable("super_bowl_squares_config", {
   id: serial("id").primaryKey(),
-  season: integer("season").notNull().unique(),
+  gameId: text("game_id").notNull().unique().default("default"),
+  season: integer("season").notNull(),
   homeTeam: text("home_team").notNull(),
   awayTeam: text("away_team").notNull(),
   homeNumbers: text("home_numbers"), // JSON array of 10 numbers, e.g., "[3,0,7,1,9,4,2,8,5,6]"
   awayNumbers: text("away_numbers"), // JSON array of 10 numbers
   isLocked: boolean("is_locked").default(false), // Lock when numbers are assigned
   pricePerSquare: integer("price_per_square").notNull().default(5),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
 // (your types can remain as-is)

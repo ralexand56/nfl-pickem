@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { claimSquareAction, unclaimSquareAction } from "./actions";
+import { claimSquareAction, unclaimSquareAction } from "./[gameId]/actions";
 import type {
   SelectSuperBowlSquare,
   SelectSuperBowlSquaresConfig,
@@ -15,13 +15,13 @@ export default function SquaresGrid({
   squares,
   config,
   userMap,
-  season,
+  gameId,
   isBoardFull,
 }: {
   squares: SelectSuperBowlSquare[];
   config: SelectSuperBowlSquaresConfig;
   userMap: UserMap;
-  season: number;
+  gameId: string;
   isBoardFull: boolean;
 }) {
   const { data: session } = useSession();
@@ -60,7 +60,7 @@ export default function SquaresGrid({
       setError(null);
       startTransition(async () => {
         try {
-          await unclaimSquareAction(row, col, season);
+          await unclaimSquareAction(row, col, gameId);
           router.refresh();
         } catch (e: unknown) {
           setError(e instanceof Error ? e.message : "Failed to unclaim square");
@@ -79,7 +79,7 @@ export default function SquaresGrid({
     setError(null);
     startTransition(async () => {
       try {
-        await claimSquareAction(row, col, season);
+        await claimSquareAction(row, col, gameId);
         router.refresh();
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "Failed to claim square");
