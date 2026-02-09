@@ -48,7 +48,7 @@ export default function SquaresGrid({
       return;
     }
 
-    if ((config.isLocked ?? false) || isBoardFull) {
+    if (config.isLocked ?? false) {
       setError("Board is locked - no more changes can be made");
       return;
     }
@@ -141,26 +141,19 @@ export default function SquaresGrid({
                   disabled={
                     pending ||
                     (isOwned && !isMine) ||
-                    (config.isLocked ?? false) ||
-                    isBoardFull
+                    (config.isLocked ?? false)
                   }
                   className={`w-16 h-16 text-xs flex items-center justify-center transition-colors ${
                     isMine
-                      ? isBoardFull
-                        ? "bg-green-200 cursor-not-allowed"
-                        : "bg-green-200 hover:bg-green-300 cursor-pointer"
+                      ? "bg-green-200 hover:bg-green-300 cursor-pointer"
                       : isOwned
                       ? "bg-gray-200 cursor-not-allowed"
-                      : isBoardFull
-                      ? "bg-white cursor-not-allowed"
                       : "bg-white hover:bg-blue-50 cursor-pointer"
                   } ${pending ? "opacity-50" : ""} ${
                     col < 9 ? "border-r border-gray-300" : ""
                   } ${row < 9 ? "border-b border-gray-300" : ""}`}
                   title={
-                    isBoardFull
-                      ? "Board is full - locked"
-                      : isMine
+                    isMine
                       ? "Click to unclaim"
                       : owner
                       ? `Owned by ${owner.name || owner.email}`
@@ -190,9 +183,8 @@ export default function SquaresGrid({
       </div>
 
       {isBoardFull && !(config.isLocked ?? false) ? (
-        <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg text-sm">
-          <strong>Board is Full!</strong> All 100 squares are claimed. No more
-          changes can be made. Waiting for admin to assign numbers.
+        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+          <strong>Board is Full!</strong> All 100 squares are claimed. Players can still make changes until the admin locks the board.
         </div>
       ) : !(config.isLocked ?? false) ? (
         <div className="mt-4 p-3 bg-yellow-50 rounded-lg text-sm">

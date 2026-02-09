@@ -62,3 +62,15 @@ export async function lockBoardAction(gameId: string): Promise<void> {
   revalidatePath(`/squares/${gameId}`);
   revalidatePath(`/admin/squares-games/${gameId}`);
 }
+
+export async function unlockBoardAction(gameId: string): Promise<void> {
+  await requireSession();
+
+  await db
+    .update(superBowlSquaresConfig)
+    .set({ isLocked: false })
+    .where(eq(superBowlSquaresConfig.gameId, gameId));
+
+  revalidatePath(`/squares/${gameId}`);
+  revalidatePath(`/admin/squares-games/${gameId}`);
+}

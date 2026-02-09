@@ -68,3 +68,17 @@ export async function lockBoardAction(season: number): Promise<void> {
   revalidatePath("/admin/squares");
   revalidatePath("/squares");
 }
+
+export async function unlockBoardAction(season: number): Promise<void> {
+  await requireSession();
+
+  await db
+    .update(superBowlSquaresConfig)
+    .set({
+      isLocked: false,
+    })
+    .where(eq(superBowlSquaresConfig.season, season));
+
+  revalidatePath("/admin/squares");
+  revalidatePath("/squares");
+}

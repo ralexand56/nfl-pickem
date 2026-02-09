@@ -30,17 +30,6 @@ export async function claimSquareAction(
       throw new Error("Squares are locked");
     }
 
-    // Check if all 100 squares are filled
-    const allSquares = await db
-      .select()
-      .from(superBowlSquares)
-      .where(eq(superBowlSquares.gameId, gameId));
-
-    const filledCount = allSquares.filter((s) => s.userId !== null).length;
-    if (filledCount >= 100) {
-      throw new Error("All squares are filled. No more changes can be made.");
-    }
-
     // Check if square already exists
     const existing = await db
       .select()
@@ -116,17 +105,6 @@ export async function unclaimSquareAction(
 
     if (config.isLocked) {
       throw new Error("Squares are locked");
-    }
-
-    // Check if all 100 squares are filled
-    const allSquares = await db
-      .select()
-      .from(superBowlSquares)
-      .where(eq(superBowlSquares.gameId, gameId));
-
-    const filledCount = allSquares.filter((s) => s.userId !== null).length;
-    if (filledCount >= 100) {
-      throw new Error("All squares are filled. No more changes can be made.");
     }
 
     // Check if square exists and is owned by current user
