@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useSession, signIn, signOut } from "next-auth/react";
-import AdminSyncWeekButton from "@/components/AdminSyncWeekButton";
 import React, { useEffect } from "react";
+import Button from "@/components/ui/Button";
 
 type User = {
   name?: string | null;
@@ -38,13 +39,13 @@ export default function Nav() {
   if (currentWeek == null) return null; // still loading
 
   return (
-    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b">
+    <header className="sticky top-0 z-40 bg-surface/80 backdrop-blur border-b border-border">
       <nav className="flex-col sm:flex-row max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/" className="font-bold text-lg">
+          <Link href="/" className="font-bold text-lg text-text">
             Alexander NFL Pick’em
           </Link>
-          <div className="hidden sm:flex items-center gap-3 text-sm text-gray-600">
+          <div className="hidden sm:flex items-center gap-3 text-sm text-text-muted">
             <Link href="/" className="hover:underline">
               Weeks
             </Link>
@@ -68,42 +69,34 @@ export default function Nav() {
           </div>
         </div>
         <div className="flex-col flex items-center gap-3">
-          {/* {(user?.isAdmin || user?.email === "ralexand56@gmail.com") && (
-            <AdminSyncWeekButton />
-          )} */}
           {status === "loading" && (
-            <span className="text-sm text-gray-500">…</span>
+            <span className="text-sm text-text-muted">…</span>
           )}
           {status !== "loading" && !user && (
-            <button
-              onClick={() => signIn(undefined, { callbackUrl: "/" })}
-              className="px-3 py-1.5 rounded-lg border"
-            >
+            <Button size="sm" onClick={() => signIn(undefined, { callbackUrl: "/" })}>
               Sign in
-            </button>
+            </Button>
           )}
           {user && (
             <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-700 hidden sm:inline">
+              <span className="text-sm text-text hidden sm:inline">
                 {user.name ?? user.email}
               </span>
               {user.image && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={user.image}
                   alt="avatar"
-                  className="w-8 h-8 rounded-full border"
+                  width={32}
+                  height={32}
+                  className="rounded-full border border-border"
                 />
               )}
-              <button
-                onClick={() => signOut({ callbackUrl: "/" })}
-                className="px-3 py-1.5 rounded-lg border"
-              >
+              <Button size="sm" onClick={() => signOut({ callbackUrl: "/" })}>
                 Sign out
-              </button>
+              </Button>
             </div>
           )}
-          <div className="sm:hidden flex justify-between items-center gap-3 text-sm text-gray-600">
+          <div className="sm:hidden flex justify-between items-center gap-3 text-sm text-text-muted">
             <Link href="/" className="hover:underline">
               Weeks
             </Link>

@@ -39,7 +39,7 @@ export default function WeekSelector({
         const [s, w] = e.target.value.split("-");
         router.push(`/week/${s}/${w}/leaderboard`);
       }}
-      className="px-3 py-2 rounded-lg border bg-white"
+      className="px-3 py-2 rounded-control border border-border bg-surface text-text"
     >
       {availableWeeks.map((aw) => (
         <option key={`${aw.season}-${aw.week}`} value={`${aw.season}-${aw.week}`}>

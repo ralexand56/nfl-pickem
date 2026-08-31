@@ -57,7 +57,7 @@ export default function GamesEditor({
     <div className="space-y-6">
       <div className="flex gap-4 items-end">
         <label className="flex flex-col">
-          <span className="text-sm text-gray-600 mb-1">Season</span>
+          <span className="text-sm text-text-muted mb-1">Season</span>
           <select
             value={selectedSeason ?? ""}
             onChange={(e) => handleSeasonChange(e.target.value)}
@@ -74,7 +74,7 @@ export default function GamesEditor({
 
         {selectedSeason && (
           <label className="flex flex-col">
-            <span className="text-sm text-gray-600 mb-1">Week</span>
+            <span className="text-sm text-text-muted mb-1">Week</span>
             <select
               value={selectedWeek ?? ""}
               onChange={(e) => handleWeekChange(e.target.value)}
@@ -114,19 +114,19 @@ export default function GamesEditor({
                   <form
                     key={game.id}
                     action={handleSubmit}
-                    className="border rounded-xl p-4 bg-gray-50"
+                    className="border rounded-xl p-4 bg-surface-muted"
                   >
                     <input type="hidden" name="gameId" value={game.id} />
                     <input type="hidden" name="season" value={game.season} />
                     <input type="hidden" name="week" value={game.week} />
-                    <p className="text-xs text-gray-500 mb-4 break-all">
+                    <p className="text-xs text-text-muted mb-4 break-all">
                       Game ID: {game.id}
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label
                           htmlFor={`away-team-${game.id}`}
-                          className="block text-sm text-gray-600 mb-1"
+                          className="block text-sm text-text-muted mb-1"
                         >
                           Away Team
                         </label>
@@ -142,7 +142,7 @@ export default function GamesEditor({
                       <div>
                         <label
                           htmlFor={`home-team-${game.id}`}
-                          className="block text-sm text-gray-600 mb-1"
+                          className="block text-sm text-text-muted mb-1"
                         >
                           Home Team
                         </label>
@@ -158,7 +158,7 @@ export default function GamesEditor({
                       <div>
                         <label
                           htmlFor={`date-${game.id}`}
-                          className="block text-sm text-gray-600 mb-1"
+                          className="block text-sm text-text-muted mb-1"
                         >
                           Date & Time
                         </label>
@@ -174,7 +174,7 @@ export default function GamesEditor({
                       <div>
                         <label
                           htmlFor={`status-${game.id}`}
-                          className="block text-sm text-gray-600 mb-1"
+                          className="block text-sm text-text-muted mb-1"
                         >
                           Status
                         </label>
@@ -194,7 +194,7 @@ export default function GamesEditor({
                       <div>
                         <label
                           htmlFor={`away-score-${game.id}`}
-                          className="block text-sm text-gray-600 mb-1"
+                          className="block text-sm text-text-muted mb-1"
                         >
                           Away Score
                         </label>
@@ -210,7 +210,7 @@ export default function GamesEditor({
                       <div>
                         <label
                           htmlFor={`home-score-${game.id}`}
-                          className="block text-sm text-gray-600 mb-1"
+                          className="block text-sm text-text-muted mb-1"
                         >
                           Home Score
                         </label>
@@ -232,7 +232,7 @@ export default function GamesEditor({
                             defaultChecked={game.isMondayNight ?? false}
                             className="w-4 h-4"
                           />
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm text-text-muted">
                             Monday Night Game
                           </span>
                         </label>
@@ -246,7 +246,7 @@ export default function GamesEditor({
                             defaultChecked={game.isTiebreaker ?? false}
                             className="w-4 h-4"
                           />
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm text-text-muted">
                             Tiebreaker Game
                           </span>
                         </label>
@@ -256,7 +256,7 @@ export default function GamesEditor({
                       <button
                         type="submit"
                         disabled={pending}
-                        className="px-4 py-2 bg-black text-white rounded-lg disabled:opacity-50"
+                        className="px-4 py-2 bg-brand-600 text-white rounded-lg disabled:opacity-50"
                       >
                         {pending ? "Saving..." : "Save"}
                       </button>
@@ -282,10 +282,10 @@ export default function GamesEditor({
                     <div className="font-semibold text-lg">
                       {game.awayTeam} @ {game.homeTeam}
                     </div>
-                    <div className="text-sm text-gray-600 mt-1">
+                    <div className="text-sm text-text-muted mt-1">
                       {new Date(game.date).toLocaleString()}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1 break-all">
+                    <div className="text-xs text-text-muted mt-1 break-all">
                       Game ID: {game.id}
                     </div>
                     <div className="text-sm mt-2">
@@ -300,7 +300,7 @@ export default function GamesEditor({
                       {game.isMondayNight && (
                         <>
                           {" · "}
-                          <span className="text-blue-600 font-medium">
+                          <span className="text-brand-600 font-medium">
                             Monday Night
                           </span>
                         </>
@@ -308,7 +308,7 @@ export default function GamesEditor({
                       {game.isTiebreaker && (
                         <>
                           {" · "}
-                          <span className="text-green-600 font-medium">
+                          <span className="text-success font-medium">
                             Tiebreaker
                           </span>
                         </>
@@ -317,7 +317,7 @@ export default function GamesEditor({
                   </div>
                   <button
                     onClick={() => setEditingGameId(game.id)}
-                    className="px-4 py-2 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                    className="px-4 py-2 border rounded-lg hover:bg-surface-muted cursor-pointer"
                   >
                     Edit
                   </button>
@@ -329,13 +329,13 @@ export default function GamesEditor({
       )}
 
       {selectedSeason && selectedWeek && games.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-text-muted">
           No games found for Season {selectedSeason}, Week {selectedWeek}
         </div>
       )}
 
       {!selectedSeason && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-text-muted">
           Select a season and week to edit games
         </div>
       )}

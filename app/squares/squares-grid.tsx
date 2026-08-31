@@ -87,29 +87,35 @@ export default function SquaresGrid({
     });
   }
 
+  const LEFT_COL = "w-8 sm:w-12";
+  const CELL = "w-10 sm:w-16";
+  const RIGHT_COL = "w-14 sm:w-20";
+  const HEADER_H = "h-8 sm:h-12";
+  const ROW_H = "h-10 sm:h-16";
+
   return (
     <div className="overflow-x-auto">
       {error && (
-        <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg">
+        <div className="mb-4 p-3 bg-danger-muted text-danger rounded-control">
           {error}
         </div>
       )}
 
-      <div className="inline-block border-2 border-gray-400">
+      <div className="inline-block border-2 border-border">
         {/* Header row with away team numbers */}
         <div className="flex">
-          <div className="w-12 h-12 bg-gray-100 border-r border-b border-gray-400"></div>
+          <div className={`${LEFT_COL} ${HEADER_H} bg-surface-muted border-r border-b border-border`}></div>
           {Array.from({ length: 10 }, (_, i) => (
             <div
               key={`away-${i}`}
-              className={`w-16 h-12 flex items-center justify-center font-bold text-sm bg-gray-100 border-b border-gray-400 ${
+              className={`${CELL} ${HEADER_H} flex items-center justify-center font-bold text-xs sm:text-sm bg-surface-muted border-b border-border ${
                 i < 9 ? "border-r" : ""
               }`}
             >
               {awayNumbers ? awayNumbers[i] : "?"}
             </div>
           ))}
-          <div className="w-20 h-12 flex items-center justify-center text-xs font-semibold bg-gray-100 border-l-2 border-b border-gray-400">
+          <div className={`${RIGHT_COL} ${HEADER_H} flex items-center justify-center text-xs font-semibold bg-surface-muted border-l-2 border-b border-border`}>
             {config.awayTeam}
           </div>
         </div>
@@ -119,7 +125,7 @@ export default function SquaresGrid({
           <div key={`row-${row}`} className="flex">
             {/* Home team number */}
             <div
-              className={`w-12 h-16 flex items-center justify-center font-bold text-sm bg-gray-100 border-r border-gray-400 ${
+              className={`${LEFT_COL} ${ROW_H} flex items-center justify-center font-bold text-xs sm:text-sm bg-surface-muted border-r border-border ${
                 row < 9 ? "border-b" : ""
               }`}
             >
@@ -143,15 +149,15 @@ export default function SquaresGrid({
                     (isOwned && !isMine) ||
                     (config.isLocked ?? false)
                   }
-                  className={`w-16 h-16 text-xs flex items-center justify-center transition-colors ${
+                  className={`${CELL} ${ROW_H} text-[10px] sm:text-xs flex items-center justify-center transition-colors ${
                     isMine
-                      ? "bg-green-200 hover:bg-green-300 cursor-pointer"
+                      ? "bg-success-muted hover:opacity-80 cursor-pointer"
                       : isOwned
-                      ? "bg-gray-200 cursor-not-allowed"
-                      : "bg-white hover:bg-blue-50 cursor-pointer"
+                      ? "bg-surface-muted cursor-not-allowed"
+                      : "bg-surface hover:bg-brand-50 cursor-pointer"
                   } ${pending ? "opacity-50" : ""} ${
-                    col < 9 ? "border-r border-gray-300" : ""
-                  } ${row < 9 ? "border-b border-gray-300" : ""}`}
+                    col < 9 ? "border-r border-border" : ""
+                  } ${row < 9 ? "border-b border-border" : ""}`}
                   title={
                     isMine
                       ? "Click to unclaim"
@@ -165,7 +171,7 @@ export default function SquaresGrid({
                       {owner.name?.split(" ")[0] || owner.email?.split("@")[0]}
                     </span>
                   ) : (
-                    <span className="text-gray-400">-</span>
+                    <span className="text-text-muted">-</span>
                   )}
                 </button>
               );
@@ -173,21 +179,21 @@ export default function SquaresGrid({
 
             {/* Row label */}
             {row === 4 && (
-              <div className="w-20 h-16 flex items-center justify-center text-xs font-semibold bg-gray-100 border-l-2 border-gray-400">
+              <div className={`${RIGHT_COL} ${ROW_H} flex items-center justify-center text-xs font-semibold bg-surface-muted border-l-2 border-border`}>
                 {config.homeTeam}
               </div>
             )}
-            {row !== 4 && <div className="w-20 h-16 border-l-2 border-gray-400"></div>}
+            {row !== 4 && <div className={`${RIGHT_COL} ${ROW_H} border-l-2 border-border`}></div>}
           </div>
         ))}
       </div>
 
       {isBoardFull && !(config.isLocked ?? false) ? (
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+        <div className="mt-4 p-3 bg-brand-50 border border-brand-200 rounded-control text-sm text-text">
           <strong>Board is Full!</strong> All 100 squares are claimed. Players can still make changes until the admin locks the board.
         </div>
       ) : !(config.isLocked ?? false) ? (
-        <div className="mt-4 p-3 bg-yellow-50 rounded-lg text-sm">
+        <div className="mt-4 p-3 bg-warning-muted rounded-control text-sm text-text">
           <strong>Note:</strong> Numbers will be randomly assigned after all
           squares are filled.
         </div>

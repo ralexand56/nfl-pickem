@@ -3,7 +3,8 @@ import { superBowlSquares, superBowlSquaresConfig } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import SquaresGrid from "../squares-grid";
-import { getUserMap } from "@/lib/sportsdb";
+import { getUserMap } from "@/lib/users";
+import Card from "@/components/ui/Card";
 
 export const dynamic = "force-dynamic";
 
@@ -41,20 +42,20 @@ export default async function SquaresPage({
 
   return (
     <main className="max-w-7xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-2">Super Bowl Squares</h1>
-      <p className="text-gray-600 mb-6">
+      <h1 className="text-3xl font-bold mb-2 text-text">Super Bowl Squares</h1>
+      <p className="text-text-muted mb-6">
         ${config.pricePerSquare} per square · {config.awayTeam} vs{" "}
         {config.homeTeam}
         {isBoardFull && (
-          <span className="ml-2 text-orange-600 font-semibold">
+          <span className="ml-2 text-warning font-semibold">
             • BOARD FULL
           </span>
         )}
       </p>
 
-      <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-        <h2 className="font-semibold mb-2">How It Works:</h2>
-        <ul className="text-sm text-gray-700 space-y-1">
+      <Card className="mb-6 bg-brand-50 border-transparent">
+        <h2 className="font-semibold mb-2 text-text">How It Works:</h2>
+        <ul className="text-sm text-text-muted space-y-1">
           <li>• Click any available square to claim it for ${config.pricePerSquare}</li>
           <li>• Click your own square again to unclaim it (green squares)</li>
           <li>
@@ -67,7 +68,7 @@ export default async function SquaresPage({
           </li>
           <li>• Prize pool will be split: Q1 (20% - ${config.pricePerSquare * 20}), Q2 (20% - ${config.pricePerSquare * 20}), Q3 (20% - ${config.pricePerSquare * 20}), Final (40% - ${config.pricePerSquare * 40})</li>
         </ul>
-      </div>
+      </Card>
 
       <SquaresGrid
         squares={squares}
@@ -77,7 +78,7 @@ export default async function SquaresPage({
         isBoardFull={isBoardFull}
       />
 
-      <div className="mt-6 text-sm text-gray-600">
+      <div className="mt-6 text-sm text-text-muted">
         <p>Total pot: ${config.pricePerSquare * 100}</p>
         <p>
           Claimed squares: {squares.filter((s) => s.userId).length} / 100
@@ -86,7 +87,7 @@ export default async function SquaresPage({
 
       {/* Player List */}
       <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-4">Players</h2>
+        <h2 className="text-xl font-semibold mb-4 text-text">Players</h2>
         <div className="grid gap-3">
           {Object.entries(
             squares
@@ -108,9 +109,9 @@ export default async function SquaresPage({
                 squares.find((s) => s.userId === userId)?.isPaid ?? false;
 
               return (
-                <div
+                <Card
                   key={userId}
-                  className="flex items-center justify-between p-4 border rounded-lg bg-white"
+                  className="flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
                     {user?.image && (
@@ -122,27 +123,27 @@ export default async function SquaresPage({
                       />
                     )}
                     <div>
-                      <div className="font-semibold">
+                      <div className="font-semibold text-text">
                         {user?.name || user?.email || "Unknown"}
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-text-muted">
                         {count} {count === 1 ? "square" : "squares"}
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-semibold text-lg">${totalOwed}</div>
+                    <div className="font-semibold text-lg text-text">${totalOwed}</div>
                     {isPaid && (
-                      <div className="text-xs text-green-600">Paid ✓</div>
+                      <div className="text-xs text-success">Paid ✓</div>
                     )}
                   </div>
-                </div>
+                </Card>
               );
             })}
         </div>
 
         {squares.filter((s) => s.userId).length === 0 && (
-          <p className="text-gray-500 text-center py-8">
+          <p className="text-text-muted text-center py-8">
             No squares claimed yet
           </p>
         )}

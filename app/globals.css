@@ -1,5 +1,58 @@
 @import "tailwindcss";
-/* Optional theme tokens */
+
 @theme {
-  --color-brand: #0f766e;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Brand */
+  --color-brand-50: #f0fdfa;
+  --color-brand-100: #ccfbf1;
+  --color-brand-200: #99f6e4;
+  --color-brand-300: #5eead4;
+  --color-brand-400: #2dd4bf;
+  --color-brand-500: #14b8a6;
+  --color-brand-600: #0f766e;
+  --color-brand-700: #0d5f58;
+  --color-brand-800: #0b4a45;
+  --color-brand-900: #073934;
+
+  /* Semantic */
+  --color-success: #16a34a;
+  --color-success-muted: #dcfce7;
+  --color-danger: #dc2626;
+  --color-danger-muted: #fee2e2;
+  --color-warning: #d97706;
+  --color-warning-muted: #fef3c7;
+
+  /* Radius */
+  --radius-card: 1rem;
+  --radius-control: 0.625rem;
+
+  /* Shadow */
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.06);
+
+  /* Surface (overridden for dark mode below - values stay as CSS variables
+     so prefers-color-scheme can swap them without regenerating utilities) */
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #0b1220;
+    --color-surface: #131c2e;
+    --color-surface-muted: #1a2439;
+    --color-border: #263248;
+    --color-text: #e2e8f0;
+    --color-text-muted: #94a3b8;
+  }
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
 }

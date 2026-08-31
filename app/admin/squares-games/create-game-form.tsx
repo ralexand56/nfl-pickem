@@ -48,14 +48,14 @@ export default function CreateGameForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+        <div className="p-3 bg-danger-muted border border-danger rounded-lg text-danger text-sm">
           {error}
         </div>
       )}
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm text-gray-600 mb-1">
+          <label className="block text-sm text-text-muted mb-1">
             Away Team *
           </label>
           <input
@@ -68,7 +68,7 @@ export default function CreateGameForm() {
           />
         </div>
         <div>
-          <label className="block text-sm text-gray-600 mb-1">
+          <label className="block text-sm text-text-muted mb-1">
             Home Team *
           </label>
           <input
@@ -84,7 +84,7 @@ export default function CreateGameForm() {
 
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm text-gray-600 mb-1">Season</label>
+          <label className="block text-sm text-text-muted mb-1">Season</label>
           <input
             type="number"
             value={season}
@@ -94,7 +94,7 @@ export default function CreateGameForm() {
           />
         </div>
         <div>
-          <label className="block text-sm text-gray-600 mb-1">
+          <label className="block text-sm text-text-muted mb-1">
             Price per Square ($)
           </label>
           <input
@@ -107,7 +107,7 @@ export default function CreateGameForm() {
           />
         </div>
         <div>
-          <label className="block text-sm text-gray-600 mb-1">
+          <label className="block text-sm text-text-muted mb-1">
             Game ID (optional)
           </label>
           <input
@@ -123,7 +123,7 @@ export default function CreateGameForm() {
       <button
         type="submit"
         disabled={pending || !homeTeam || !awayTeam}
-        className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+        className="px-6 py-2 bg-success text-white rounded-lg hover:opacity-90 disabled:opacity-50"
       >
         {pending ? "Creating..." : "Create Game"}
       </button>

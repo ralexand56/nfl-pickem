@@ -39,7 +39,7 @@ export default async function SquaresGamesAdminPage() {
       <h1 className="text-2xl font-bold mb-6">Manage Squares Games</h1>
 
       {/* Create New Game Section */}
-      <div className="mb-8 border rounded-lg p-6 bg-gray-50">
+      <div className="mb-8 border rounded-lg p-6 bg-surface-muted">
         <h2 className="text-xl font-semibold mb-4">Create New Game</h2>
         <CreateGameForm />
       </div>
@@ -49,7 +49,7 @@ export default async function SquaresGamesAdminPage() {
         <h2 className="text-xl font-semibold">Existing Games ({games.length})</h2>
 
         {games.length === 0 ? (
-          <p className="text-gray-500">No games created yet. Create one above!</p>
+          <p className="text-text-muted">No games created yet. Create one above!</p>
         ) : (
           <div className="grid gap-4">
             {games.map((game) => (
@@ -64,18 +64,18 @@ export default async function SquaresGamesAdminPage() {
                         {game.awayTeam} @ {game.homeTeam}
                       </h3>
                       {game.isLocked && (
-                        <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">
+                        <span className="px-2 py-1 bg-danger-muted text-danger text-xs rounded-full">
                           Locked
                         </span>
                       )}
                       {game.claimedCount === 100 && !game.isLocked && (
-                        <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
+                        <span className="px-2 py-1 bg-warning-muted text-warning text-xs rounded-full">
                           Full
                         </span>
                       )}
                     </div>
 
-                    <div className="text-sm text-gray-600 space-y-1">
+                    <div className="text-sm text-text-muted space-y-1">
                       <p>
                         <strong>Game ID:</strong> {game.gameId}
                       </p>
@@ -92,7 +92,7 @@ export default async function SquaresGamesAdminPage() {
                         <strong>Total Revenue:</strong> ${game.totalRevenue}
                       </p>
                       {game.homeNumbers && game.awayNumbers && (
-                        <p className="text-green-600">
+                        <p className="text-success">
                           ✓ Numbers assigned
                         </p>
                       )}
@@ -102,13 +102,13 @@ export default async function SquaresGamesAdminPage() {
                   <div className="flex flex-col gap-2">
                     <Link
                       href={`/squares/${game.gameId}`}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center text-sm"
+                      className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 text-center text-sm"
                     >
                       View Game
                     </Link>
                     <Link
                       href={`/admin/squares-games/${game.gameId}`}
-                      className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 text-center text-sm"
+                      className="px-4 py-2 bg-brand-700 text-white rounded-lg hover:bg-brand-800 text-center text-sm"
                     >
                       Manage
                     </Link>

@@ -1,24 +1,27 @@
 "use client";
 import { signIn } from "next-auth/react";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
 
 export default function SignIn() {
   return (
-    <div className="min-h-screen grid place-items-center p-6">
-      <div className="rounded-2xl p-8 shadow-xl max-w-sm w-full bg-white">
-        <h1 className="text-2xl font-bold mb-6 text-center">Sign in</h1>
-        <button
-          className="w-full rounded-xl py-3 mb-3 bg-black text-white"
+    <div className="min-h-screen grid place-items-center p-6 bg-bg">
+      <Card className="max-w-sm w-full p-8">
+        <h1 className="text-2xl font-bold mb-6 text-center text-text">Sign in</h1>
+        <Button
+          variant="primary"
+          className="w-full py-3 mb-3"
           onClick={() => signIn("google", { callbackUrl: "/" })}
         >
           Continue with Google
-        </button>
-        <button
-          className="w-full rounded-xl py-3 bg-[#4267B2] text-white"
+        </Button>
+        <Button
+          className="w-full py-3 bg-[#4267B2] text-white hover:opacity-90 border-transparent"
           onClick={() => signIn("facebook", { callbackUrl: "/" })}
         >
           Continue with Facebook
-        </button>
-      </div>
+        </Button>
+      </Card>
     </div>
   );
 }

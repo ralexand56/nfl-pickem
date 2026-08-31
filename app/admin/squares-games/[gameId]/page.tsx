@@ -35,7 +35,7 @@ export default async function GameAdminPage({
         <h1 className="text-2xl font-bold">
           Manage Game: {config.awayTeam} @ {config.homeTeam}
         </h1>
-        <p className="text-gray-600">Game ID: {config.gameId}</p>
+        <p className="text-text-muted">Game ID: {config.gameId}</p>
       </div>
 
       <GameAdmin config={config} gameId={gameId} />

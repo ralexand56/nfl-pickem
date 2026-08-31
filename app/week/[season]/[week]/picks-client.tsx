@@ -1,6 +1,11 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useState, useTransition } from "react";
+import { clsx } from "clsx";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import Badge from "@/components/ui/Badge";
 
 // Extend the session user type to include 'id'
 import type { DefaultSession } from "next-auth";
@@ -105,33 +110,39 @@ export default function PicksClient({
 
   return (
     <div className="max-w-5xl mx-auto p-6">
-      <h2 className="text-2xl font-semibold mb-4">
+      <h2 className="text-2xl font-semibold mb-4 text-text">
         Week {week} · {season} {pending && "(updating...)"}
       </h2>
 
       {firstGameTimeMs != null && (
-        <div className={`rounded-xl border mb-6 p-4 ${cutoffPassed ? "bg-gray-50" : "bg-yellow-50"}`}>
+        <Card
+          className={clsx(
+            "mb-6",
+            cutoffPassed ? "bg-surface-muted" : "bg-warning-muted border-transparent"
+          )}
+        >
           <div className="flex items-center justify-between">
-            <div className="font-semibold">{cutoffPassed ? "Picks closed" : "Time remaining to make your picks"}</div>
-            <div className="text-sm">
+            <div className="font-semibold text-text">
+              {cutoffPassed ? "Picks closed" : "Time remaining to make your picks"}
+            </div>
+            <div className="text-sm text-text">
               {cutoffPassed ? "00:00:00" : formatRemaining(msRemaining!)}
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
-      <div className="rounded-xl border mb-6 p-4">
-        <h3 className="font-semibold mb-2">
+      <Card className="mb-6">
+        <h3 className="font-semibold mb-2 text-text">
           Tiebreaker (total points in last game)
         </h3>
         <div className="flex gap-2 items-center">
           <label htmlFor="mnf-tiebreaker" className="sr-only">
             Tiebreaker Total Points
           </label>
-          <input
+          <Input
             id="mnf-tiebreaker"
             type="number"
-            className="border rounded-lg px-3 py-2"
             value={myTB}
             placeholder="Enter total points"
             title="Tiebreaker Total Points"
@@ -139,14 +150,11 @@ export default function PicksClient({
               setMyTB(e.target.value === "" ? "" : Number(e.target.value))
             }
           />
-          <button
-            onClick={saveTB}
-            className="rounded-lg px-4 py-2 bg-black text-white"
-          >
+          <Button variant="primary" onClick={saveTB}>
             Save
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
 
       <div className="grid gap-3">
         {games
@@ -164,18 +172,21 @@ export default function PicksClient({
               g.awayScore !== null &&
               g.awayScore > g.homeScore;
             return (
-              <div key={g.id} className={`border rounded-xl p-4 ${g.isTiebreaker ? "bg-gray-300" : ""}`}>
+              <Card
+                key={g.id}
+                className={clsx(g.isTiebreaker && "bg-surface-muted")}
+              >
                 <div className="flex justify-between items-center">
                   <div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-text-muted">
                       {new Date(g.date).toLocaleString()}
                     </div>
-                    <div className="font-semibold">
-                      {g.awayTeam} @ {g.homeTeam}{" "}
-                      {g.isTiebreaker && "(tiebreaker)"}
+                    <div className="font-semibold text-text flex items-center gap-2">
+                      {g.awayTeam} @ {g.homeTeam}
+                      {g.isTiebreaker && <Badge tone="brand">tiebreaker</Badge>}
                     </div>
                     {g.status === "final" && (
-                      <div className="text-sm mt-1">
+                      <div className="text-sm mt-1 text-text">
                         Final: {g.awayScore} - {g.homeScore}
                       </div>
                     )}
@@ -184,9 +195,13 @@ export default function PicksClient({
                     <button
                       disabled={!uid || g.status === "final" || pending || cutoffPassed}
                       onClick={() => pick(g.id, "AWAY")}
-                      className={`px-3 py-2 rounded-lg border cursor-pointer disabled:cursor-not-allowed ${
-                        mine === "AWAY" ? "bg-black text-white" : ""
-                      } ${awayWon ? "ring-2 ring-green-500" : ""}`}
+                      className={clsx(
+                        "px-3 py-2 rounded-control border cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 transition-colors",
+                        mine === "AWAY"
+                          ? "bg-brand-600 text-white border-transparent"
+                          : "border-border hover:bg-surface-muted text-text",
+                        awayWon && "ring-2 ring-success"
+                      )}
                       title={cutoffPassed ? "Picks are closed for this week" : undefined}
                     >
                       {g.awayTeam}
@@ -194,9 +209,13 @@ export default function PicksClient({
                     <button
                       disabled={!uid || g.status === "final" || pending || cutoffPassed}
                       onClick={() => pick(g.id, "HOME")}
-                      className={`px-3 py-2 rounded-lg border cursor-pointer disabled:cursor-not-allowed ${
-                        mine === "HOME" ? "bg-black text-white" : ""
-                      } ${homeWon ? "ring-2 ring-green-500" : ""}`}
+                      className={clsx(
+                        "px-3 py-2 rounded-control border cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 transition-colors",
+                        mine === "HOME"
+                          ? "bg-brand-600 text-white border-transparent"
+                          : "border-border hover:bg-surface-muted text-text",
+                        homeWon && "ring-2 ring-success"
+                      )}
                       title={cutoffPassed ? "Picks are closed for this week" : undefined}
                     >
                       {g.homeTeam}
@@ -204,23 +223,24 @@ export default function PicksClient({
                   </div>
                 </div>
 
-                <div className="mt-3 text-sm">
-                  <span className="font-medium">All picks:</span>{" "}
+                <div className="mt-3 text-sm text-text-muted">
+                  <span className="font-medium text-text">All picks:</span>{" "}
                   {allPicks
                     .filter((p) => p.picks.gameId === g.id)
                     .map((p) => (
                       <span
                         key={p.picks.id}
-                        className={`inline-block px-2 py-1 rounded-full border mx-1 ${
-                          p.picks.userId === uid ? "bg-gray-100" : ""
-                        }`}
+                        className={clsx(
+                          "inline-block px-2 py-1 rounded-full border border-border mx-1",
+                          p.picks.userId === uid && "bg-surface-muted"
+                        )}
                       >
                         {(p.users.name ?? "Unknown").slice(0, 6)}:{" "}
                         {p.picks.pick}
                       </span>
                     ))}
                 </div>
-              </div>
+              </Card>
             );
           })}
       </div>
