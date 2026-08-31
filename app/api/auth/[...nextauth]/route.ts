@@ -1,6 +1,7 @@
 // app/api/auth/[...nextauth]/route.ts
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import Email from "next-auth/providers/email";
 // import Facebook from "next-auth/providers/facebook";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/db";
@@ -12,12 +13,16 @@ export const authOptions = {
     usersTable: users,
     accountsTable: accounts,
     sessionsTable: sessions, // optional if using JWT sessions
-    verificationTokensTable: verificationTokens, // optional unless using magic links
+    verificationTokensTable: verificationTokens, // required for the Email magic-link provider
   }),
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    Email({
+      server: process.env.EMAIL_SERVER,
+      from: process.env.EMAIL_FROM,
     }),
     // Facebook requires either manually adding every user as a Tester or
     // Business Verification to let the public log in - not worth it for

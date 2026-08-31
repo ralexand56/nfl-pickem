@@ -20,6 +20,7 @@
     "neondatabase": "^0.0.1-security",
     "next": "15.5.9",
     "next-auth": "^4.24.11",
+    "nodemailer": "^6.10.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "zod": "^4.1.8"
@@ -29,6 +30,7 @@
     "@tailwindcss/postcss": "^4",
     "@types/luxon": "^3.7.1",
     "@types/node": "20.19.43",
+    "@types/nodemailer": "^8.0.1",
     "@types/react": "19.2.18",
     "@types/react-dom": "^19",
     "drizzle-kit": "^0.31.4",
