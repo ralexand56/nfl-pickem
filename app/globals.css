@@ -16,7 +16,9 @@
   --color-brand-800: #0b4a45;
   --color-brand-900: #073934;
 
-  /* Semantic */
+  /* Semantic (muted variants overridden for dark mode below, along with
+     brand-50 - all three are used as tinted panel/badge backgrounds, so
+     they need to stay legible against theme-aware text like --color-text) */
   --color-success: #16a34a;
   --color-success-muted: #dcfce7;
   --color-danger: #dc2626;
@@ -49,6 +51,14 @@
     --color-border: #263248;
     --color-text: #e2e8f0;
     --color-text-muted: #94a3b8;
+
+    --color-brand-50: #042f2e;
+    --color-success: #4ade80;
+    --color-success-muted: #052e1f;
+    --color-danger: #f87171;
+    --color-danger-muted: #3f0d0d;
+    --color-warning: #fbbf24;
+    --color-warning-muted: #3a2205;
   }
 }
 
