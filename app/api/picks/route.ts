@@ -50,13 +50,18 @@ export async function POST(req: Request) {
     );
   }
 
-  await db
-    .insert(picks)
-    .values({ userId: session.user!.id!, gameId, pick })
-    .onConflictDoUpdate({
-      target: [picks.userId, picks.gameId],
-      set: { pick },
-    });
+  try {
+    await db
+      .insert(picks)
+      .values({ userId: session.user!.id!, gameId, pick })
+      .onConflictDoUpdate({
+        target: [picks.userId, picks.gameId],
+        set: { pick },
+      });
+  } catch (error) {
+    console.error("Failed to save pick:", error);
+    return NextResponse.json({ error: "Failed to save pick" }, { status: 500 });
+  }
 
   return NextResponse.json({ ok: true });
 }

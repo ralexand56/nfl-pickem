@@ -1,5 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { clsx } from "clsx";
 import Card from "@/components/ui/Card";
@@ -38,6 +39,7 @@ export default function PicksClient({
   week: number;
 }) {
   const { data: session } = useSession();
+  const router = useRouter();
 
   const uid = session?.user?.id;
 
@@ -46,6 +48,7 @@ export default function PicksClient({
     tiebreakers.find((t) => t.userId === uid)?.mnfTotalPointsGuess ?? ""
   );
   const [nowMs, setNowMs] = useState<number>(Date.now());
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setMyTB(
@@ -70,22 +73,34 @@ export default function PicksClient({
   );
 
   async function pick(gameId: string, pick: "HOME" | "AWAY") {
+    setError(null);
     start(async () => {
-      await fetch("/api/picks", {
+      const res = await fetch("/api/picks", {
         method: "POST",
         body: JSON.stringify({ gameId, pick }),
       });
-      location.reload();
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        setError(body?.error ?? "Failed to save pick");
+        return;
+      }
+      router.refresh();
     });
   }
 
   async function saveTB() {
     if (myTB === "") return;
-    await fetch("/api/tiebreaker", {
+    setError(null);
+    const res = await fetch("/api/tiebreaker", {
       method: "POST",
       body: JSON.stringify({ season, week, mnfTotalPointsGuess: Number(myTB) }),
     });
-    location.reload();
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      setError(body?.error ?? "Failed to save tiebreaker");
+      return;
+    }
+    router.refresh();
   }
 
   // Determine if the cutoff (first game of the week) has passed in user's local time
@@ -113,6 +128,12 @@ export default function PicksClient({
       <h2 className="text-2xl font-semibold mb-4 text-text">
         Week {week} · {season} {pending && "(updating...)"}
       </h2>
+
+      {error && (
+        <Card className="mb-6 bg-danger-muted border-transparent">
+          <div className="text-danger">{error}</div>
+        </Card>
+      )}
 
       {firstGameTimeMs != null && (
         <Card
