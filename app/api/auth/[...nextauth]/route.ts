@@ -1,7 +1,7 @@
 // app/api/auth/[...nextauth]/route.ts
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
-import Facebook from "next-auth/providers/facebook";
+// import Facebook from "next-auth/providers/facebook";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/db";
 import { users } from "@/db/schema";
@@ -19,10 +19,14 @@ export const authOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
-    Facebook({
-      clientId: process.env.FACEBOOK_CLIENT_ID!,
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
-    }),
+    // Facebook requires either manually adding every user as a Tester or
+    // Business Verification to let the public log in - not worth it for
+    // this app. Re-enable if that changes (credentials are already in
+    // .env.local and Vercel).
+    // Facebook({
+    //   clientId: process.env.FACEBOOK_CLIENT_ID!,
+    //   clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+    // }),
   ],
   session: { strategy: "jwt" },
   callbacks: {

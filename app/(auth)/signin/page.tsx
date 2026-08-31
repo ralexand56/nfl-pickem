@@ -10,17 +10,21 @@ export default function SignIn() {
         <h1 className="text-2xl font-bold mb-6 text-center text-text">Sign in</h1>
         <Button
           variant="primary"
-          className="w-full py-3 mb-3"
+          className="w-full py-3"
           onClick={() => signIn("google", { callbackUrl: "/" })}
         >
           Continue with Google
         </Button>
+        {/* Facebook login disabled - requires manually adding every user as
+            a Tester or Business Verification to let the public log in.
+            Re-enable in app/api/auth/[...nextauth]/route.ts if that changes.
         <Button
-          className="w-full py-3 bg-[#4267B2] text-white hover:opacity-90 border-transparent"
+          className="w-full py-3 mt-3 bg-[#4267B2] text-white hover:opacity-90 border-transparent"
           onClick={() => signIn("facebook", { callbackUrl: "/" })}
         >
           Continue with Facebook
         </Button>
+        */}
       </Card>
     </div>
   );
