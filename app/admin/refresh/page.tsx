@@ -17,7 +17,7 @@ export default function AdminRefreshPage() {
               <span className="text-sm text-text-muted">Season Label</span>
               <input
                 name="seasonLabel"
-                defaultValue="2025-2026"
+                defaultValue="2026-2027"
                 className="border rounded-lg px-3 py-2"
               />
             </label>
@@ -26,7 +26,7 @@ export default function AdminRefreshPage() {
               <input
                 name="seasonYear"
                 type="number"
-                defaultValue={2025}
+                defaultValue={2026}
                 className="border rounded-lg px-3 py-2"
               />
             </label>
@@ -62,7 +62,7 @@ export default function AdminRefreshPage() {
               <input
                 name="seasonYear"
                 type="number"
-                defaultValue={2025}
+                defaultValue={2026}
                 className="border rounded-lg px-3 py-2"
               />
             </label>

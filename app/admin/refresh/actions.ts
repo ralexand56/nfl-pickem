@@ -6,7 +6,7 @@ import { syncScoresMinimal } from "@/lib/server/syncScoresMinimal";
 import { syncScores } from "@/lib/server/scoresSync";
 
 export async function refreshScoresAction(formData: FormData): Promise<void> {
-  const seasonYear = Number(formData.get("seasonYear") ?? 2025);
+  const seasonYear = Number(formData.get("seasonYear") ?? 2026);
   const weekRaw = formData.get("week");
   const week = weekRaw ? Number(weekRaw) : undefined;
 
@@ -29,7 +29,7 @@ export async function refreshScoresAction(formData: FormData): Promise<void> {
 // in addition to updating scores/status - syncScoresMinimal above only
 // updates rows that already exist, so this is needed to bootstrap a week.
 export async function fullSyncAction(formData: FormData): Promise<void> {
-  const seasonYear = Number(formData.get("seasonYear") ?? 2025);
+  const seasonYear = Number(formData.get("seasonYear") ?? 2026);
   const weekRaw = formData.get("week");
   const week = weekRaw ? Number(weekRaw) : undefined;
 

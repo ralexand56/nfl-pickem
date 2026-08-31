@@ -15,10 +15,8 @@ type User = {
 export default function Nav() {
   const { data: session, status } = useSession();
   const [currentWeek, setCurrentWeek] = React.useState<number | null>(null);
+  const [currentSeason, setCurrentSeason] = React.useState<number | null>(null);
   const user = session?.user as User;
-
-  // Weeks 18-22 are in 2026 season (Week 18 + Playoffs)
-  const currentSeason = currentWeek && currentWeek >= 18 ? 2026 : 2025;
 
   useEffect(() => {
     let cancelled = false;
@@ -26,9 +24,15 @@ export default function Nav() {
       try {
         const r = await fetch("/api/current-week", { cache: "no-store" });
         const j = await r.json();
-        if (!cancelled) setCurrentWeek(j.week ?? null);
+        if (!cancelled) {
+          setCurrentWeek(j.week ?? null);
+          setCurrentSeason(j.season ?? null);
+        }
       } catch {
-        if (!cancelled) setCurrentWeek(null);
+        if (!cancelled) {
+          setCurrentWeek(null);
+          setCurrentSeason(null);
+        }
       }
     })();
     return () => {
@@ -36,7 +40,7 @@ export default function Nav() {
     };
   }, []);
 
-  if (currentWeek == null) return null; // still loading
+  if (currentWeek == null || currentSeason == null) return null; // still loading
 
   return (
     <header className="sticky top-0 z-40 bg-surface/80 backdrop-blur border-b border-border">
