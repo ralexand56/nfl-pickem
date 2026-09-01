@@ -49,6 +49,8 @@ export default function PicksClient({
   );
   const [nowMs, setNowMs] = useState<number>(Date.now());
   const [error, setError] = useState<string | null>(null);
+  const [tbSaving, setTbSaving] = useState(false);
+  const [tbSaved, setTbSaved] = useState(false);
 
   useEffect(() => {
     setMyTB(
@@ -75,32 +77,46 @@ export default function PicksClient({
   async function pick(gameId: string, pick: "HOME" | "AWAY") {
     setError(null);
     start(async () => {
-      const res = await fetch("/api/picks", {
-        method: "POST",
-        body: JSON.stringify({ gameId, pick }),
-      });
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        setError(body?.error ?? "Failed to save pick");
-        return;
+      try {
+        const res = await fetch("/api/picks", {
+          method: "POST",
+          body: JSON.stringify({ gameId, pick }),
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => null);
+          setError(body?.error ?? "Failed to save pick");
+          return;
+        }
+        router.refresh();
+      } catch {
+        setError("Failed to save pick");
       }
-      router.refresh();
     });
   }
 
   async function saveTB() {
     if (myTB === "") return;
     setError(null);
-    const res = await fetch("/api/tiebreaker", {
-      method: "POST",
-      body: JSON.stringify({ season, week, mnfTotalPointsGuess: Number(myTB) }),
-    });
-    if (!res.ok) {
-      const body = await res.json().catch(() => null);
-      setError(body?.error ?? "Failed to save tiebreaker");
-      return;
+    setTbSaved(false);
+    setTbSaving(true);
+    try {
+      const res = await fetch("/api/tiebreaker", {
+        method: "POST",
+        body: JSON.stringify({ season, week, mnfTotalPointsGuess: Number(myTB) }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        setError(body?.error ?? "Failed to save tiebreaker");
+        return;
+      }
+      router.refresh();
+      setTbSaved(true);
+      setTimeout(() => setTbSaved(false), 3000);
+    } catch {
+      setError("Failed to save tiebreaker");
+    } finally {
+      setTbSaving(false);
     }
-    router.refresh();
   }
 
   // Determine if the cutoff (first game of the week) has passed in user's local time
@@ -167,13 +183,15 @@ export default function PicksClient({
             value={myTB}
             placeholder="Enter total points"
             title="Tiebreaker Total Points"
-            onChange={(e) =>
-              setMyTB(e.target.value === "" ? "" : Number(e.target.value))
-            }
+            onChange={(e) => {
+              setMyTB(e.target.value === "" ? "" : Number(e.target.value));
+              setTbSaved(false);
+            }}
           />
-          <Button variant="primary" onClick={saveTB}>
-            Save
+          <Button variant="primary" onClick={saveTB} disabled={tbSaving}>
+            {tbSaving ? "Saving…" : "Save"}
           </Button>
+          {tbSaved && <span className="text-sm text-success">Saved</span>}
         </div>
       </Card>
 
