@@ -96,7 +96,7 @@ export default async function Leaderboard({
         <Card className="mb-6 bg-success-muted border-transparent">
           <div className="font-semibold text-text">Winner:</div>
           <div className="text-text">
-            {userMap[winner.uid].name.slice(0, 6)} · {winner.correct} correct{" "}
+            {userMap[winner.uid].name.slice(0, 12)} · {winner.correct} correct{" "}
             {winner.tieDistance != null ? `(TB +${winner.tieDistance})` : ""}
           </div>
         </Card>
@@ -124,7 +124,7 @@ export default async function Leaderboard({
                     className="rounded-full"
                   />
                 </td>
-                <td className="p-2 text-text">{userMap[r.uid].name.slice(0, 6)}</td>
+                <td className="p-2 text-text">{userMap[r.uid].name.slice(0, 12)}</td>
                 <td className="p-2 text-text">{r.correct}</td>
                 <td className="p-2 text-text">{r.tb}</td>
                 <td className="p-2 text-text">{r.tieDistance ?? "—"}</td>
