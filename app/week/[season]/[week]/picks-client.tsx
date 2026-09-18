@@ -1,7 +1,7 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { clsx } from "clsx";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -51,15 +51,15 @@ export default function PicksClient({
   const [error, setError] = useState<string | null>(null);
   const [tbSaving, setTbSaving] = useState(false);
   const [tbSaved, setTbSaved] = useState(false);
+  const tbDirtyRef = useRef(false);
 
   useEffect(() => {
+    // Don't clobber an in-progress, unsaved edit when the page refreshes
+    // for an unrelated reason (e.g. saving a pick elsewhere on this page).
+    if (tbDirtyRef.current) return;
     setMyTB(
       tiebreakers.find((t) => t.userId === uid)?.mnfTotalPointsGuess ?? ""
     );
-
-    return () => {
-      setMyTB("");
-    };
   }, [tiebreakers, uid]);
 
   // Ticking clock for live countdown
@@ -109,6 +109,7 @@ export default function PicksClient({
         setError(body?.error ?? "Failed to save tiebreaker");
         return;
       }
+      tbDirtyRef.current = false;
       router.refresh();
       setTbSaved(true);
       setTimeout(() => setTbSaved(false), 3000);
@@ -184,6 +185,7 @@ export default function PicksClient({
             placeholder="Enter total points"
             title="Tiebreaker Total Points"
             onChange={(e) => {
+              tbDirtyRef.current = true;
               setMyTB(e.target.value === "" ? "" : Number(e.target.value));
               setTbSaved(false);
             }}
