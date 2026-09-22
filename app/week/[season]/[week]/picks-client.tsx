@@ -107,6 +107,10 @@ export default function PicksClient({
       if (!res.ok) {
         const body = await res.json().catch(() => null);
         setError(body?.error ?? "Failed to save tiebreaker");
+        if (res.status === 409) {
+          tbDirtyRef.current = false;
+          setMyTB("");
+        }
         return;
       }
       tbDirtyRef.current = false;
