@@ -188,17 +188,23 @@ export default function PicksClient({
             value={myTB}
             placeholder="Enter total points"
             title="Tiebreaker Total Points"
+            disabled={!uid}
             onChange={(e) => {
               tbDirtyRef.current = true;
               setMyTB(e.target.value === "" ? "" : Number(e.target.value));
               setTbSaved(false);
             }}
           />
-          <Button variant="primary" onClick={saveTB} disabled={tbSaving}>
+          <Button variant="primary" onClick={saveTB} disabled={!uid || tbSaving}>
             {tbSaving ? "Saving…" : "Save"}
           </Button>
           {tbSaved && <span className="text-sm text-success">Saved</span>}
         </div>
+        {!uid && (
+          <div className="text-sm text-text-muted mt-2">
+            Sign in to enter a tiebreaker.
+          </div>
+        )}
       </Card>
 
       <div className="grid gap-3">

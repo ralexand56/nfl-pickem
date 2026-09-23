@@ -5,8 +5,17 @@ import { weeklyTiebreakers } from "@/db/schema";
 import { requireSession } from "@/lib/auth";
 
 export async function POST(req: Request) {
-  const session = await requireSession();
-  const userId = session.user!.id!;
+  let userId: string;
+  try {
+    const session = await requireSession();
+    userId = session.user!.id!;
+  } catch {
+    return NextResponse.json(
+      { error: "You've been signed out. Please sign in again to save your tiebreaker." },
+      { status: 401 }
+    );
+  }
+
   const { season, week, mnfTotalPointsGuess } = await req.json();
 
   try {
