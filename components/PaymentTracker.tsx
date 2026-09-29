@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { clsx } from "clsx";
 import Card from "@/components/ui/Card";
 import type { PaymentPlayer, PaymentViewer } from "@/lib/payments";
@@ -20,14 +20,28 @@ function usePayment(
   const [paid, setPaid] = useState(player.paid);
   const [method, setMethod] = useState(player.method);
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // What the latest local save expects the server to return. A refresh from
+  // an earlier save can land after a newer change; ignore it until the
+  // server data catches up.
+  const expected = useRef<{ paid: boolean; method: string | null } | null>(null);
 
-  useEffect(() => setPaid(player.paid), [player.paid]);
-  useEffect(() => setMethod(player.method), [player.method]);
+  useEffect(() => {
+    const exp = expected.current;
+    if (exp && (exp.paid !== player.paid || exp.method !== player.method)) return;
+    expected.current = null;
+    setPaid(player.paid);
+    setMethod(player.method);
+  }, [player.paid, player.method]);
 
   async function save(change: PaymentChange) {
     const prev = { paid, method };
-    if (change.paid !== undefined) setPaid(change.paid);
-    if (change.method !== undefined) setMethod(change.method);
+    const next = { ...prev, ...change };
+    expected.current = next;
+    setPaid(next.paid);
+    setMethod(next.method);
+    setSaved(false);
     setSaving(true);
     try {
       const res = await fetch("/api/payments", {
@@ -36,13 +50,18 @@ function usePayment(
       });
       if (!res.ok) {
         const body = await res.json().catch(() => null);
+        expected.current = null;
         setPaid(prev.paid);
         setMethod(prev.method);
         onError?.(body?.error ?? "Failed to save payment status");
         return;
       }
       router.refresh();
+      setSaved(true);
+      if (savedTimer.current) clearTimeout(savedTimer.current);
+      savedTimer.current = setTimeout(() => setSaved(false), 3000);
     } catch {
+      expected.current = null;
       setPaid(prev.paid);
       setMethod(prev.method);
       onError?.("Failed to save payment status");
@@ -51,7 +70,11 @@ function usePayment(
     }
   }
 
-  return { paid, method, saving, save };
+  useEffect(() => () => {
+    if (savedTimer.current) clearTimeout(savedTimer.current);
+  }, []);
+
+  return { paid, method, saving, saved, save };
 }
 
 function canEdit(viewer: PaymentViewer, player: PaymentPlayer) {
@@ -230,7 +253,12 @@ function PaymentRow({
   viewer: PaymentViewer;
   onError: (msg: string) => void;
 }) {
-  const { paid, method, saving, save } = usePayment(player, season, week, onError);
+  const { paid, method, saving, saved, save } = usePayment(
+    player,
+    season,
+    week,
+    onError
+  );
   const editable = canEdit(viewer, player);
 
   return (
@@ -249,9 +277,16 @@ function PaymentRow({
         onToggle={() => editable && save({ paid: !paid })}
       />
       <div className="min-w-0 flex flex-col">
-        <span className="text-sm text-text truncate" title={player.name}>
-          {player.name}
-        </span>
+        <div className="flex items-center gap-1 min-w-0">
+          <span className="text-sm text-text truncate" title={player.name}>
+            {player.name}
+          </span>
+          {saved && (
+            <span className="shrink-0 text-xs text-success" role="status">
+              Saved
+            </span>
+          )}
+        </div>
         {paid &&
           (editable ? (
             <MethodPicker
