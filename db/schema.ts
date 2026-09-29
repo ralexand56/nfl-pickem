@@ -8,6 +8,7 @@ import {
   timestamp,
   boolean,
   uniqueIndex,
+  unique,
   uuid,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -79,6 +80,34 @@ export const weeklyTiebreakers = pgTable(
   ]
 );
 
+// Weekly buy-in payments. One row per user per week; updatedBy records who
+// last changed it (the player themselves or a payment admin).
+export const weeklyPayments = pgTable(
+  "weekly_payments",
+  {
+    id: serial("id").primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    season: integer("season").notNull(),
+    week: integer("week").notNull(),
+    paid: boolean("paid").notNull().default(false),
+    // "Cash App", "Zelle", or free text the player typed for "Other"
+    method: text("method"),
+    updatedBy: uuid("updated_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  },
+  (t) => [
+    unique("weekly_payments_user_season_week_unique").on(
+      t.userId,
+      t.season,
+      t.week
+    ),
+  ]
+);
+
 // Super Bowl Squares
 export const superBowlSquares = pgTable(
   "super_bowl_squares",
@@ -126,6 +155,8 @@ export type InsertPick = typeof picks.$inferInsert;
 export type SelectPick = typeof picks.$inferSelect;
 export type InsertWeeklyTiebreaker = typeof weeklyTiebreakers.$inferInsert;
 export type SelectWeeklyTiebreaker = typeof weeklyTiebreakers.$inferSelect;
+export type InsertWeeklyPayment = typeof weeklyPayments.$inferInsert;
+export type SelectWeeklyPayment = typeof weeklyPayments.$inferSelect;
 export type InsertSuperBowlSquare = typeof superBowlSquares.$inferInsert;
 export type SelectSuperBowlSquare = typeof superBowlSquares.$inferSelect;
 export type InsertSuperBowlSquaresConfig =

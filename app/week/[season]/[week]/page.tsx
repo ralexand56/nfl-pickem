@@ -2,6 +2,8 @@ import { db } from "@/db";
 import { games, picks, weeklyTiebreakers, users } from "@/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import PicksClient from "./picks-client";
+import PaymentTracker from "@/components/PaymentTracker";
+import { getPaymentViewer, getWeekPayments } from "@/lib/payments";
 
 export default async function WeekPage({
   params,
@@ -38,8 +40,25 @@ export default async function WeekPage({
         )
       );
 
+    const [paymentPlayers, viewer] = await Promise.all([
+      getWeekPayments(seasonNumber, weekNumber),
+      getPaymentViewer(),
+    ]);
+    const participantIds = Array.from(
+      new Set(allPicks.map((p) => p.picks.userId))
+    );
+
     return (
       <PicksClient
+        paymentTracker={
+          <PaymentTracker
+            players={paymentPlayers}
+            participantIds={participantIds}
+            season={seasonNumber}
+            week={weekNumber}
+            viewer={viewer}
+          />
+        }
         games={gs}
         allPicks={allPicks}
         tiebreakers={tbs}

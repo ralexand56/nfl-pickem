@@ -1,7 +1,14 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+  type ReactNode,
+} from "react";
 import { clsx } from "clsx";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -31,12 +38,14 @@ export default function PicksClient({
   tiebreakers,
   season,
   week,
+  paymentTracker,
 }: {
   games: SelectGame[];
   allPicks: { picks: SelectPick; users: SelectUser }[];
   tiebreakers: SelectWeeklyTiebreaker[];
   season: number;
   week: number;
+  paymentTracker?: ReactNode;
 }) {
   const { data: session } = useSession();
   const router = useRouter();
@@ -173,6 +182,8 @@ export default function PicksClient({
           </div>
         </Card>
       )}
+
+      {paymentTracker}
 
       <Card className="mb-6">
         <h3 className="font-semibold mb-2 text-text">

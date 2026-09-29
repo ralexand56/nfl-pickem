@@ -8,6 +8,8 @@ import Image from "next/image";
 import WeekSelector from "./week-selector";
 import Card from "@/components/ui/Card";
 import Table, { TableContainer } from "@/components/ui/Table";
+import PaymentTracker, { PaidToggle } from "@/components/PaymentTracker";
+import { getPaymentViewer, getWeekPayments } from "@/lib/payments";
 
 export default async function Leaderboard({
   params,
@@ -55,7 +57,12 @@ export default async function Leaderboard({
       )
     );
 
-  const userMap = await getUserMap();
+  const [userMap, paymentPlayers, viewer] = await Promise.all([
+    getUserMap(),
+    getWeekPayments(seasonNumber, weekNumber),
+    getPaymentViewer(),
+  ]);
+  const paymentByUser = new Map(paymentPlayers.map((p) => [p.id, p]));
   const userIds = Array.from(new Set(ps.map((p) => p.userId)));
   const rows = userIds
     .map((uid) => ({
@@ -110,6 +117,7 @@ export default async function Leaderboard({
               <th>Correct</th>
               <th>Tiebreak</th>
               <th>Tiebreaker Diff</th>
+              <th>Paid</th>
             </tr>
           </thead>
           <tbody>
@@ -128,11 +136,30 @@ export default async function Leaderboard({
                 <td className="p-2 text-text">{r.correct}</td>
                 <td className="p-2 text-text">{r.tb}</td>
                 <td className="p-2 text-text">{r.tieDistance ?? "—"}</td>
+                <td className="p-2">
+                  {paymentByUser.has(r.uid) && (
+                    <PaidToggle
+                      player={paymentByUser.get(r.uid)!}
+                      season={seasonNumber}
+                      week={weekNumber}
+                      viewer={viewer}
+                    />
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </Table>
       </TableContainer>
+      <div className="mt-6">
+        <PaymentTracker
+          players={paymentPlayers}
+          participantIds={userIds}
+          season={seasonNumber}
+          week={weekNumber}
+          viewer={viewer}
+        />
+      </div>
     </main>
   );
 }
