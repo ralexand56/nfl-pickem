@@ -14,6 +14,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Badge from "@/components/ui/Badge";
+import { useToast } from "@/components/Toast";
 
 // Extend the session user type to include 'id'
 import type { DefaultSession } from "next-auth";
@@ -49,6 +50,7 @@ export default function PicksClient({
 }) {
   const { data: session } = useSession();
   const router = useRouter();
+  const toast = useToast();
 
   const uid = session?.user?.id;
 
@@ -57,9 +59,7 @@ export default function PicksClient({
     tiebreakers.find((t) => t.userId === uid)?.mnfTotalPointsGuess ?? ""
   );
   const [nowMs, setNowMs] = useState<number>(Date.now());
-  const [error, setError] = useState<string | null>(null);
   const [tbSaving, setTbSaving] = useState(false);
-  const [tbSaved, setTbSaved] = useState(false);
   const tbDirtyRef = useRef(false);
 
   useEffect(() => {
@@ -84,7 +84,8 @@ export default function PicksClient({
   );
 
   async function pick(gameId: string, pick: "HOME" | "AWAY") {
-    setError(null);
+    const game = games.find((g) => g.id === gameId);
+    const team = pick === "HOME" ? game?.homeTeam : game?.awayTeam;
     start(async () => {
       try {
         const res = await fetch("/api/picks", {
@@ -93,20 +94,19 @@ export default function PicksClient({
         });
         if (!res.ok) {
           const body = await res.json().catch(() => null);
-          setError(body?.error ?? "Failed to save pick");
+          toast.error(body?.error ?? "Failed to save pick");
           return;
         }
         router.refresh();
+        toast.success(team ? `Pick saved: ${team}` : "Pick saved");
       } catch {
-        setError("Failed to save pick");
+        toast.error("Failed to save pick");
       }
     });
   }
 
   async function saveTB() {
     if (myTB === "") return;
-    setError(null);
-    setTbSaved(false);
     setTbSaving(true);
     try {
       const res = await fetch("/api/tiebreaker", {
@@ -115,7 +115,7 @@ export default function PicksClient({
       });
       if (!res.ok) {
         const body = await res.json().catch(() => null);
-        setError(body?.error ?? "Failed to save tiebreaker");
+        toast.error(body?.error ?? "Failed to save tiebreaker");
         if (res.status === 409) {
           tbDirtyRef.current = false;
           setMyTB("");
@@ -124,10 +124,9 @@ export default function PicksClient({
       }
       tbDirtyRef.current = false;
       router.refresh();
-      setTbSaved(true);
-      setTimeout(() => setTbSaved(false), 3000);
+      toast.success("Tiebreaker saved");
     } catch {
-      setError("Failed to save tiebreaker");
+      toast.error("Failed to save tiebreaker");
     } finally {
       setTbSaving(false);
     }
@@ -158,12 +157,6 @@ export default function PicksClient({
       <h2 className="text-2xl font-semibold mb-4 text-text">
         Week {week} · {season} {pending && "(updating...)"}
       </h2>
-
-      {error && (
-        <Card className="mb-6 bg-danger-muted border-transparent">
-          <div className="text-danger">{error}</div>
-        </Card>
-      )}
 
       {firstGameTimeMs != null && (
         <Card
@@ -203,13 +196,11 @@ export default function PicksClient({
             onChange={(e) => {
               tbDirtyRef.current = true;
               setMyTB(e.target.value === "" ? "" : Number(e.target.value));
-              setTbSaved(false);
             }}
           />
           <Button variant="primary" onClick={saveTB} disabled={!uid || tbSaving}>
             {tbSaving ? "Saving…" : "Save"}
           </Button>
-          {tbSaved && <span className="text-sm text-success">Saved</span>}
         </div>
         {!uid && (
           <div className="text-sm text-text-muted mt-2">

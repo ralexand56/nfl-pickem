@@ -2,7 +2,8 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
+import { useToast } from "@/components/Toast";
 import { claimSquareAction, unclaimSquareAction } from "./[gameId]/actions";
 import type {
   SelectSuperBowlSquare,
@@ -27,7 +28,7 @@ export default function SquaresGrid({
   const { data: session } = useSession();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const toast = useToast();
 
   const homeNumbers = config.homeNumbers
     ? JSON.parse(config.homeNumbers)
@@ -44,12 +45,12 @@ export default function SquaresGrid({
 
   async function handleSquareClick(row: number, col: number) {
     if (!session?.user?.id) {
-      setError("Please sign in to claim a square");
+      toast.error("Please sign in to claim a square");
       return;
     }
 
     if (config.isLocked ?? false) {
-      setError("Board is locked - no more changes can be made");
+      toast.error("Board is locked - no more changes can be made");
       return;
     }
 
@@ -57,13 +58,12 @@ export default function SquaresGrid({
 
     // If clicking your own square, unclaim it
     if (square?.userId === session.user.id) {
-      setError(null);
       startTransition(async () => {
         try {
           await unclaimSquareAction(row, col, gameId);
           router.refresh();
         } catch (e: unknown) {
-          setError(e instanceof Error ? e.message : "Failed to unclaim square");
+          toast.error(e instanceof Error ? e.message : "Failed to unclaim square");
         }
       });
       return;
@@ -71,18 +71,17 @@ export default function SquaresGrid({
 
     // If square is claimed by someone else
     if (square?.userId) {
-      setError("This square is already claimed");
+      toast.error("This square is already claimed");
       return;
     }
 
     // Claim the square
-    setError(null);
     startTransition(async () => {
       try {
         await claimSquareAction(row, col, gameId);
         router.refresh();
       } catch (e: unknown) {
-        setError(e instanceof Error ? e.message : "Failed to claim square");
+        toast.error(e instanceof Error ? e.message : "Failed to claim square");
       }
     });
   }
@@ -95,12 +94,6 @@ export default function SquaresGrid({
 
   return (
     <div className="overflow-x-auto">
-      {error && (
-        <div className="mb-4 p-3 bg-danger-muted text-danger rounded-control">
-          {error}
-        </div>
-      )}
-
       <div className="inline-block border-2 border-border">
         {/* Header row with away team numbers */}
         <div className="flex">

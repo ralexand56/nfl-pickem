@@ -3,25 +3,28 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { clsx } from "clsx";
 import Card from "@/components/ui/Card";
+import { useToast } from "@/components/Toast";
 import type { PaymentPlayer, PaymentViewer } from "@/lib/payments";
 import { MAX_METHOD_LENGTH, PAYMENT_METHODS } from "@/lib/payment-methods";
 
 type PaymentChange = { paid?: boolean; method?: string | null };
 
+function successMessage(name: string, change: PaymentChange) {
+  if (change.paid !== undefined)
+    return `${name} marked ${change.paid ? "paid" : "not paid"}`;
+  return change.method
+    ? `Payment method saved: ${change.method}`
+    : "Payment method cleared";
+}
+
 // Paid/method state for one player, saved optimistically and rolled back if
 // the server rejects it.
-function usePayment(
-  player: PaymentPlayer,
-  season: number,
-  week: number,
-  onError?: (msg: string) => void
-) {
+function usePayment(player: PaymentPlayer, season: number, week: number) {
   const router = useRouter();
+  const toast = useToast();
   const [paid, setPaid] = useState(player.paid);
   const [method, setMethod] = useState(player.method);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // What the latest local save expects the server to return. A refresh from
   // an earlier save can land after a newer change; ignore it until the
   // server data catches up.
@@ -41,7 +44,6 @@ function usePayment(
     expected.current = next;
     setPaid(next.paid);
     setMethod(next.method);
-    setSaved(false);
     setSaving(true);
     try {
       const res = await fetch("/api/payments", {
@@ -53,28 +55,22 @@ function usePayment(
         expected.current = null;
         setPaid(prev.paid);
         setMethod(prev.method);
-        onError?.(body?.error ?? "Failed to save payment status");
+        toast.error(body?.error ?? "Failed to save payment status");
         return;
       }
       router.refresh();
-      setSaved(true);
-      if (savedTimer.current) clearTimeout(savedTimer.current);
-      savedTimer.current = setTimeout(() => setSaved(false), 3000);
+      toast.success(successMessage(player.name, change));
     } catch {
       expected.current = null;
       setPaid(prev.paid);
       setMethod(prev.method);
-      onError?.("Failed to save payment status");
+      toast.error("Failed to save payment status");
     } finally {
       setSaving(false);
     }
   }
 
-  useEffect(() => () => {
-    if (savedTimer.current) clearTimeout(savedTimer.current);
-  }, []);
-
-  return { paid, method, saving, saved, save };
+  return { paid, method, saving, save };
 }
 
 function canEdit(viewer: PaymentViewer, player: PaymentPlayer) {
@@ -245,20 +241,13 @@ function PaymentRow({
   season,
   week,
   viewer,
-  onError,
 }: {
   player: PaymentPlayer;
   season: number;
   week: number;
   viewer: PaymentViewer;
-  onError: (msg: string) => void;
 }) {
-  const { paid, method, saving, saved, save } = usePayment(
-    player,
-    season,
-    week,
-    onError
-  );
+  const { paid, method, saving, save } = usePayment(player, season, week);
   const editable = canEdit(viewer, player);
 
   return (
@@ -277,16 +266,9 @@ function PaymentRow({
         onToggle={() => editable && save({ paid: !paid })}
       />
       <div className="min-w-0 flex flex-col">
-        <div className="flex items-center gap-1 min-w-0">
-          <span className="text-sm text-text truncate" title={player.name}>
-            {player.name}
-          </span>
-          {saved && (
-            <span className="shrink-0 text-xs text-success" role="status">
-              Saved
-            </span>
-          )}
-        </div>
+        <span className="text-sm text-text truncate" title={player.name}>
+          {player.name}
+        </span>
         {paid &&
           (editable ? (
             <MethodPicker
@@ -322,7 +304,6 @@ export default function PaymentTracker({
   viewer: PaymentViewer;
 }) {
   const [showAll, setShowAll] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const visible = useMemo(() => {
     if (showAll) return players;
@@ -341,8 +322,6 @@ export default function PaymentTracker({
         </span>
       </div>
 
-      {error && <div className="text-sm text-danger mb-2">{error}</div>}
-
       {visible.length === 0 ? (
         <div className="text-sm text-text-muted">No players yet this week.</div>
       ) : (
@@ -354,7 +333,6 @@ export default function PaymentTracker({
               season={season}
               week={week}
               viewer={viewer}
-              onError={setError}
             />
           ))}
         </ul>
