@@ -1,51 +1,51 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { picks, games } from "@/db/schema";
-import { and, eq, inArray } from "drizzle-orm";
-import { requireSession } from "@/lib/auth";
-
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const season = Number(searchParams.get("season"));
-  const week = Number(searchParams.get("week"));
-
-  const weekGames = await db
-    .select({ id: games.id })
-    .from(games)
-    .where(and(eq(games.season, season), eq(games.week, week)));
-
-  const rows = await db
-    .select()
-    .from(picks)
-    .where(
-      inArray(
-        picks.gameId,
-        weekGames.map((g) => g.id)
-      )
-    );
-
-  return NextResponse.json(rows);
-}
+import { and, eq } from "drizzle-orm";
+import {
+  isSeasonActive,
+  requireGroupMember,
+  type GroupContext,
+} from "@/lib/group";
+import { groupErrorResponse } from "@/lib/api";
+import { pickDeadlineMs } from "@/lib/group-settings";
 
 export async function POST(req: Request) {
-  const session = await requireSession();
-  const { gameId, pick } = await req.json();
+  const { group: slug, gameId, pick } = await req.json();
+
+  let ctx: GroupContext;
+  try {
+    ctx = await requireGroupMember(slug);
+  } catch (error) {
+    return groupErrorResponse(error);
+  }
 
   const [game] = await db.select().from(games).where(eq(games.id, gameId));
   if (!game)
     return NextResponse.json({ error: "Unknown game" }, { status: 400 });
 
-  // Enforce cutoff: no picks after the first game of the week has started
-  const [firstGame] = await db
-    .select()
-    .from(games)
-    .where(and(eq(games.season, game.season), eq(games.week, game.week)))
-    .orderBy(games.date)
-    .limit(1);
-
-  if (firstGame && new Date().getTime() > new Date(firstGame.date).getTime()) {
+  if (!(await isSeasonActive(ctx.group.id, game.season))) {
     return NextResponse.json(
-      { error: "Picks are closed for this week" },
+      { error: `Your group isn't active for the ${game.season} season yet. Ask your admin to renew.` },
+      { status: 402 }
+    );
+  }
+
+  // Enforce the group's cutoff: the first kickoff of the week, or (if the
+  // group allows it) each game's own kickoff.
+  const weekGames = await db
+    .select({ date: games.date })
+    .from(games)
+    .where(and(eq(games.season, game.season), eq(games.week, game.week)));
+  const rule = ctx.settings.pickDeadline;
+  if (Date.now() > pickDeadlineMs(rule, game, weekGames)) {
+    return NextResponse.json(
+      {
+        error:
+          rule === "game"
+            ? "This game has already started"
+            : "Picks are closed for this week",
+      },
       { status: 403 }
     );
   }
@@ -53,9 +53,9 @@ export async function POST(req: Request) {
   try {
     await db
       .insert(picks)
-      .values({ userId: session.user!.id!, gameId, pick })
+      .values({ groupId: ctx.group.id, userId: ctx.viewer.id, gameId, pick })
       .onConflictDoUpdate({
-        target: [picks.userId, picks.gameId],
+        target: [picks.groupId, picks.userId, picks.gameId],
         set: { pick },
       });
   } catch (error) {

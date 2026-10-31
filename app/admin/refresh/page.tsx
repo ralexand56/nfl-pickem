@@ -1,10 +1,12 @@
 // app/admin/refresh/page.tsx
 import { refreshScoresAction, fullSyncAction } from "./actions";
 import SubmitButton from "./SubmitButton";
+import { requireOwner } from "@/lib/auth";
 
 export const revalidate = 0;
 
-export default function AdminRefreshPage() {
+export default async function AdminRefreshPage() {
+  await requireOwner();
   return (
     <main className="mx-auto max-w-xl p-6 space-y-8">
       <h1 className="text-xl font-semibold">Admin: NFL Schedule &amp; Scores</h1>

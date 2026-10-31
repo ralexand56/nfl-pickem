@@ -1,25 +1,36 @@
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { users, weeklyPayments } from "@/db/schema";
-import { requireSession } from "@/lib/auth";
-import { isPaymentAdmin } from "@/lib/payments";
+import { groupMembers, weeklyPayments } from "@/db/schema";
+import { requireGroupMember, type GroupContext } from "@/lib/group";
+import { groupErrorResponse } from "@/lib/api";
 import { MAX_METHOD_LENGTH } from "@/lib/payment-methods";
 
 export async function POST(req: Request) {
-  let viewerId: string;
+  // paid and method are each optional so either can be changed on its own
+  const {
+    group: slug,
+    userId,
+    season,
+    week,
+    paid,
+    method: rawMethod,
+  } = await req.json();
+
+  let ctx: GroupContext;
   try {
-    const session = await requireSession();
-    viewerId = session.user!.id!;
-  } catch {
+    ctx = await requireGroupMember(slug);
+  } catch (error) {
+    return groupErrorResponse(error);
+  }
+  const viewerId = ctx.viewer.id;
+  if (!ctx.settings.buyInEnabled) {
     return NextResponse.json(
-      { error: "You've been signed out. Please sign in again." },
-      { status: 401 }
+      { error: "This group doesn't track buy-ins." },
+      { status: 403 }
     );
   }
 
-  // paid and method are each optional so either can be changed on its own
-  const { userId, season, week, paid, method: rawMethod } = await req.json();
   const method =
     typeof rawMethod === "string" ? rawMethod.trim().slice(0, MAX_METHOD_LENGTH) || null : rawMethod;
   if (
@@ -34,15 +45,24 @@ export async function POST(req: Request) {
   }
 
   if (userId !== viewerId) {
-    const [viewer] = await db
-      .select({ email: users.email })
-      .from(users)
-      .where(eq(users.id, viewerId));
-    if (!isPaymentAdmin(viewer?.email)) {
+    if (!ctx.viewer.isAdmin) {
       return NextResponse.json(
         { error: "You can only change your own payment status." },
         { status: 403 }
       );
+    }
+    // Admins can only mark members of their own group.
+    const [member] = await db
+      .select({ userId: groupMembers.userId })
+      .from(groupMembers)
+      .where(
+        and(
+          eq(groupMembers.groupId, ctx.group.id),
+          eq(groupMembers.userId, userId)
+        )
+      );
+    if (!member) {
+      return NextResponse.json({ error: "Not a group member" }, { status: 404 });
     }
   }
 
@@ -55,9 +75,14 @@ export async function POST(req: Request) {
     };
     await db
       .insert(weeklyPayments)
-      .values({ userId, season, week, ...changes })
+      .values({ groupId: ctx.group.id, userId, season, week, ...changes })
       .onConflictDoUpdate({
-        target: [weeklyPayments.userId, weeklyPayments.season, weeklyPayments.week],
+        target: [
+          weeklyPayments.groupId,
+          weeklyPayments.userId,
+          weeklyPayments.season,
+          weeklyPayments.week,
+        ],
         set: changes,
       });
   } catch (error) {

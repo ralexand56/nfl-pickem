@@ -1,63 +1,410 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { clsx } from "clsx";
+import type { ReactNode } from "react";
 import Card from "@/components/ui/Card";
-import WeekStatusBadge from "@/components/WeekStatusBadge";
-import { getCurrentNfl } from "@/lib/server";
-import { WEEK_LABELS, getWeekStatus } from "@/lib/weeks";
+import { getUserGroups, getViewerId } from "@/lib/group";
 
 export default async function Home() {
-  const current = await getCurrentNfl();
-  const season = current.season ?? new Date().getFullYear();
-
-  const renderWeek = (week: number, label: string) => {
-    const status = getWeekStatus(season, week, current);
-    return (
-      <a key={week} href={`/week/${season}/${week}`}>
-        <Card
-          className={clsx(
-            "p-4 hover:bg-surface-muted transition-colors flex items-center justify-between gap-3",
-            status === "current" && "border-brand-500 ring-1 ring-brand-500",
-            status === "past" && "text-text-muted"
-          )}
-        >
-          <span>{label}</span>
-          <WeekStatusBadge status={status} />
-        </Card>
-      </a>
-    );
-  };
+  const viewerId = await getViewerId();
+  const groups = viewerId ? await getUserGroups(viewerId) : [];
+  if (groups.length > 0) redirect(`/g/${groups[0].slug}`);
 
   return (
-    <main className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-4 text-text">Alexander NFL Pick&apos;em</h1>
-      <p className="text-text-muted mb-4">
-        Choose a week to make your picks.
-        {current.week != null && current.season === season && (
-          <>
-            {" "}
-            <a
-              href={`/week/${season}/${current.week}`}
-              className="text-brand-600 hover:underline"
-            >
-              Jump to this week →
-            </a>
-          </>
-        )}
+    <div className="bg-bg">
+      {viewerId && <NoGroupNotice />}
+      <Hero />
+      <Features />
+      <HowItWorks />
+      <Pricing />
+      <Faq />
+    </div>
+  );
+}
+
+// Signed in but not in any group: the only ways in are an invite or paying.
+function NoGroupNotice() {
+  return (
+    <div className="bg-brand-50 border-b border-border">
+      <p className="max-w-5xl mx-auto px-4 py-3 text-sm text-text">
+        You&apos;re signed in but not in a group yet. Ask your group&apos;s admin for
+        their invite link, or{" "}
+        <Link href="/start" className="font-medium text-brand-700 underline">
+          start your own group
+        </Link>
+        .
       </p>
+    </div>
+  );
+}
 
-      <div className="grid gap-2">
-        {/* Regular Season Weeks */}
-        <h2 className="text-xl font-semibold mt-4 mb-2 text-text">Regular Season</h2>
-        {Array.from({ length: 18 }, (_, i) => i + 1).map((week) =>
-          renderWeek(week, `Week ${week}`)
-        )}
+function CtaButton({ className }: { className?: string }) {
+  return (
+    <Link
+      href="/start"
+      className={clsx(
+        "inline-block rounded-control bg-brand-600 px-6 py-3 font-semibold text-white hover:bg-brand-700",
+        className
+      )}
+    >
+      Start your group · $10
+    </Link>
+  );
+}
 
-        {/* Playoff Weeks */}
-        <h2 className="text-xl font-semibold mt-6 mb-2 text-text">Playoffs</h2>
-        {[19, 20, 21].map((week) =>
-          renderWeek(week, `Week ${week} - ${WEEK_LABELS[week]}`)
-        )}
-        {/* Add Super Bowl (week 22) once it's on the schedule */}
+function Hero() {
+  return (
+    <section className="max-w-5xl mx-auto px-4 pt-16 pb-12 text-center">
+      <p className="text-sm font-semibold uppercase tracking-wide text-brand-600 mb-3">
+        NFL pick&apos;em for families &amp; friends
+      </p>
+      <h1 className="text-4xl sm:text-5xl font-bold text-text leading-tight mb-4">
+        Run your family&apos;s NFL pick&apos;em.
+        <br className="hidden sm:block" /> Skip the spreadsheet.
+      </h1>
+      <p className="text-lg text-text-muted max-w-2xl mx-auto mb-8">
+        Weekly picks, automatic scoring, a live leaderboard, buy-in tracking and a
+        Super Bowl squares board, all in one private group for $10 a season.
+      </p>
+      <CtaButton />
+      <p className="text-sm text-text-muted mt-3">
+        Members join free with your invite link.
+      </p>
+    </section>
+  );
+}
+
+function Feature({
+  title,
+  children,
+  preview,
+  reverse,
+}: {
+  title: string;
+  children: ReactNode;
+  preview: ReactNode;
+  reverse?: boolean;
+}) {
+  return (
+    <div
+      className={clsx(
+        "grid md:grid-cols-2 gap-8 items-center",
+        reverse && "md:[&>*:first-child]:order-2"
+      )}
+    >
+      <div>
+        <h3 className="text-2xl font-bold text-text mb-3">{title}</h3>
+        <div className="text-text-muted space-y-2">{children}</div>
       </div>
-    </main>
+      <div aria-hidden>{preview}</div>
+    </div>
+  );
+}
+
+function PicksPreview() {
+  const games = [
+    ["KC", "BUF", "BUF"],
+    ["DAL", "PHI", "DAL"],
+    ["SF", "SEA", "SF"],
+  ];
+  return (
+    <Card className="space-y-3">
+      <div className="flex justify-between rounded-control bg-warning-muted px-3 py-2 text-sm text-text">
+        <span className="font-semibold">Picks lock in</span>
+        <span className="font-mono">1d 04:12:09</span>
+      </div>
+      {games.map(([away, home, pick]) => (
+        <div key={away} className="flex items-center justify-between">
+          <span className="text-sm text-text">
+            {away} @ {home}
+          </span>
+          <span className="flex gap-2">
+            {[away, home].map((t) => (
+              <span
+                key={t}
+                className={clsx(
+                  "rounded-control border px-3 py-1 text-sm",
+                  t === pick
+                    ? "border-transparent bg-brand-600 text-white"
+                    : "border-border text-text"
+                )}
+              >
+                {t}
+              </span>
+            ))}
+          </span>
+        </div>
+      ))}
+    </Card>
+  );
+}
+
+function LeaderboardPreview() {
+  const rows = [
+    ["Grandma Jo", 12, true],
+    ["Marcus", 11, true],
+    ["Aunt Lisa", 11, false],
+    ["Devin", 9, true],
+  ] as const;
+  return (
+    <Card>
+      <div className="mb-3 flex items-center justify-between">
+        <span className="font-semibold text-text">Week 8 Leaderboard</span>
+        <span className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-medium text-brand-700">
+          This week
+        </span>
+      </div>
+      <ul className="divide-y divide-border text-sm">
+        {rows.map(([name, correct, paid], i) => (
+          <li key={name} className="flex items-center justify-between py-2">
+            <span className="text-text">
+              {i === 0 && "🏆 "}
+              {name}
+            </span>
+            <span className="flex items-center gap-3">
+              <span className="text-text">{correct} correct</span>
+              <span
+                className={clsx(
+                  "grid h-6 w-6 place-items-center rounded-full text-xs font-bold",
+                  paid ? "bg-success-muted text-success" : "bg-surface-muted text-text-muted"
+                )}
+              >
+                $
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
+function PaymentPreview() {
+  const people = [
+    ["Grandma Jo", "Zelle"],
+    ["Marcus", "Cash App"],
+    ["Aunt Lisa", null],
+    ["Devin", "Venmo"],
+    ["Uncle Ray", null],
+    ["Kayla", "Cash App"],
+  ] as const;
+  return (
+    <Card>
+      <div className="mb-3 flex justify-between text-sm">
+        <span className="font-semibold text-text">Who&apos;s paid · Week 8 · $5 buy-in</span>
+        <span className="text-text-muted">4 of 6 paid</span>
+      </div>
+      <ul className="grid grid-cols-2 gap-2 text-sm">
+        {people.map(([name, method]) => (
+          <li key={name} className="flex items-center gap-2">
+            <span
+              className={clsx(
+                "grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-bold",
+                method ? "bg-success-muted text-success" : "bg-surface-muted text-text-muted"
+              )}
+            >
+              $
+            </span>
+            <span className="text-text truncate">{name}</span>
+            {method && <span className="text-xs text-text-muted">{method}</span>}
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
+function SquaresPreview() {
+  const claimed = new Set([2, 5, 11, 14, 17, 23, 28, 31, 36, 40, 44, 47, 52, 58, 61, 63, 69, 72, 77, 80, 85, 88, 93, 96, 99]);
+  const mine = new Set([14, 47, 77]);
+  return (
+    <Card>
+      <div className="mb-3 text-sm font-semibold text-text">Super Bowl Squares · $5/square</div>
+      <div className="grid grid-cols-10 gap-1">
+        {Array.from({ length: 100 }, (_, i) => (
+          <div
+            key={i}
+            className={clsx(
+              "aspect-square rounded-sm",
+              mine.has(i)
+                ? "bg-success"
+                : claimed.has(i)
+                  ? "bg-brand-300"
+                  : "bg-surface-muted"
+            )}
+          />
+        ))}
+      </div>
+      <div className="mt-3 flex justify-between text-xs text-text-muted">
+        <span>Q1 20% · Q2 20% · Q3 20% · Final 40%</span>
+        <span>25 / 100 claimed</span>
+      </div>
+    </Card>
+  );
+}
+
+function Features() {
+  return (
+    <section className="max-w-5xl mx-auto px-4 py-12 space-y-16">
+      <Feature title="Weekly picks with a live countdown" preview={<PicksPreview />}>
+        <p>
+          Every NFL game is loaded automatically each week. Members tap a team, and
+          a countdown shows exactly when picks lock.
+        </p>
+        <p>
+          A Monday-night tiebreaker (guess the total points) settles ties. You choose
+          whether picks lock at the first kickoff or game by game.
+        </p>
+      </Feature>
+
+      <Feature
+        reverse
+        title="Scores and the leaderboard update themselves"
+        preview={<LeaderboardPreview />}
+      >
+        <p>
+          Final scores come in automatically and the weekly leaderboard ranks
+          everyone, tiebreaker included. No more adding up a group text on Tuesday.
+        </p>
+        <p>
+          Every week is labeled <em>Final</em>, <em>This week</em> or{" "}
+          <em>Upcoming</em>, so everyone always lands in the right place.
+        </p>
+      </Feature>
+
+      <Feature title="Track who's paid the buy-in" preview={<PaymentPreview />}>
+        <p>
+          Set your weekly buy-in and the ways people pay (Cash App, Zelle, Venmo,
+          whatever your group uses). Members tap the <strong>$</strong> to mark
+          themselves paid, and admins can mark anyone.
+        </p>
+        <p className="text-sm">
+          The money stays between your members. The app just keeps score.
+        </p>
+      </Feature>
+
+      <Feature reverse title="Super Bowl squares, built in" preview={<SquaresPreview />}>
+        <p>
+          Run the classic 10×10 Super Bowl squares board right next to your pick&apos;em.
+          Members claim squares, you set the price, and once the board fills you
+          draw the random numbers with one tap.
+        </p>
+        <p>
+          Lock the board before kickoff, see who owes what, and the payouts are laid
+          out by quarter. You can run more than one board if you like.
+        </p>
+      </Feature>
+
+      <div className="grid sm:grid-cols-3 gap-4">
+        {[
+          [
+            "Invite-only & private",
+            "Only people with your invite link can join. Reset the link any time.",
+          ],
+          [
+            "You're the commissioner",
+            "Add co-admins, remove members, and turn features on or off for your group.",
+          ],
+          [
+            "Works on any phone",
+            "Nothing to install. Sign in with Google or an email link.",
+          ],
+        ].map(([title, body]) => (
+          <Card key={title}>
+            <h3 className="font-semibold text-text mb-1">{title}</h3>
+            <p className="text-sm text-text-muted">{body}</p>
+          </Card>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function HowItWorks() {
+  const steps = [
+    ["Start your group", "Name it and pay $10 for the season."],
+    ["Share your invite link", "Drop it in the family group chat."],
+    ["Play all season", "Picks, scores, leaderboard and squares are handled."],
+  ];
+  return (
+    <section className="bg-surface border-y border-border">
+      <div className="max-w-5xl mx-auto px-4 py-12">
+        <h2 className="text-2xl font-bold text-text text-center mb-8">How it works</h2>
+        <ol className="grid sm:grid-cols-3 gap-6">
+          {steps.map(([title, body], i) => (
+            <li key={title} className="text-center">
+              <div className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-full bg-brand-600 font-bold text-white">
+                {i + 1}
+              </div>
+              <h3 className="font-semibold text-text">{title}</h3>
+              <p className="text-sm text-text-muted">{body}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+function Pricing() {
+  return (
+    <section className="max-w-5xl mx-auto px-4 py-12">
+      <Card className="max-w-md mx-auto p-8 text-center">
+        <h2 className="text-lg font-semibold text-text">One price, whole group</h2>
+        <p className="my-4">
+          <span className="text-5xl font-bold text-text">$10</span>
+          <span className="text-text-muted"> / season</span>
+        </p>
+        <ul className="text-sm text-text-muted space-y-1 mb-6">
+          <li>Unlimited members, free for them</li>
+          <li>Weekly picks, tiebreakers and leaderboard</li>
+          <li>Buy-in tracker and Super Bowl squares</li>
+          <li>One-time payment. Nothing renews automatically.</li>
+        </ul>
+        <CtaButton className="w-full" />
+      </Card>
+    </section>
+  );
+}
+
+function Faq() {
+  const faqs = [
+    [
+      "Do my members have to pay?",
+      "No. The admin pays $10 for the season and everyone with the invite link plays free.",
+    ],
+    [
+      "Does the app handle our pot or buy-ins?",
+      "No money moves through the app except the $10 season fee. It tracks who has paid; your group settles up however it already does.",
+    ],
+    [
+      "What happens next season?",
+      "Your group, members and history stay. When the new season starts you'll see a reminder to renew for another $10. It never charges you automatically.",
+    ],
+    [
+      "Can I be in more than one group?",
+      "Yes. Join your family's group and your office's with the same login, and switch between them from the menu.",
+    ],
+  ];
+  return (
+    <section className="max-w-3xl mx-auto px-4 pb-16">
+      <h2 className="text-2xl font-bold text-text text-center mb-6">Questions</h2>
+      <div className="space-y-3">
+        {faqs.map(([q, a]) => (
+          <details key={q} className="rounded-card border border-border bg-surface p-4">
+            <summary className="cursor-pointer font-medium text-text">{q}</summary>
+            <p className="mt-2 text-text-muted">{a}</p>
+          </details>
+        ))}
+      </div>
+      <div className="mt-10 text-center">
+        <CtaButton />
+        <p className="mt-4 text-sm text-text-muted">
+          <Link href="/privacy" className="underline">
+            Privacy
+          </Link>
+        </p>
+      </div>
+    </section>
   );
 }

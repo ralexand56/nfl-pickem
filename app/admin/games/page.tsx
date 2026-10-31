@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { games } from "@/db/schema";
 import { and, eq, asc } from "drizzle-orm";
-import { requireSession } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import GamesEditor from "./GamesEditor";
 
 export const revalidate = 0;
@@ -11,7 +11,7 @@ export default async function AdminGamesPage({
 }: {
   searchParams: Promise<{ season?: string; week?: string }>;
 }) {
-  await requireSession();
+  await requireOwner();
 
   const params = await searchParams;
   const season = params.season ? Number(params.season) : null;

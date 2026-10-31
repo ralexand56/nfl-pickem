@@ -4,8 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { clsx } from "clsx";
 import Card from "@/components/ui/Card";
 import { useToast } from "@/components/Toast";
+import { useGroup } from "@/components/GroupProvider";
 import type { PaymentPlayer, PaymentViewer } from "@/lib/payments";
-import { MAX_METHOD_LENGTH, PAYMENT_METHODS } from "@/lib/payment-methods";
+import { MAX_METHOD_LENGTH } from "@/lib/payment-methods";
 
 type PaymentChange = { paid?: boolean; method?: string | null };
 
@@ -22,6 +23,7 @@ function successMessage(name: string, change: PaymentChange) {
 function usePayment(player: PaymentPlayer, season: number, week: number) {
   const router = useRouter();
   const toast = useToast();
+  const group = useGroup();
   const [paid, setPaid] = useState(player.paid);
   const [method, setMethod] = useState(player.method);
   const [saving, setSaving] = useState(false);
@@ -48,7 +50,13 @@ function usePayment(player: PaymentPlayer, season: number, week: number) {
     try {
       const res = await fetch("/api/payments", {
         method: "POST",
-        body: JSON.stringify({ userId: player.id, season, week, ...change }),
+        body: JSON.stringify({
+          group: group.slug,
+          userId: player.id,
+          season,
+          week,
+          ...change,
+        }),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => null);
@@ -176,8 +184,8 @@ function MethodPicker({
   disabled: boolean;
   onSave: (method: string | null) => void;
 }) {
-  const isPreset = (m: string | null) =>
-    !!m && (PAYMENT_METHODS as readonly string[]).includes(m);
+  const { paymentMethods } = useGroup().settings;
+  const isPreset = (m: string | null) => !!m && paymentMethods.includes(m);
   const choiceFor = (m: string | null) => (!m ? "" : isPreset(m) ? m : OTHER);
 
   const [choice, setChoice] = useState(choiceFor(method));
@@ -209,7 +217,7 @@ function MethodPicker({
         className="text-xs rounded-control border border-border bg-surface text-text px-1 py-0.5"
       >
         <option value="">How&apos;d you pay?</option>
-        {PAYMENT_METHODS.map((m) => (
+        {paymentMethods.map((m) => (
           <option key={m} value={m}>
             {m}
           </option>
@@ -304,6 +312,7 @@ export default function PaymentTracker({
   viewer: PaymentViewer;
 }) {
   const [showAll, setShowAll] = useState(false);
+  const { buyInAmount } = useGroup().settings;
 
   const visible = useMemo(() => {
     if (showAll) return players;
@@ -316,7 +325,12 @@ export default function PaymentTracker({
   return (
     <Card className="mb-6">
       <div className="flex items-center justify-between gap-2 mb-3">
-        <h3 className="font-semibold text-text">Who&apos;s paid · Week {week}</h3>
+        <h3 className="font-semibold text-text">
+          Who&apos;s paid · Week {week}
+          {buyInAmount > 0 && (
+            <span className="font-normal text-text-muted"> · ${buyInAmount} buy-in</span>
+          )}
+        </h3>
         <span className="text-sm text-text-muted">
           {paidCount} of {visible.length} paid
         </span>

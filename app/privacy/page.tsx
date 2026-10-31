@@ -1,7 +1,7 @@
 import Card from "@/components/ui/Card";
 
 export const metadata = {
-  title: "Privacy Policy - Alexander NFL Pick'em",
+  title: "Privacy Policy - NFL Pick'em",
 };
 
 export default function PrivacyPolicy() {
@@ -11,18 +11,28 @@ export default function PrivacyPolicy() {
 
       <Card className="space-y-4 text-text-muted">
         <p>
-          Alexander NFL Pick&apos;em is a small, invite-only app for making
-          weekly NFL picks with friends and family. This page explains what
+          NFL Pick&apos;em is an invite-only app that lets families and groups
+          run a private weekly NFL pick&apos;em. This page explains what
           information the app collects and how it&apos;s used.
         </p>
 
         <section>
           <h2 className="font-semibold text-text mb-1">Information we collect</h2>
           <p>
-            When you sign in with Google or Facebook, we receive your name,
-            email address, and profile picture from that provider. We don&apos;t
-            collect passwords - authentication is handled entirely by Google
-            or Facebook.
+            When you sign in with Google, we receive your name, email address,
+            and profile picture from Google. If you sign in with an email link,
+            we store only your email address. We don&apos;t collect passwords.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="font-semibold text-text mb-1">Payments</h2>
+          <p>
+            Group admins pay the season fee through Stripe. Your card details go
+            directly to Stripe and never reach our servers; we only keep a record
+            that the payment for your group&apos;s season was completed. The app
+            does not process buy-ins or pots between members. It only records
+            whether a member says they paid and how.
           </p>
         </section>
 
@@ -39,8 +49,9 @@ export default function PrivacyPolicy() {
           <h2 className="font-semibold text-text mb-1">Sharing</h2>
           <p>
             We don&apos;t sell or share your information with any third party.
-            Your picks, tiebreaker guesses, and profile info are visible only
-            to other signed-in players of this app.
+            Your picks, tiebreaker guesses, payment status, and profile info
+            are visible only to the other members of the groups you join. Group
+            admins can also see members&apos; email addresses.
           </p>
         </section>
 

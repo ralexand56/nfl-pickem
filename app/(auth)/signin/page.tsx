@@ -1,18 +1,32 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 
+// useSearchParams needs a Suspense boundary to keep this page prerenderable.
 export default function SignIn() {
+  return (
+    <Suspense>
+      <SignInForm />
+    </Suspense>
+  );
+}
+
+function SignInForm() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  // Only same-site paths, so the param can't bounce people to another site.
+  const requested = useSearchParams().get("callbackUrl");
+  const callbackUrl =
+    requested?.startsWith("/") && !requested.startsWith("//") ? requested : "/";
 
   async function sendMagicLink(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
-    await signIn("email", { email, callbackUrl: "/", redirect: false });
+    await signIn("email", { email, callbackUrl, redirect: false });
     setSent(true);
   }
 
@@ -23,7 +37,7 @@ export default function SignIn() {
         <Button
           variant="primary"
           className="w-full py-3"
-          onClick={() => signIn("google", { callbackUrl: "/" })}
+          onClick={() => signIn("google", { callbackUrl })}
         >
           Continue with Google
         </Button>
@@ -60,7 +74,7 @@ export default function SignIn() {
             Re-enable in app/api/auth/[...nextauth]/route.ts if that changes.
         <Button
           className="w-full py-3 mt-3 bg-[#4267B2] text-white hover:opacity-90 border-transparent"
-          onClick={() => signIn("facebook", { callbackUrl: "/" })}
+          onClick={() => signIn("facebook", { callbackUrl })}
         >
           Continue with Facebook
         </Button>

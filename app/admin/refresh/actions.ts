@@ -4,8 +4,10 @@
 import { revalidateTag } from "next/cache";
 import { syncScoresMinimal } from "@/lib/server/syncScoresMinimal";
 import { syncScores } from "@/lib/server/scoresSync";
+import { requireOwner } from "@/lib/auth";
 
 export async function refreshScoresAction(formData: FormData): Promise<void> {
+  await requireOwner();
   const seasonYear = Number(formData.get("seasonYear") ?? 2026);
   const weekRaw = formData.get("week");
   const week = weekRaw ? Number(weekRaw) : undefined;
@@ -29,6 +31,7 @@ export async function refreshScoresAction(formData: FormData): Promise<void> {
 // in addition to updating scores/status - syncScoresMinimal above only
 // updates rows that already exist, so this is needed to bootstrap a week.
 export async function fullSyncAction(formData: FormData): Promise<void> {
+  await requireOwner();
   const seasonYear = Number(formData.get("seasonYear") ?? 2026);
   const weekRaw = formData.get("week");
   const week = weekRaw ? Number(weekRaw) : undefined;

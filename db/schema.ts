@@ -7,9 +7,11 @@ import {
   integer,
   timestamp,
   boolean,
-  uniqueIndex,
   unique,
   uuid,
+  jsonb,
+  primaryKey,
+  index,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -23,6 +25,68 @@ export const users = pgTable("users", {
   emailVerified: timestamp("emailVerified", { withTimezone: true }),
   image: text("image"),
 });
+
+// --- Groups: each family/office pool is a group. People-generated data
+// (picks, tiebreakers, payments, squares) belongs to exactly one group; the
+// NFL schedule (games) is shared by everyone.
+export const groups = pgTable("groups", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  slug: text("slug").notNull().unique(),
+  name: text("name").notNull(),
+  inviteToken: text("invite_token").notNull().unique(),
+  settings: jsonb("settings").notNull().default({}),
+  createdBy: uuid("created_by").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export type GroupRole = "admin" | "member";
+
+export const groupMembers = pgTable(
+  "group_members",
+  {
+    groupId: uuid("group_id")
+      .notNull()
+      .references(() => groups.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    role: text("role").$type<GroupRole>().notNull().default("member"),
+    joinedAt: timestamp("joined_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.groupId, t.userId] }),
+    index("group_members_user_idx").on(t.userId),
+  ],
+);
+
+// A group can play a season once it has a row here: "paid" via Stripe
+// Checkout, or "comped" (the original family group).
+export const groupSeasons = pgTable(
+  "group_seasons",
+  {
+    groupId: uuid("group_id")
+      .notNull()
+      .references(() => groups.id, { onDelete: "cascade" }),
+    season: integer("season").notNull(),
+    status: text("status").$type<"paid" | "comped">().notNull(),
+    stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
+    paidAt: timestamp("paid_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.groupId, t.season] })],
+);
+
+const groupIdColumn = () =>
+  uuid("group_id")
+    .notNull()
+    .references(() => groups.id, { onDelete: "cascade" });
 
 // --- Your app tables (reference users.id as UUID) ---
 export const games = pgTable("games", {
@@ -43,6 +107,7 @@ export const picks = pgTable(
   "picks",
   {
     id: serial("id").primaryKey(),
+    groupId: groupIdColumn(),
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
@@ -51,13 +116,8 @@ export const picks = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
   (t) => [
-    {
-      userGameUnique: uniqueIndex("picks_user_game_unique").on(
-        t.userId,
-        t.gameId
-      ),
-    },
-  ]
+    unique("picks_group_user_game_unique").on(t.groupId, t.userId, t.gameId),
+  ],
 );
 
 // db/schema.ts
@@ -65,6 +125,7 @@ export const weeklyTiebreakers = pgTable(
   "weekly_tiebreakers",
   {
     id: serial("id").primaryKey(),
+    groupId: groupIdColumn(),
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
@@ -74,10 +135,13 @@ export const weeklyTiebreakers = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
   (t) => [
-    {
-      uniq: uniqueIndex("uniq_user_season_week").on(t.userId, t.season, t.week),
-    },
-  ]
+    unique("weekly_tiebreakers_group_user_season_week_unique").on(
+      t.groupId,
+      t.userId,
+      t.season,
+      t.week,
+    ),
+  ],
 );
 
 // Weekly buy-in payments. One row per user per week; updatedBy records who
@@ -86,6 +150,7 @@ export const weeklyPayments = pgTable(
   "weekly_payments",
   {
     id: serial("id").primaryKey(),
+    groupId: groupIdColumn(),
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
@@ -100,12 +165,13 @@ export const weeklyPayments = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
   (t) => [
-    unique("weekly_payments_user_season_week_unique").on(
+    unique("weekly_payments_group_user_season_week_unique").on(
+      t.groupId,
       t.userId,
       t.season,
-      t.week
+      t.week,
     ),
-  ]
+  ],
 );
 
 // Super Bowl Squares
@@ -113,40 +179,49 @@ export const superBowlSquares = pgTable(
   "super_bowl_squares",
   {
     id: serial("id").primaryKey(),
+    groupId: groupIdColumn(),
     gameId: text("game_id").notNull().default("default"),
     row: integer("row").notNull(), // 0-9
     col: integer("col").notNull(), // 0-9
-    userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+    userId: uuid("user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     season: integer("season").notNull(), // e.g., 2026
     claimedAt: timestamp("claimed_at", { withTimezone: true }),
     isPaid: boolean("is_paid").default(false),
   },
   (t) => [
-    {
-      rowColGameUnique: uniqueIndex("squares_row_col_game_unique").on(
-        t.row,
-        t.col,
-        t.gameId
-      ),
-    },
-  ]
+    unique("squares_group_game_row_col_unique").on(
+      t.groupId,
+      t.gameId,
+      t.row,
+      t.col,
+    ),
+  ],
 );
 
-export const superBowlSquaresConfig = pgTable("super_bowl_squares_config", {
-  id: serial("id").primaryKey(),
-  gameId: text("game_id").notNull().unique().default("default"),
-  season: integer("season").notNull(),
-  homeTeam: text("home_team").notNull(),
-  awayTeam: text("away_team").notNull(),
-  homeNumbers: text("home_numbers"), // JSON array of 10 numbers, e.g., "[3,0,7,1,9,4,2,8,5,6]"
-  awayNumbers: text("away_numbers"), // JSON array of 10 numbers
-  isLocked: boolean("is_locked").default(false), // Lock when numbers are assigned
-  pricePerSquare: integer("price_per_square").notNull().default(5),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-});
+export const superBowlSquaresConfig = pgTable(
+  "super_bowl_squares_config",
+  {
+    id: serial("id").primaryKey(),
+    groupId: groupIdColumn(),
+    gameId: text("game_id").notNull().default("default"),
+    season: integer("season").notNull(),
+    homeTeam: text("home_team").notNull(),
+    awayTeam: text("away_team").notNull(),
+    homeNumbers: text("home_numbers"), // JSON array of 10 numbers, e.g., "[3,0,7,1,9,4,2,8,5,6]"
+    awayNumbers: text("away_numbers"), // JSON array of 10 numbers
+    isLocked: boolean("is_locked").default(false), // Lock when numbers are assigned
+    pricePerSquare: integer("price_per_square").notNull().default(5),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  },
+  (t) => [unique("squares_config_group_game_unique").on(t.groupId, t.gameId)],
+);
 
 // (your types can remain as-is)
 
+export type SelectGroup = typeof groups.$inferSelect;
+export type SelectGroupMember = typeof groupMembers.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type SelectUser = typeof users.$inferSelect;
 export type InsertGame = typeof games.$inferInsert;

@@ -3,11 +3,11 @@
 import { db } from "@/db";
 import { games } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { requireSession } from "@/lib/auth";
+import { requireOwner } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 export async function updateGameAction(formData: FormData): Promise<void> {
-  await requireSession(); // Ensure user is authenticated
+  await requireOwner();
 
   const gameId = formData.get("gameId") as string;
   const season = Number(formData.get("season"));
