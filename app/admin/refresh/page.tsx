@@ -2,11 +2,13 @@
 import { refreshScoresAction, fullSyncAction } from "./actions";
 import SubmitButton from "./SubmitButton";
 import { requireOwner } from "@/lib/auth";
+import { notFound } from "next/navigation";
 
 export const revalidate = 0;
 
 export default async function AdminRefreshPage() {
-  await requireOwner();
+  // Non-owners get a plain 404 rather than an error page.
+  await requireOwner().catch(() => notFound());
   return (
     <main className="mx-auto max-w-xl p-6 space-y-8">
       <h1 className="text-xl font-semibold">Admin: NFL Schedule &amp; Scores</h1>
