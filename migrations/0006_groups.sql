@@ -101,6 +101,8 @@ ALTER TABLE weekly_tiebreakers DROP CONSTRAINT IF EXISTS weekly_tiebreakers_user
 --> statement-breakpoint
 DROP INDEX IF EXISTS weekly_tiebreakers_user_season_week_unique;
 --> statement-breakpoint
+ALTER TABLE weekly_tiebreakers DROP CONSTRAINT IF EXISTS uniq_user_season_week;
+--> statement-breakpoint
 DROP INDEX IF EXISTS uniq_user_season_week;
 --> statement-breakpoint
 ALTER TABLE weekly_tiebreakers ADD CONSTRAINT weekly_tiebreakers_group_user_season_week_unique UNIQUE (group_id, user_id, season, week);
@@ -108,6 +110,8 @@ ALTER TABLE weekly_tiebreakers ADD CONSTRAINT weekly_tiebreakers_group_user_seas
 ALTER TABLE weekly_payments DROP CONSTRAINT IF EXISTS weekly_payments_user_season_week_unique;
 --> statement-breakpoint
 ALTER TABLE weekly_payments ADD CONSTRAINT weekly_payments_group_user_season_week_unique UNIQUE (group_id, user_id, season, week);
+--> statement-breakpoint
+ALTER TABLE super_bowl_squares DROP CONSTRAINT IF EXISTS squares_row_col_game_unique;
 --> statement-breakpoint
 DROP INDEX IF EXISTS squares_row_col_game_unique;
 --> statement-breakpoint
