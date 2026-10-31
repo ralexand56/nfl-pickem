@@ -4,7 +4,8 @@ import { getStripe } from "@/lib/stripe";
 import { fulfillCheckout } from "@/lib/billing";
 
 // Stripe -> us. Configure the endpoint in the Stripe dashboard for
-// checkout.session.completed and checkout.session.async_payment_succeeded,
+// checkout.session.completed, checkout.session.async_payment_succeeded and
+// checkout.session.async_payment_failed,
 // and put its signing secret in STRIPE_WEBHOOK_SECRET.
 export async function POST(req: Request) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -32,6 +33,12 @@ export async function POST(req: Request) {
       // Non-2xx makes Stripe retry later.
       return NextResponse.json({ error: "Fulfillment failed" }, { status: 500 });
     }
+  }
+
+  if (event.type === "checkout.session.async_payment_failed") {
+    // Nothing was granted (fulfillment waits for a paid session); the buyer
+    // can simply start checkout again.
+    console.warn("Async payment failed for checkout session", event.data.object.id);
   }
 
   return NextResponse.json({ received: true });

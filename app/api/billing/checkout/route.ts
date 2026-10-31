@@ -76,6 +76,8 @@ export async function POST(req: NextRequest) {
         },
       ],
       client_reference_id: userId,
+      // Labels these sessions in the Stripe Dashboard.
+      integration_identifier: "pickem-season-qhtwmzrk",
       metadata,
       success_url: `${origin}/start/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl,

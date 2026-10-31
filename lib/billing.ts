@@ -33,11 +33,13 @@ async function groupForSession(sessionId: string) {
   return row?.slug ?? null;
 }
 
-// Returns the group's slug, or null if the session isn't paid yet.
+// Returns the group's slug, or null if the session isn't paid yet. With
+// delayed payment methods checkout.session.completed arrives while still
+// "unpaid"; async_payment_succeeded fulfills it later.
 export async function fulfillCheckout(
   session: Stripe.Checkout.Session
 ): Promise<string | null> {
-  if (session.payment_status !== "paid") return null;
+  if (session.payment_status === "unpaid") return null;
 
   const existing = await groupForSession(session.id);
   if (existing) return existing;
