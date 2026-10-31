@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { getWeekLabel, getWeekStatus, type WeekStatus } from "@/lib/weeks";
 
 type WeekOption = {
   week: number;
@@ -11,23 +12,21 @@ type WeekSelectorProps = {
   availableWeeks: WeekOption[];
   currentSeason: number;
   currentWeek: number;
+  // The live NFL week from ESPN, used to tag options; currentSeason and
+  // currentWeek above are the week being viewed.
+  liveNfl: { season: number | null; week: number | null };
 };
 
-const WEEK_LABELS: Record<number, string> = {
-  19: "Wild Card",
-  20: "Divisional",
-  21: "Conference",
-  22: "Super Bowl",
-};
-
-const getWeekLabel = (wk: number) => {
-  return WEEK_LABELS[wk] || `Week ${wk}`;
-};
+// Native <option>s can't hold a badge, so tag the live and future weeks in
+// text. Past weeks stay untagged to keep the list short.
+const statusSuffix = (status: WeekStatus | null) =>
+  status === "current" ? " (this week)" : status === "upcoming" ? " (upcoming)" : "";
 
 export default function WeekSelector({
   availableWeeks,
   currentSeason,
   currentWeek,
+  liveNfl,
 }: WeekSelectorProps) {
   const router = useRouter();
 
@@ -44,6 +43,7 @@ export default function WeekSelector({
       {availableWeeks.map((aw) => (
         <option key={`${aw.season}-${aw.week}`} value={`${aw.season}-${aw.week}`}>
           {getWeekLabel(aw.week)}
+          {statusSuffix(getWeekStatus(aw.season, aw.week, liveNfl))}
         </option>
       ))}
     </select>

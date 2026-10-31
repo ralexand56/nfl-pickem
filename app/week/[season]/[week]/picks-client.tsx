@@ -15,6 +15,8 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Badge from "@/components/ui/Badge";
 import { useToast } from "@/components/Toast";
+import WeekStatusBadge from "@/components/WeekStatusBadge";
+import type { WeekStatus } from "@/lib/weeks";
 
 // Extend the session user type to include 'id'
 import type { DefaultSession } from "next-auth";
@@ -39,6 +41,7 @@ export default function PicksClient({
   tiebreakers,
   season,
   week,
+  weekStatus,
   paymentTracker,
 }: {
   games: SelectGame[];
@@ -46,6 +49,7 @@ export default function PicksClient({
   tiebreakers: SelectWeeklyTiebreaker[];
   season: number;
   week: number;
+  weekStatus?: WeekStatus | null;
   paymentTracker?: ReactNode;
 }) {
   const { data: session } = useSession();
@@ -154,8 +158,11 @@ export default function PicksClient({
 
   return (
     <div className="max-w-5xl mx-auto p-6">
-      <h2 className="text-2xl font-semibold mb-4 text-text">
-        Week {week} · {season} {pending && "(updating...)"}
+      <h2 className="text-2xl font-semibold mb-4 text-text flex items-center gap-3">
+        <span>
+          Week {week} · {season} {pending && "(updating...)"}
+        </span>
+        <WeekStatusBadge status={weekStatus ?? null} />
       </h2>
 
       {firstGameTimeMs != null && (

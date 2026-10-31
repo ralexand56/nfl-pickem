@@ -10,6 +10,9 @@ import Card from "@/components/ui/Card";
 import Table, { TableContainer } from "@/components/ui/Table";
 import PaymentTracker, { PaidToggle } from "@/components/PaymentTracker";
 import { getPaymentViewer, getWeekPayments } from "@/lib/payments";
+import { getCurrentNfl } from "@/lib/server";
+import { getWeekLabel, getWeekStatus } from "@/lib/weeks";
+import WeekStatusBadge from "@/components/WeekStatusBadge";
 
 export default async function Leaderboard({
   params,
@@ -57,10 +60,11 @@ export default async function Leaderboard({
       )
     );
 
-  const [userMap, paymentPlayers, viewer] = await Promise.all([
+  const [userMap, paymentPlayers, viewer, current] = await Promise.all([
     getUserMap(),
     getWeekPayments(seasonNumber, weekNumber),
     getPaymentViewer(),
+    getCurrentNfl(),
   ]);
   const paymentByUser = new Map(paymentPlayers.map((p) => [p.id, p]));
   const userIds = Array.from(new Set(ps.map((p) => p.userId)));
@@ -77,26 +81,20 @@ export default async function Leaderboard({
 
   const winner = rows[0];
 
-  // Week labels for playoffs
-  const WEEK_LABELS: Record<number, string> = {
-    19: "Wild Card",
-    20: "Divisional",
-    21: "Conference",
-    22: "Super Bowl",
-  };
-
-  const getWeekLabel = (wk: number) => {
-    return WEEK_LABELS[wk] || `Week ${wk}`;
-  };
-
   return (
     <main className="max-w-3xl mx-auto p-6">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold text-text">{getWeekLabel(weekNumber)} Leaderboard</h1>
+        <h1 className="text-2xl font-bold text-text flex items-center gap-3">
+          <span>{getWeekLabel(weekNumber)} Leaderboard</span>
+          <WeekStatusBadge
+            status={getWeekStatus(seasonNumber, weekNumber, current)}
+          />
+        </h1>
         <WeekSelector
           availableWeeks={availableWeeks}
           currentSeason={seasonNumber}
           currentWeek={weekNumber}
+          liveNfl={current}
         />
       </div>
       {winner && (

@@ -4,6 +4,8 @@ import { and, eq, inArray } from "drizzle-orm";
 import PicksClient from "./picks-client";
 import PaymentTracker from "@/components/PaymentTracker";
 import { getPaymentViewer, getWeekPayments } from "@/lib/payments";
+import { getCurrentNfl } from "@/lib/server";
+import { getWeekStatus } from "@/lib/weeks";
 
 export default async function WeekPage({
   params,
@@ -40,9 +42,10 @@ export default async function WeekPage({
         )
       );
 
-    const [paymentPlayers, viewer] = await Promise.all([
+    const [paymentPlayers, viewer, current] = await Promise.all([
       getWeekPayments(seasonNumber, weekNumber),
       getPaymentViewer(),
+      getCurrentNfl(),
     ]);
     const participantIds = Array.from(
       new Set(allPicks.map((p) => p.picks.userId))
@@ -64,6 +67,7 @@ export default async function WeekPage({
         tiebreakers={tbs}
         season={seasonNumber}
         week={weekNumber}
+        weekStatus={getWeekStatus(seasonNumber, weekNumber, current)}
       />
     );
   } catch (error) {
