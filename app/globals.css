@@ -84,20 +84,22 @@ body {
   color: var(--color-text);
 }
 
-/* Printing the Super Bowl squares guide: everything else is print:hidden,
-   so the grid gets the page to itself. */
+/* Printable pages (squares grid, weekly pick sheets): the page marks the
+   part to print with .printable and everything else print:hidden, so it
+   gets the page to itself. */
 @media print {
   @page {
     margin: 0.5in;
   }
-  #printable-grid {
+  .printable {
     border: none;
     padding: 0;
     overflow: visible;
+    box-shadow: none;
   }
-  body:has(#printable-grid),
-  body:has(#printable-grid) main,
-  body:has(#printable-grid) main > div {
+  body:has(.printable),
+  body:has(.printable) main,
+  body:has(.printable) main > div {
     background: #fff;
   }
 }

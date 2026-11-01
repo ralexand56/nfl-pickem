@@ -502,6 +502,14 @@ function Faq() {
       <div className="mt-10 text-center">
         <CtaButton />
         <p className="mt-4 text-sm text-text-muted">
+          <Link href="/pick-sheets" className="underline">
+            Free pick sheets
+          </Link>
+          {" · "}
+          <Link href="/super-bowl-squares" className="underline">
+            Squares guide
+          </Link>
+          {" · "}
           <Link href="/terms" className="underline">
             Terms
           </Link>

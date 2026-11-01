@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Card from "@/components/ui/Card";
-import PrintGridButton from "./print-button";
+import PrintButton from "@/components/PrintButton";
 
 // Public guide that ranks for "Super Bowl squares" searches each January and
 // leads into running a board on The Pick'em Club.
@@ -160,9 +160,9 @@ export default function SuperBowlSquaresGuide() {
               <h2 className="text-2xl sm:text-3xl font-bold text-text">Free printable squares grid</h2>
               <p className="text-text-muted">Print it, pass it around, fill in the teams and numbers.</p>
             </div>
-            <PrintGridButton />
+            <PrintButton label="Print the grid" />
           </div>
-          <div id="printable-grid" className="rounded-card border border-border bg-white p-4 text-black overflow-x-auto">
+          <div id="printable-grid" className="printable rounded-card border border-border bg-white p-4 text-black overflow-x-auto">
             <div className="min-w-[560px]">
               <div className="flex items-center justify-center gap-2 mb-2 pl-9 text-sm font-semibold">
                 Team across the top: <span className="inline-block w-48 border-b border-black" />
