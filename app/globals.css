@@ -40,7 +40,7 @@
   --color-surface-muted: #f1f5f9;
   --color-border: #e2e8f0;
   --color-text: #0f172a;
-  --color-text-muted: #64748b;
+  --color-text-muted: #475569;
 }
 
 @media (prefers-color-scheme: dark) {

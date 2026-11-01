@@ -141,22 +141,22 @@ function Hero() {
         sizes="100vw"
         className="-z-10 object-cover object-[65%_40%] max-md:object-[70%_50%]"
       />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-brand-900/95 via-brand-900/80 to-brand-900/25 max-md:bg-gradient-to-b max-md:from-brand-900/90 max-md:via-brand-900/75 max-md:to-brand-900/50" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-brand-900/95 from-30% via-brand-900/85 via-55% to-brand-900/30 max-md:bg-gradient-to-b max-md:from-brand-900/90 max-md:via-brand-900/75 max-md:to-brand-900/50" />
       <div className="max-w-6xl mx-auto px-4 py-20 sm:py-28">
         <div className="max-w-xl text-white">
-          <p className="text-sm font-semibold uppercase tracking-wider text-brand-200 mb-3">
+          <p className="text-sm font-semibold uppercase tracking-wider text-brand-200 mb-3 [text-shadow:0_1px_6px_rgb(0_0_0/0.5)]">
             The NFL pick&apos;em for family &amp; friends
           </p>
-          <h1 className="text-4xl sm:text-6xl font-extrabold leading-[1.05] mb-5">
+          <h1 className="text-4xl sm:text-6xl font-extrabold leading-[1.05] mb-5 [text-shadow:0_2px_12px_rgb(0_0_0/0.35)]">
             Run your NFL pick&apos;em with family &amp; friends.
           </h1>
-          <p className="text-lg text-brand-50/90 mb-8">
+          <p className="text-lg text-white mb-8 [text-shadow:0_1px_8px_rgb(0_0_0/0.45)]">
             Pick every NFL game each week, with automatic scoring, a live
             leaderboard and a Super Bowl squares board, all in one private group
             for $10 per NFL season. Skip the spreadsheet.
           </p>
           <CtaButton light />
-          <p className="text-sm text-brand-100/80 mt-3">
+          <p className="text-sm font-medium text-white/90 mt-3 [text-shadow:0_1px_6px_rgb(0_0_0/0.5)]">
             Members join free with your invite link.
           </p>
         </div>
