@@ -91,7 +91,7 @@ export default function Nav({ groups }: { groups: NavGroup[] }) {
   );
 
   return (
-    <header className="sticky top-0 z-40 bg-surface/80 backdrop-blur border-b border-border">
+    <header className="sticky top-0 z-40 bg-surface/80 backdrop-blur border-b border-border print:hidden">
       <nav className="flex-col sm:flex-row max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-4">
           <Link

@@ -68,7 +68,7 @@ export default function SuperBowlSquaresGuide() {
         }}
       />
 
-      <section className="bg-brand-900 text-white">
+      <section className="bg-brand-900 text-white print:hidden">
         <div className="max-w-4xl mx-auto px-4 py-14 sm:py-20">
           <p className="text-sm font-semibold uppercase tracking-wider text-accent-400 mb-3">
             Game-day guide
@@ -98,8 +98,8 @@ export default function SuperBowlSquaresGuide() {
         </div>
       </section>
 
-      <div className="max-w-4xl mx-auto px-4 py-12 space-y-14">
-        <section>
+      <div className="max-w-4xl mx-auto px-4 py-12 space-y-14 print:p-0 print:max-w-none">
+        <section className="print:hidden">
           <h2 className="text-2xl sm:text-3xl font-bold text-text mb-6">How it works</h2>
           <ol className="grid sm:grid-cols-2 gap-4">
             {STEPS.map(([title, body], i) => (
@@ -126,7 +126,7 @@ export default function SuperBowlSquaresGuide() {
           </Card>
         </section>
 
-        <section>
+        <section className="print:hidden">
           <h2 className="text-2xl sm:text-3xl font-bold text-text mb-2">Popular payout splits</h2>
           <p className="text-text-muted mb-5">
             Agree on the split before the board fills. These are the three most
@@ -155,7 +155,7 @@ export default function SuperBowlSquaresGuide() {
         </section>
 
         <section id="grid" className="scroll-mt-20">
-          <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
+          <div className="flex flex-wrap items-end justify-between gap-3 mb-4 print:hidden">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold text-text">Free printable squares grid</h2>
               <p className="text-text-muted">Print it, pass it around, fill in the teams and numbers.</p>
@@ -164,12 +164,15 @@ export default function SuperBowlSquaresGuide() {
           </div>
           <div id="printable-grid" className="rounded-card border border-border bg-white p-4 text-black overflow-x-auto">
             <div className="min-w-[560px]">
-              <div className="flex items-center justify-center gap-2 mb-2 text-sm font-semibold">
+              <div className="flex items-center justify-center gap-2 mb-2 pl-9 text-sm font-semibold">
                 Team across the top: <span className="inline-block w-48 border-b border-black" />
               </div>
               <div className="flex">
-                <div className="flex items-center pr-2 text-sm font-semibold [writing-mode:vertical-rl] rotate-180">
-                  Team down the side: <span className="inline-block h-40 border-l border-black" />
+                {/* Rotated label, centered on the grid's height. */}
+                <div className="relative w-9 shrink-0">
+                  <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 -rotate-90 items-center gap-2 whitespace-nowrap text-sm font-semibold">
+                    Team down the side: <span className="inline-block w-48 border-b border-black" />
+                  </div>
                 </div>
                 <div className="grid flex-1 grid-cols-11 border-l border-t border-black">
                   {Array.from({ length: 121 }, (_, i) => {
@@ -190,7 +193,7 @@ export default function SuperBowlSquaresGuide() {
           </div>
         </section>
 
-        <Card className="bg-brand-900 border-transparent text-white p-8 text-center">
+        <Card className="bg-brand-900 border-transparent text-white p-8 text-center print:hidden">
           <h2 className="text-2xl sm:text-3xl font-bold mb-2">Skip the paper grid</h2>
           <p className="text-white/85 max-w-xl mx-auto mb-6">
             On The Pick’em Club your group claims squares from their phones, you
@@ -205,7 +208,7 @@ export default function SuperBowlSquaresGuide() {
           </Link>
         </Card>
 
-        <section>
+        <section className="print:hidden">
           <h2 className="text-2xl sm:text-3xl font-bold text-text mb-5">Super Bowl squares FAQ</h2>
           <div className="space-y-3">
             {FAQS.map(([q, a]) => (
