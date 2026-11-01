@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { clsx } from "clsx";
 import type { ReactNode } from "react";
 import Card from "@/components/ui/Card";
+import PromoVideo from "@/components/PromoVideo";
 import type { Metadata } from "next";
 import { getUserGroups, getViewerId } from "@/lib/group";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
@@ -81,6 +82,7 @@ export default async function Home() {
       />
       {viewerId && <NoGroupNotice />}
       <Hero />
+      <Tour />
       <Features />
       <HowItWorks />
       <Pricing />
@@ -155,7 +157,16 @@ function Hero() {
             leaderboard and a Super Bowl squares board, all in one private group
             for $10 per NFL season. Skip the spreadsheet.
           </p>
-          <CtaButton light />
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            <CtaButton light />
+            <a
+              href="#tour"
+              className="inline-flex items-center gap-2 font-semibold text-white hover:text-accent-300 [text-shadow:0_1px_6px_rgb(0_0_0/0.5)]"
+            >
+              <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full border border-white/60 text-xs">▶</span>
+              Watch the 45-second tour
+            </a>
+          </div>
           <p className="text-sm font-medium text-white/90 mt-3 [text-shadow:0_1px_6px_rgb(0_0_0/0.5)]">
             Members join free with your invite link.
           </p>
@@ -323,6 +334,25 @@ function SquaresPreview() {
         <span>25 / 100 claimed</span>
       </div>
     </Card>
+  );
+}
+
+// The product tour video, right after the hero.
+function Tour() {
+  return (
+    <section id="tour" className="scroll-mt-20 bg-brand-900">
+      <div className="max-w-4xl mx-auto px-4 py-16 sm:py-20">
+        <div className="text-center mb-8">
+          <p className="text-sm font-semibold uppercase tracking-wider text-accent-400 mb-2">
+            See how it works
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white">
+            From group chat to leaderboard in 45 seconds
+          </h2>
+        </div>
+        <PromoVideo />
+      </div>
+    </section>
   );
 }
 
