@@ -8,10 +8,20 @@ import { db } from "@/db";
 import { groupMembers, groupSeasons, groups } from "@/db/schema";
 import { newInviteToken } from "@/lib/group";
 import { NEW_GROUP_SETTINGS } from "@/lib/group-settings";
+import { track } from "@vercel/analytics/server";
 
 export type CheckoutMetadata =
   | { kind: "create"; userId: string; groupName: string; season: string }
   | { kind: "renew"; userId: string; groupId: string; season: string };
+
+// First-touch fields the checkout route adds (see lib/attribution.ts).
+type SourceMetadata = {
+  src_source?: string;
+  src_medium?: string;
+  src_campaign?: string;
+  src_landing?: string;
+  src_at?: string;
+};
 
 function slugify(name: string) {
   const base = name
@@ -34,6 +44,18 @@ async function groupForSession(sessionId: string) {
   return row?.slug ?? null;
 }
 
+// Analytics only; never let it block fulfillment.
+async function recordPurchase(
+  kind: "create" | "renew",
+  firstTouch: { source: string; medium: string } | null
+) {
+  await track("group_purchased", {
+    kind,
+    source: firstTouch?.source ?? "unknown",
+    medium: firstTouch?.medium ?? "unknown",
+  }).catch(() => {});
+}
+
 // Returns the group's slug, or null if the session isn't paid yet. With
 // delayed payment methods checkout.session.completed arrives while still
 // "unpaid"; async_payment_succeeded fulfills it later.
@@ -45,13 +67,23 @@ export async function fulfillCheckout(
   const existing = await groupForSession(session.id);
   if (existing) return existing;
 
-  const meta = session.metadata as CheckoutMetadata | null;
+  const meta = session.metadata as (CheckoutMetadata & SourceMetadata) | null;
   const season = Number(meta?.season);
   if (!meta || !Number.isInteger(season)) {
     throw new Error(`Checkout session ${session.id} has no usable metadata`);
   }
 
   try {
+    const firstTouch = meta.src_source
+      ? {
+          source: meta.src_source,
+          medium: meta.src_medium ?? "",
+          campaign: meta.src_campaign ?? "",
+          landing: meta.src_landing ?? "",
+          at: meta.src_at ?? "",
+        }
+      : null;
+
     if (meta.kind === "create") {
       const groupId = crypto.randomUUID();
       const slug = slugify(meta.groupName);
@@ -63,6 +95,7 @@ export async function fulfillCheckout(
           name: meta.groupName,
           inviteToken: newInviteToken(),
           settings: NEW_GROUP_SETTINGS,
+          firstTouch,
           createdBy: meta.userId,
         }),
         db
@@ -75,6 +108,7 @@ export async function fulfillCheckout(
           stripeCheckoutSessionId: session.id,
         }),
       ]);
+      await recordPurchase("create", firstTouch);
       return slug;
     }
 
@@ -87,6 +121,7 @@ export async function fulfillCheckout(
         stripeCheckoutSessionId: session.id,
       })
       .onConflictDoNothing();
+    await recordPurchase("renew", firstTouch);
     const [g] = await db
       .select({ slug: groups.slug })
       .from(groups)

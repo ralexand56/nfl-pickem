@@ -4,6 +4,8 @@ import "./globals.css";
 import Nav from "@/components/Nav";
 import SessionProvider from "./providers";
 import { getUserGroups, getViewerId } from "@/lib/group";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
+import SiteAnalytics from "@/components/SiteAnalytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,9 +18,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "The Pick’em Club · NFL Pick’em for Families & Friends",
-  description:
-    "Run a private NFL pick’em for your family or group: pick every NFL game, automatic scoring, a live leaderboard and Super Bowl squares. $10 per NFL season.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${SITE_NAME} · ${SITE_TAGLINE}`,
+    template: `%s · ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} · ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+    url: "/",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE_NAME} · ${SITE_TAGLINE}`,
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default async function RootLayout({
@@ -35,6 +54,7 @@ export default async function RootLayout({
         <SessionProvider>
           <Nav groups={groups} />
           <main>{children}</main>
+          <SiteAnalytics />
         </SessionProvider>
       </body>
     </html>

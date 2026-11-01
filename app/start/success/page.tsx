@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Card from "@/components/ui/Card";
 import { getViewerId } from "@/lib/group";
@@ -5,6 +6,11 @@ import { getStripe } from "@/lib/stripe";
 import { fulfillCheckout } from "@/lib/billing";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Payment received",
+  robots: { index: false, follow: false },
+};
 
 // Stripe sends the buyer here after paying. We confirm the payment with
 // Stripe directly (never trusting the URL alone) and create the group if the

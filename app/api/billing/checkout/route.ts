@@ -10,6 +10,8 @@ import {
 } from "@/lib/group";
 import { groupErrorResponse } from "@/lib/api";
 import { getCurrentNfl } from "@/lib/server";
+import { ATTRIBUTION_COOKIE, parseFirstTouch } from "@/lib/attribution";
+import { track } from "@vercel/analytics/server";
 
 // Starts a $10 Stripe Checkout: { kind: "create", name } for a new group, or
 // { kind: "renew", group: slug } for an admin renewing the current season.
@@ -67,6 +69,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
+  // First-touch source, so purchases can be credited to search, campaigns
+  // or referrals. Visible on the session in the Stripe Dashboard.
+  const firstTouch = parseFirstTouch(req.cookies.get(ATTRIBUTION_COOKIE)?.value);
+  const sourceMetadata: Record<string, string> = firstTouch
+    ? {
+        src_source: firstTouch.source,
+        src_medium: firstTouch.medium,
+        src_campaign: firstTouch.campaign,
+        src_landing: firstTouch.landing,
+        src_at: firstTouch.at,
+      }
+    : {};
+  await track("checkout_started", {
+    kind: metadata.kind,
+    source: firstTouch?.source ?? "unknown",
+    medium: firstTouch?.medium ?? "unknown",
+  }).catch(() => {});
+
   try {
     const session = await getStripe().checkout.sessions.create({
       mode: "payment",
@@ -86,7 +106,7 @@ export async function POST(req: NextRequest) {
       client_reference_id: userId,
       // Labels these sessions in the Stripe Dashboard.
       integration_identifier: "pickem-season-qhtwmzrk",
-      metadata,
+      metadata: { ...metadata, ...sourceMetadata },
       success_url: `${origin}/start/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl,
     });

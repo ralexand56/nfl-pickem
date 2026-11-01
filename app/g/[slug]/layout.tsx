@@ -1,8 +1,14 @@
 import type { ReactNode } from "react";
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { GroupProvider } from "@/components/GroupProvider";
 import { getGroupContext, getViewerId, isSeasonActive } from "@/lib/group";
 import { getCurrentNfl } from "@/lib/server";
+
+// Private to members; keep out of search results.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 export default async function GroupLayout({
   children,

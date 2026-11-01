@@ -3,7 +3,67 @@ import { redirect } from "next/navigation";
 import { clsx } from "clsx";
 import type { ReactNode } from "react";
 import Card from "@/components/ui/Card";
+import type { Metadata } from "next";
 import { getUserGroups, getViewerId } from "@/lib/group";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
+// Shown on the page and in the FAQPage structured data; keep them one list
+// so the two never disagree.
+const FAQS: [string, string][] = [
+  [
+    "Do my members have to pay?",
+    "No. The admin pays $10 for the season and everyone with the invite link plays free.",
+  ],
+  [
+    "Does the app handle any money between members?",
+    "No. The only payment is the $10 season fee for the software. The app never holds, moves or pays out money between members.",
+  ],
+  [
+    "Is it just for the NFL?",
+    "Yes. The Pick'em Club is built for NFL pick'em: every regular-season and playoff game, plus the Super Bowl squares board.",
+  ],
+  [
+    "What happens next season?",
+    "Your group, members and history stay. When the new season starts you'll see a reminder to renew for another $10. It never charges you automatically.",
+  ],
+  [
+    "Can I be in more than one group?",
+    "Yes. Join your family's group and your office's with the same login, and switch between them from the menu.",
+  ],
+];
+
+// Structured data so search engines understand the product, its price and
+// the FAQ (eligible for rich results).
+const STRUCTURED_DATA = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: SITE_NAME,
+    url: SITE_URL,
+    description: SITE_DESCRIPTION,
+    applicationCategory: "SportsApplication",
+    operatingSystem: "Web",
+    offers: {
+      "@type": "Offer",
+      price: "10.00",
+      priceCurrency: "USD",
+      description: "One-time fee per group per NFL season",
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQS.map(([q, a]) => ({
+      "@type": "Question",
+      name: q,
+      acceptedAnswer: { "@type": "Answer", text: a },
+    })),
+  },
+];
 
 export default async function Home() {
   const viewerId = await getViewerId();
@@ -12,6 +72,12 @@ export default async function Home() {
 
   return (
     <div className="bg-bg">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(STRUCTURED_DATA).replace(/</g, "\\u003c"),
+        }}
+      />
       {viewerId && <NoGroupNotice />}
       <Hero />
       <Features />
@@ -363,33 +429,11 @@ function Pricing() {
 }
 
 function Faq() {
-  const faqs = [
-    [
-      "Do my members have to pay?",
-      "No. The admin pays $10 for the season and everyone with the invite link plays free.",
-    ],
-    [
-      "Does the app handle any money between members?",
-      "No. The only payment is the $10 season fee for the software. The app never holds, moves or pays out money between members.",
-    ],
-    [
-      "Is it just for the NFL?",
-      "Yes. The Pick'em Club is built for NFL pick'em: every regular-season and playoff game, plus the Super Bowl squares board.",
-    ],
-    [
-      "What happens next season?",
-      "Your group, members and history stay. When the new season starts you'll see a reminder to renew for another $10. It never charges you automatically.",
-    ],
-    [
-      "Can I be in more than one group?",
-      "Yes. Join your family's group and your office's with the same login, and switch between them from the menu.",
-    ],
-  ];
   return (
     <section className="max-w-3xl mx-auto px-4 pb-16">
       <h2 className="text-2xl font-bold text-text text-center mb-6">Questions</h2>
       <div className="space-y-3">
-        {faqs.map(([q, a]) => (
+        {FAQS.map(([q, a]) => (
           <details key={q} className="rounded-card border border-border bg-surface p-4">
             <summary className="cursor-pointer font-medium text-text">{q}</summary>
             <p className="mt-2 text-text-muted">{a}</p>

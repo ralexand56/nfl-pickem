@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
 import Card from "@/components/ui/Card";
 
-export const metadata = {
-  title: "Privacy Policy - The Pick'em Club",
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPolicy() {
@@ -43,6 +45,20 @@ export default function PrivacyPolicy() {
             Your name and picture are shown next to your weekly picks and on
             the leaderboard so other players can see who picked what. Your
             email is used only to identify your account.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="font-semibold text-text mb-1">Analytics and cookies</h2>
+          <p>
+            We use Vercel Web Analytics to count page visits and see which sites
+            and search engines send visitors to us. It doesn&apos;t use cookies or
+            track you across other websites, and we remove invite links and group
+            names from what it records. We also set one first-party cookie,
+            kept for 90 days, that remembers how you first found us (for example
+            &quot;Google search&quot;). If you start a group, that source is saved
+            with your purchase so we know which channels work. We don&apos;t sell
+            this information or use it for advertising.
           </p>
         </section>
 

@@ -41,6 +41,8 @@ export const groups = pgTable("groups", {
   settings: jsonb("settings").notNull().default({}),
   // Never needs to pay for a season. Set only by migration (see 0007).
   compedForever: boolean("comped_forever").notNull().default(false),
+  // Where the buyer first came from (see lib/attribution.ts, migration 0009).
+  firstTouch: jsonb("first_touch"),
   createdBy: uuid("created_by").references(() => users.id, {
     onDelete: "set null",
   }),
