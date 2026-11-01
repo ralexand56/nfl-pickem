@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSession, signIn, signOut } from "next-auth/react";
 import React, { useEffect } from "react";
 import Button from "@/components/ui/Button";
+import LogoMark from "@/components/Logo";
 import type { GroupRole } from "@/db/schema";
 
 type User = {
@@ -97,6 +98,7 @@ export default function Nav({ groups }: { groups: NavGroup[] }) {
             href={base ?? "/"}
             className="font-bold text-lg text-text flex items-center gap-2"
           >
+            <LogoMark size={34} />
             The Pick&rsquo;em Club
             <span className="rounded bg-accent-500 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-900">
               NFL

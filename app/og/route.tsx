@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { LOGO_ON_DARK, pickSheetSvg, svgDataUri } from "@/lib/logo";
 
 // Link preview image (texts, social posts, search) at /og. Referenced from
 // the root metadata with an absolute thepickemclub.com URL, rather than the
@@ -17,12 +18,15 @@ export function GET() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "72px 88px",
-          background: "linear-gradient(135deg, #073934 0%, #0f766e 100%)",
+          background: "linear-gradient(135deg, #1d1c1a 0%, #36332f 100%)",
           color: "white",
           fontFamily: "sans-serif",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 36 }}>
+          {/* ImageResponse renders plain <img>; next/image can't be used here. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={svgDataUri(pickSheetSvg(LOGO_ON_DARK))} width={72} height={72} alt="" />
           <div style={{ fontSize: 44, fontWeight: 800 }}>The Pick’em Club</div>
           <div
             style={{
@@ -30,8 +34,8 @@ export function GET() {
               fontSize: 26,
               fontWeight: 800,
               letterSpacing: 2,
-              background: "white",
-              color: "#0f766e",
+              background: "#f2a33a",
+              color: "#1d1c1a",
               padding: "6px 14px",
               borderRadius: 8,
             }}
@@ -42,10 +46,10 @@ export function GET() {
         <div style={{ fontSize: 76, fontWeight: 800, lineHeight: 1.05, maxWidth: 980 }}>
           NFL pick’em for family & friends.
         </div>
-        <div style={{ fontSize: 34, marginTop: 28, color: "#ccfbf1", maxWidth: 980 }}>
+        <div style={{ fontSize: 34, marginTop: 28, color: "#d7d4cf", maxWidth: 980 }}>
           Weekly picks · automatic scoring · live leaderboard · Super Bowl squares
         </div>
-        <div style={{ fontSize: 30, marginTop: 44, fontWeight: 700 }}>
+        <div style={{ fontSize: 30, marginTop: 44, fontWeight: 700, color: "#f2a33a" }}>
           $10 per NFL season · thepickemclub.com
         </div>
       </div>
