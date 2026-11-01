@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import SessionProvider from "./providers";
@@ -9,6 +9,12 @@ import SiteAnalytics from "@/components/SiteAnalytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+// Display face: round, geometric, thin-to-bold. Headings, brand, big numbers.
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
 });
 
@@ -58,7 +64,7 @@ export default async function RootLayout({
   const groups = viewerId ? await getUserGroups(viewerId) : [];
 
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable}`}>
       <body className="font-sans min-h-screen">
         <SessionProvider>
           <Nav groups={groups} />

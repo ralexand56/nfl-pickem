@@ -96,7 +96,7 @@ export default function Nav({ groups }: { groups: NavGroup[] }) {
         <div className="flex items-center gap-4">
           <Link
             href={base ?? "/"}
-            className="font-bold text-lg text-text flex items-center gap-2"
+            className="font-display font-semibold text-xl text-text flex items-center gap-2"
           >
             <LogoMark size={34} />
             The Pick&rsquo;em Club

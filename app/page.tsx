@@ -437,7 +437,7 @@ function Pricing() {
       <Card className="max-w-md mx-auto p-8 text-center">
         <h2 className="text-lg font-semibold text-text">One price, whole group</h2>
         <p className="my-4">
-          <span className="text-5xl font-bold text-text">$10</span>
+          <span className="font-display text-6xl font-light text-text">$10</span>
           <span className="text-text-muted"> / NFL season</span>
         </p>
         <ul className="text-sm text-text-muted space-y-1 mb-6">

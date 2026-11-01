@@ -3,6 +3,7 @@
 @theme {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-outfit), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 
   /* Brand: warm graphite, the "classic" charcoal look */
   --color-brand-50: #f6f5f3;
@@ -69,6 +70,13 @@
     --color-warning: #fbbf24;
     --color-warning-muted: #3a2205;
   }
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
 }
 
 body {
