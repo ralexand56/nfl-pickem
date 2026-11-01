@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Fonts read from disk by the share-image route (app/og/route.tsx).
+  outputFileTracingIncludes: { "/og": ["./assets/fonts/**"] },
   experimental: { serverActions: { allowedOrigins: ["*"] } },
   // Links from before groups existed all belonged to the family group.
   async redirects() {
