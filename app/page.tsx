@@ -56,15 +56,16 @@ function Hero() {
   return (
     <section className="max-w-5xl mx-auto px-4 pt-16 pb-12 text-center">
       <p className="text-sm font-semibold uppercase tracking-wide text-brand-600 mb-3">
-        The Pick&apos;em Club · NFL pick&apos;em for families &amp; friends
+        The NFL pick&apos;em for families &amp; friends
       </p>
       <h1 className="text-4xl sm:text-5xl font-bold text-text leading-tight mb-4">
         Run your family&apos;s NFL pick&apos;em.
         <br className="hidden sm:block" /> Skip the spreadsheet.
       </h1>
       <p className="text-lg text-text-muted max-w-2xl mx-auto mb-8">
-        Weekly picks, automatic scoring, a live leaderboard and a Super Bowl
-        squares board, all in one private group for $10 a season.
+        Pick every NFL game each week, with automatic scoring, a live
+        leaderboard and a Super Bowl squares board, all in one private group
+        for $10 per NFL season.
       </p>
       <CtaButton />
       <p className="text-sm text-text-muted mt-3">
@@ -316,9 +317,9 @@ function Features() {
 
 function HowItWorks() {
   const steps = [
-    ["Start your group", "Name it and pay $10 for the season."],
+    ["Start your group", "Name it and pay $10 for the NFL season."],
     ["Share your invite link", "Drop it in the family group chat."],
-    ["Play all season", "Picks, scores, leaderboard and squares are handled."],
+    ["Play all season", "Every NFL game, scored automatically, through the Super Bowl."],
   ];
   return (
     <section className="bg-surface border-y border-border">
@@ -347,7 +348,7 @@ function Pricing() {
         <h2 className="text-lg font-semibold text-text">One price, whole group</h2>
         <p className="my-4">
           <span className="text-5xl font-bold text-text">$10</span>
-          <span className="text-text-muted"> / season</span>
+          <span className="text-text-muted"> / NFL season</span>
         </p>
         <ul className="text-sm text-text-muted space-y-1 mb-6">
           <li>Unlimited members, free for them</li>
@@ -370,6 +371,10 @@ function Faq() {
     [
       "Does the app handle any money between members?",
       "No. The only payment is the $10 season fee for the software. The app never holds, moves or pays out money between members.",
+    ],
+    [
+      "Is it just for the NFL?",
+      "Yes. The Pick'em Club is built for NFL pick'em: every regular-season and playoff game, plus the Super Bowl squares board.",
     ],
     [
       "What happens next season?",

@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
             currency: "usd",
             unit_amount: SEASON_PRICE_CENTS,
             product_data: {
-              name: "The Pick'em Club season",
+              name: "The Pick'em Club · NFL season",
               description,
             },
           },

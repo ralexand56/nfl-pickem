@@ -68,7 +68,7 @@ export default function StartForm() {
         {redirecting ? "Opening secure checkout…" : "Continue to payment · $10"}
       </Button>
       <p className="text-xs text-text-muted text-center">
-        One-time payment for this season. Nothing renews automatically.
+        One-time payment for this NFL season. Nothing renews automatically.
       </p>
     </form>
   );

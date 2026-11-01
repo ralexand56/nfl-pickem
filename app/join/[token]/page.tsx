@@ -60,7 +60,8 @@ export default async function JoinPage({
         <p className="text-sm text-text-muted mb-1">You&apos;re invited to</p>
         <h1 className="text-2xl font-bold text-text mb-1">{group.name}</h1>
         <p className="text-sm text-text-muted mb-6">
-          {members} {members === 1 ? "member" : "members"} · The Pick&apos;em Club
+          {members} {members === 1 ? "member" : "members"} · NFL pick&apos;em on The
+          Pick&apos;em Club
         </p>
         <form action={joinGroupAction.bind(null, token)} className="space-y-4 text-left">
           <label className="flex items-start gap-2 text-sm text-text cursor-pointer">

@@ -93,8 +93,14 @@ export default function Nav({ groups }: { groups: NavGroup[] }) {
     <header className="sticky top-0 z-40 bg-surface/80 backdrop-blur border-b border-border">
       <nav className="flex-col sm:flex-row max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-4">
-          <Link href={base ?? "/"} className="font-bold text-lg text-text">
+          <Link
+            href={base ?? "/"}
+            className="font-bold text-lg text-text flex items-center gap-2"
+          >
             The Pick&rsquo;em Club
+            <span className="rounded bg-brand-600 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+              NFL
+            </span>
           </Link>
           {groups.length > 1 ? (
             <select
