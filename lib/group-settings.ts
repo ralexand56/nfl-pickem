@@ -46,3 +46,10 @@ export function pickDeadlineMs(
   if (rule === "game") return new Date(game.date).getTime();
   return Math.min(...weekGames.map((g) => new Date(g.date).getTime()));
 }
+
+// New groups start with the money-related features off; admins opt in.
+// (Defaults above stay on so groups saved before this keep their behavior.)
+export const NEW_GROUP_SETTINGS: Partial<GroupSettings> = {
+  buyInEnabled: false,
+  squaresEnabled: false,
+};

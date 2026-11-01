@@ -11,10 +11,13 @@ export const dynamic = "force-dynamic";
 
 export default async function JoinPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ token: string }>;
+  searchParams: Promise<{ agree?: string }>;
 }) {
   const { token } = await params;
+  const { agree } = await searchParams;
 
   const [group] = await db
     .select({ id: groups.id, slug: groups.slug, name: groups.name })
@@ -59,7 +62,21 @@ export default async function JoinPage({
         <p className="text-sm text-text-muted mb-6">
           {members} {members === 1 ? "member" : "members"} · The Pick&apos;em Club
         </p>
-        <form action={joinGroupAction.bind(null, token)}>
+        <form action={joinGroupAction.bind(null, token)} className="space-y-4 text-left">
+          <label className="flex items-start gap-2 text-sm text-text cursor-pointer">
+            <input type="checkbox" name="agree" className="mt-1" required />
+            <span>
+              I&apos;m 18 or older (or joining with a parent or guardian&apos;s
+              permission) and I agree to the{" "}
+              <a href="/terms" target="_blank" className="text-brand-600 underline">
+                Terms of Service
+              </a>
+              .
+            </span>
+          </label>
+          {agree === "required" && (
+            <p className="text-sm text-danger">Please check the box to continue.</p>
+          )}
           <Button variant="primary" className="w-full py-3" type="submit">
             Join group
           </Button>

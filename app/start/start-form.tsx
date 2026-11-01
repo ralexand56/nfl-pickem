@@ -7,16 +7,17 @@ import { useToast } from "@/components/Toast";
 export default function StartForm() {
   const toast = useToast();
   const [name, setName] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!name.trim() || !agreed) return;
     setRedirecting(true);
     try {
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
-        body: JSON.stringify({ kind: "create", name }),
+        body: JSON.stringify({ kind: "create", name, agreed }),
       });
       const body = await res.json().catch(() => null);
       if (!res.ok || !body?.url) throw new Error(body?.error);
@@ -42,11 +43,27 @@ export default function StartForm() {
           required
         />
       </label>
+      <label className="flex items-start gap-2 text-sm text-text cursor-pointer">
+        <input
+          type="checkbox"
+          className="mt-1"
+          checked={agreed}
+          onChange={(e) => setAgreed(e.target.checked)}
+          required
+        />
+        <span>
+          I&apos;m 18 or older and I agree to the{" "}
+          <a href="/terms" target="_blank" className="text-brand-600 underline">
+            Terms of Service
+          </a>
+          .
+        </span>
+      </label>
       <Button
         type="submit"
         variant="primary"
         className="w-full py-3"
-        disabled={redirecting || !name.trim()}
+        disabled={redirecting || !name.trim() || !agreed}
       >
         {redirecting ? "Opening secure checkout…" : "Continue to payment · $10"}
       </Button>

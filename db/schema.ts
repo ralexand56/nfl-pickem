@@ -24,6 +24,8 @@ export const users = pgTable("users", {
   email: text("email").unique(),
   emailVerified: timestamp("emailVerified", { withTimezone: true }),
   image: text("image"),
+  // Last time they agreed to the Terms and confirmed their age (start/join).
+  termsAcceptedAt: timestamp("terms_accepted_at", { withTimezone: true }),
 });
 
 // --- Groups: each family/office pool is a group. People-generated data

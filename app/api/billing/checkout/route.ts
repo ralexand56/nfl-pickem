@@ -4,6 +4,7 @@ import type { CheckoutMetadata } from "@/lib/billing";
 import {
   getViewerId,
   isSeasonActive,
+  recordTermsAccepted,
   requireGroupAdmin,
   type GroupContext,
 } from "@/lib/group";
@@ -36,6 +37,13 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+    if (body.agreed !== true) {
+      return NextResponse.json(
+        { error: "Please confirm you're 18 or older and agree to the Terms." },
+        { status: 400 }
+      );
+    }
+    await recordTermsAccepted(userId);
     metadata = { kind: "create", userId, groupName: name, season };
     description = `${name} · ${season} season`;
     cancelUrl = `${origin}/start`;

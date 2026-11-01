@@ -63,8 +63,8 @@ function Hero() {
         <br className="hidden sm:block" /> Skip the spreadsheet.
       </h1>
       <p className="text-lg text-text-muted max-w-2xl mx-auto mb-8">
-        Weekly picks, automatic scoring, a live leaderboard, buy-in tracking and a
-        Super Bowl squares board, all in one private group for $10 a season.
+        Weekly picks, automatic scoring, a live leaderboard and a Super Bowl
+        squares board, all in one private group for $10 a season.
       </p>
       <CtaButton />
       <p className="text-sm text-text-muted mt-3">
@@ -141,10 +141,10 @@ function PicksPreview() {
 
 function LeaderboardPreview() {
   const rows = [
-    ["Grandma Jo", 12, true],
-    ["Marcus", 11, true],
-    ["Aunt Lisa", 11, false],
-    ["Devin", 9, true],
+    ["Grandma Jo", 12, 44],
+    ["Marcus", 11, 38],
+    ["Aunt Lisa", 11, 51],
+    ["Devin", 9, 47],
   ] as const;
   return (
     <Card>
@@ -155,7 +155,7 @@ function LeaderboardPreview() {
         </span>
       </div>
       <ul className="divide-y divide-border text-sm">
-        {rows.map(([name, correct, paid], i) => (
+        {rows.map(([name, correct, tb], i) => (
           <li key={name} className="flex items-center justify-between py-2">
             <span className="text-text">
               {i === 0 && "🏆 "}
@@ -163,14 +163,7 @@ function LeaderboardPreview() {
             </span>
             <span className="flex items-center gap-3">
               <span className="text-text">{correct} correct</span>
-              <span
-                className={clsx(
-                  "grid h-6 w-6 place-items-center rounded-full text-xs font-bold",
-                  paid ? "bg-success-muted text-success" : "bg-surface-muted text-text-muted"
-                )}
-              >
-                $
-              </span>
+              <span className="text-xs text-text-muted">TB {tb}</span>
             </span>
           </li>
         ))}
@@ -179,34 +172,33 @@ function LeaderboardPreview() {
   );
 }
 
-function PaymentPreview() {
+function CheckInPreview() {
   const people = [
-    ["Grandma Jo", "Zelle"],
-    ["Marcus", "Cash App"],
-    ["Aunt Lisa", null],
-    ["Devin", "Venmo"],
-    ["Uncle Ray", null],
-    ["Kayla", "Cash App"],
+    ["Grandma Jo", true],
+    ["Marcus", true],
+    ["Aunt Lisa", false],
+    ["Devin", true],
+    ["Uncle Ray", false],
+    ["Kayla", true],
   ] as const;
   return (
     <Card>
       <div className="mb-3 flex justify-between text-sm">
-        <span className="font-semibold text-text">Who&apos;s paid · Week 8 · $5 buy-in</span>
-        <span className="text-text-muted">4 of 6 paid</span>
+        <span className="font-semibold text-text">Who&apos;s in · Week 8</span>
+        <span className="text-text-muted">4 of 6 marked in</span>
       </div>
       <ul className="grid grid-cols-2 gap-2 text-sm">
-        {people.map(([name, method]) => (
+        {people.map(([name, inThisWeek]) => (
           <li key={name} className="flex items-center gap-2">
             <span
               className={clsx(
                 "grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-bold",
-                method ? "bg-success-muted text-success" : "bg-surface-muted text-text-muted"
+                inThisWeek ? "bg-success-muted text-success" : "bg-surface-muted text-text-muted"
               )}
             >
-              $
+              {inThisWeek ? "✓" : ""}
             </span>
             <span className="text-text truncate">{name}</span>
-            {method && <span className="text-xs text-text-muted">{method}</span>}
           </li>
         ))}
       </ul>
@@ -219,7 +211,7 @@ function SquaresPreview() {
   const mine = new Set([14, 47, 77]);
   return (
     <Card>
-      <div className="mb-3 text-sm font-semibold text-text">Super Bowl Squares · $5/square</div>
+      <div className="mb-3 text-sm font-semibold text-text">Super Bowl Squares</div>
       <div className="grid grid-cols-10 gap-1">
         {Array.from({ length: 100 }, (_, i) => (
           <div
@@ -236,7 +228,7 @@ function SquaresPreview() {
         ))}
       </div>
       <div className="mt-3 flex justify-between text-xs text-text-muted">
-        <span>Q1 20% · Q2 20% · Q3 20% · Final 40%</span>
+        <span>Numbers drawn once the board fills</span>
         <span>25 / 100 claimed</span>
       </div>
     </Card>
@@ -272,14 +264,15 @@ function Features() {
         </p>
       </Feature>
 
-      <Feature title="Track who's paid the buy-in" preview={<PaymentPreview />}>
+      <Feature title="Optional: keep track of who's in" preview={<CheckInPreview />}>
         <p>
-          Set your weekly buy-in and the ways people pay (Cash App, Zelle, Venmo,
-          whatever your group uses). Members tap the <strong>$</strong> to mark
-          themselves paid, and admins can mark anyone.
+          If your group has a weekly buy-in, your admin can turn on a simple
+          tracker where members mark themselves as paid in and admins can update
+          anyone. It&apos;s off unless your admin turns it on.
         </p>
         <p className="text-sm">
-          The money stays between your members. The app just keeps score.
+          The app only keeps the list. It never holds or moves money between
+          members.
         </p>
       </Feature>
 
@@ -290,8 +283,9 @@ function Features() {
           draw the random numbers with one tap.
         </p>
         <p>
-          Lock the board before kickoff, see who owes what, and the payouts are laid
-          out by quarter. You can run more than one board if you like.
+          Lock the board before kickoff and everyone can see the numbers and who
+          holds each square. Turn it on from your admin page, and run more than one
+          board if you like.
         </p>
       </Feature>
 
@@ -358,7 +352,7 @@ function Pricing() {
         <ul className="text-sm text-text-muted space-y-1 mb-6">
           <li>Unlimited members, free for them</li>
           <li>Weekly picks, tiebreakers and leaderboard</li>
-          <li>Buy-in tracker and Super Bowl squares</li>
+          <li>Optional Super Bowl squares and who&apos;s-in tracker</li>
           <li>One-time payment. Nothing renews automatically.</li>
         </ul>
         <CtaButton className="w-full" />
@@ -374,8 +368,8 @@ function Faq() {
       "No. The admin pays $10 for the season and everyone with the invite link plays free.",
     ],
     [
-      "Does the app handle our pot or buy-ins?",
-      "No money moves through the app except the $10 season fee. It tracks who has paid; your group settles up however it already does.",
+      "Does the app handle any money between members?",
+      "No. The only payment is the $10 season fee for the software. The app never holds, moves or pays out money between members.",
     ],
     [
       "What happens next season?",
@@ -400,6 +394,10 @@ function Faq() {
       <div className="mt-10 text-center">
         <CtaButton />
         <p className="mt-4 text-sm text-text-muted">
+          <Link href="/terms" className="underline">
+            Terms
+          </Link>
+          {" · "}
           <Link href="/privacy" className="underline">
             Privacy
           </Link>

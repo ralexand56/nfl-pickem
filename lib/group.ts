@@ -13,6 +13,7 @@ import {
   groupMembers,
   groupSeasons,
   groups,
+  users,
   type GroupRole,
   type SelectGroup,
 } from "@/db/schema";
@@ -130,4 +131,12 @@ export async function getUserGroups(userId: string) {
 // Unguessable token for /join/[token] links.
 export function newInviteToken() {
   return randomBytes(18).toString("base64url");
+}
+
+// Records that the user agreed to the Terms and confirmed their age.
+export async function recordTermsAccepted(userId: string) {
+  await db
+    .update(users)
+    .set({ termsAcceptedAt: new Date() })
+    .where(eq(users.id, userId));
 }

@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { groupMembers, groupSeasons, groups } from "@/db/schema";
 import { newInviteToken } from "@/lib/group";
+import { NEW_GROUP_SETTINGS } from "@/lib/group-settings";
 
 export type CheckoutMetadata =
   | { kind: "create"; userId: string; groupName: string; season: string }
@@ -61,6 +62,7 @@ export async function fulfillCheckout(
           slug,
           name: meta.groupName,
           inviteToken: newInviteToken(),
+          settings: NEW_GROUP_SETTINGS,
           createdBy: meta.userId,
         }),
         db
