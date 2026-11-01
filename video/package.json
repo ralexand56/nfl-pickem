@@ -5,6 +5,7 @@
   "scripts": {
     "studio": "remotion studio src/index.ts",
     "render": "remotion render src/index.ts Promo out/pickem-club-promo.mp4",
+    "render:vertical": "remotion render src/index.ts PromoVertical out/pickem-club-promo-vertical.mp4",
     "still": "remotion still src/index.ts Promo"
   },
   "dependencies": {

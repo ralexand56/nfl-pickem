@@ -10,7 +10,7 @@ import {
   useVideoConfig,
 } from "remotion";
 import { Backdrop, Caption, Card, LogoMark, Phone, SceneFade, useEnter } from "./components";
-import { BODY, C, DISPLAY } from "./theme";
+import { BODY, C, DISPLAY, useVertical } from "./theme";
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
@@ -26,7 +26,7 @@ export function Intro({ duration }: { duration: number }) {
         <div style={{ transform: `scale(${0.6 + pop * 0.4})` }}>
           <LogoMark size={260} delay={8} />
         </div>
-        <div style={{ ...word, display: "flex", alignItems: "center", gap: 24 }}>
+        <div style={{ ...word, display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap", justifyContent: "center", padding: "0 60px" }}>
           <div style={{ fontFamily: DISPLAY, fontWeight: 600, fontSize: 92, color: "#fff", letterSpacing: -1 }}>
             The Pick’em Club
           </div>
@@ -42,24 +42,27 @@ export function Intro({ duration }: { duration: number }) {
 // 2. Hook over the game-day photo --------------------------------------------
 export function Hook({ duration }: { duration: number }) {
   const frame = useCurrentFrame();
+  const vertical = useVertical();
   const zoom = interpolate(frame, [0, duration], [1.04, 1.14]);
-  const lines = ["Run your NFL pick’em", "with family & friends."];
+  const lines = vertical
+    ? ["Run your NFL", "pick’em with", "family & friends."]
+    : ["Run your NFL pick’em", "with family & friends."];
   const sub = useEnter(40);
   return (
     <SceneFade duration={duration}>
       <AbsoluteFill style={{ background: C.charcoal, overflow: "hidden" }}>
-        <Img src={staticFile("hero-watch-party.jpg")} style={{ width: "100%", height: "100%", objectFit: "cover", transform: `scale(${zoom})`, transformOrigin: "65% 45%" }} />
-        <AbsoluteFill style={{ background: "linear-gradient(90deg, rgba(29,28,26,.96) 0%, rgba(29,28,26,.86) 42%, rgba(29,28,26,.25) 100%)" }} />
-        <AbsoluteFill style={{ justifyContent: "center", padding: "0 140px", gap: 30 }}>
+        <Img src={staticFile("hero-watch-party.jpg")} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: vertical ? "62% 50%" : "50% 50%", transform: `scale(${zoom})`, transformOrigin: "65% 45%" }} />
+        <AbsoluteFill style={{ background: vertical ? "linear-gradient(180deg, rgba(29,28,26,.15) 0%, rgba(29,28,26,.55) 45%, rgba(29,28,26,.96) 78%)" : "linear-gradient(90deg, rgba(29,28,26,.96) 0%, rgba(29,28,26,.86) 42%, rgba(29,28,26,.25) 100%)" }} />
+        <AbsoluteFill style={{ justifyContent: vertical ? "flex-end" : "center", padding: vertical ? "0 70px 300px" : "0 140px", gap: vertical ? 14 : 30 }}>
           {lines.map((l, i) => {
             const s = useEnter(8 + i * 10, 50);
             return (
-              <div key={l} style={{ ...s, fontFamily: DISPLAY, fontWeight: 800, fontSize: 112, lineHeight: 1, letterSpacing: -2, color: "#fff", textShadow: "0 4px 24px rgba(0,0,0,.4)" }}>
+              <div key={l} style={{ ...s, fontFamily: DISPLAY, fontWeight: 800, fontSize: vertical ? 100 : 112, lineHeight: 1, letterSpacing: -2, color: "#fff", textShadow: "0 4px 24px rgba(0,0,0,.4)" }}>
                 {l}
               </div>
             );
           })}
-          <div style={{ ...sub, fontFamily: BODY, fontSize: 40, color: C.soft, marginTop: 10 }}>
+          <div style={{ ...sub, fontFamily: BODY, fontSize: vertical ? 38 : 40, lineHeight: 1.35, color: C.soft, marginTop: 10 }}>
             Skip the spreadsheet. <span style={{ color: C.tan }}>Skip the group-text math.</span>
           </div>
         </AbsoluteFill>
@@ -82,7 +85,7 @@ export function StartGroup({ duration }: { duration: number }) {
     <SceneFade duration={duration}>
       <Backdrop>
         <Caption step="Step 1 · Start" title="Start your group" sub="Name it and pay $10 for the whole season. You’re the commissioner." />
-        <div style={{ ...card, flex: 1, display: "flex", justifyContent: "center" }}>
+        <div style={{ ...card, flex: useVertical() ? "none" : 1, display: "flex", justifyContent: "center", zoom: useVertical() ? 1.18 : 1 }}>
           {!done ? (
             <Card style={{ width: 760 }}>
               <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 48, marginBottom: 10 }}>Start your NFL pick’em group</div>
@@ -139,8 +142,8 @@ export function Invite({ duration }: { duration: number }) {
     <SceneFade duration={duration}>
       <Backdrop>
         <Caption step="Step 2 · Invite" title="Share one link" sub="Drop it in the group chat. Everyone plays free." />
-        <div style={{ ...phone, flex: 1, display: "flex", justifyContent: "center", alignItems: "center", gap: 50 }}>
-          <Phone width={470}>
+        <div style={{ ...phone, flex: useVertical() ? "none" : 1, display: "flex", justifyContent: "center", alignItems: "center", gap: 50, zoom: useVertical() ? 1.12 : 1 }}>
+          <Phone width={useVertical() ? 430 : 470}>
             <div style={{ background: C.charcoal, color: "#fff", padding: "54px 30px 22px", fontFamily: DISPLAY, fontWeight: 600, fontSize: 28 }}>
               Football crew 🏈
             </div>
@@ -199,7 +202,7 @@ export function Picks({ duration }: { duration: number }) {
     <SceneFade duration={duration}>
       <Backdrop>
         <Caption step="Step 3 · Pick" title="Pick every game" sub="Tap a team each week. A countdown shows exactly when picks lock." />
-        <div style={{ ...card, flex: 1, display: "flex", justifyContent: "center", position: "relative" }}>
+        <div style={{ ...card, flex: useVertical() ? "none" : 1, display: "flex", justifyContent: "center", position: "relative", zoom: useVertical() ? 1.18 : 1 }}>
           <Card style={{ width: 780, padding: 34 }}>
             <div style={{ display: "flex", justifyContent: "space-between", background: "#fef3c7", borderRadius: 16, padding: "18px 24px", fontSize: 27, fontWeight: 600, marginBottom: 18 }}>
               <span>Picks lock in</span>
@@ -250,7 +253,7 @@ export function Leaderboard({ duration }: { duration: number }) {
     <SceneFade duration={duration}>
       <Backdrop>
         <Caption step="Every week" title="Scores update themselves" sub="Final scores come in automatically. No more adding up the group text on Tuesday." />
-        <div style={{ ...card, flex: 1, display: "flex", justifyContent: "center" }}>
+        <div style={{ ...card, flex: useVertical() ? "none" : 1, display: "flex", justifyContent: "center", zoom: useVertical() ? 1.18 : 1 }}>
           <Card style={{ width: 760, padding: 36 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <div style={{ fontFamily: DISPLAY, fontWeight: 800, fontSize: 40 }}>Week 8 Leaderboard</div>
@@ -294,7 +297,7 @@ export function Squares({ duration }: { duration: number }) {
     <SceneFade duration={duration}>
       <Backdrop>
         <Caption step="Super Bowl" title="Squares, built in" sub="Members claim squares, you lock the board and draw the numbers with one tap." />
-        <div style={{ ...card, flex: 1, display: "flex", justifyContent: "center" }}>
+        <div style={{ ...card, flex: useVertical() ? "none" : 1, display: "flex", justifyContent: "center", zoom: useVertical() ? 1.18 : 1 }}>
           <Card style={{ padding: 30 }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 24, fontWeight: 600, marginBottom: 14 }}>
               <span>Super Bowl Squares</span>
@@ -350,7 +353,7 @@ export function Outro({ duration }: { duration: number }) {
           <LogoMark size={190} delay={0} />
         </div>
         <div style={{ ...a, fontFamily: DISPLAY, fontWeight: 800, fontSize: 104, color: "#fff", letterSpacing: -2 }}>The Pick’em Club</div>
-        <div style={{ ...b, fontFamily: DISPLAY, fontWeight: 300, fontSize: 52, color: C.soft }}>
+        <div style={{ ...b, fontFamily: DISPLAY, fontWeight: 300, fontSize: 52, color: C.soft, textAlign: "center", padding: "0 70px", lineHeight: 1.3 }}>
           $10 per NFL season · members play free
         </div>
         <div style={{ ...c, marginTop: 20, background: C.tan, color: C.charcoal, borderRadius: 20, padding: "26px 56px", fontFamily: DISPLAY, fontWeight: 600, fontSize: 46 }}>

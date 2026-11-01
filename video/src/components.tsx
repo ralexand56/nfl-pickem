@@ -1,6 +1,6 @@
 import React from "react";
 import { interpolate, spring, useCurrentFrame, useVideoConfig, Easing } from "remotion";
-import { BODY, C, DISPLAY } from "./theme";
+import { BODY, C, DISPLAY, useVertical } from "./theme";
 
 // Fade + rise in, starting at `delay` frames.
 export function useEnter(delay = 0, distance = 40) {
@@ -25,11 +25,12 @@ export function SceneFade({ children, duration }: { children: React.ReactNode; d
 
 // Step label + headline used by each feature scene.
 export function Caption({ step, title, sub }: { step: string; title: string; sub: string }) {
+  const vertical = useVertical();
   const a = useEnter(0);
   const b = useEnter(6);
   const c = useEnter(12);
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 22, maxWidth: 640 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 22, maxWidth: vertical ? 940 : 640 }}>
       <div style={{ ...a, fontFamily: DISPLAY, fontWeight: 600, fontSize: 26, letterSpacing: 4, textTransform: "uppercase", color: C.tan }}>
         {step}
       </div>
@@ -62,16 +63,21 @@ export function Card({ children, style }: { children: React.ReactNode; style?: R
 
 // Charcoal backdrop with a soft tan glow, shared by feature scenes.
 export function Backdrop({ children }: { children: React.ReactNode }) {
+  const vertical = useVertical();
   return (
     <div
       style={{
         position: "absolute",
         inset: 0,
-        background: `radial-gradient(1200px 700px at 78% 40%, ${C.charcoal3} 0%, ${C.charcoal} 70%)`,
+        background: vertical
+          ? `radial-gradient(900px 1100px at 50% 62%, ${C.charcoal3} 0%, ${C.charcoal} 72%)`
+          : `radial-gradient(1200px 700px at 78% 40%, ${C.charcoal3} 0%, ${C.charcoal} 70%)`,
         display: "flex",
-        alignItems: "center",
-        padding: "0 140px",
-        gap: 110,
+        flexDirection: vertical ? "column" : "row",
+        alignItems: vertical ? "stretch" : "center",
+        justifyContent: vertical ? "center" : undefined,
+        padding: vertical ? "150px 70px 230px" : "0 140px",
+        gap: vertical ? 70 : 110,
       }}
     >
       {children}

@@ -1,3 +1,4 @@
+import { createContext, useContext } from "react";
 import { loadFont as loadOutfit } from "@remotion/google-fonts/Outfit";
 import { loadFont as loadGeist } from "@remotion/google-fonts/Geist";
 
@@ -29,3 +30,9 @@ export const C = {
 export const FPS = 30;
 export const W = 1920;
 export const H = 1080;
+
+// Landscape (1920×1080) or vertical (1080×1920 for Reels/TikTok/Shorts).
+export const VerticalContext = createContext(false);
+export const useVertical = () => useContext(VerticalContext);
+export const VW = 1080;
+export const VH = 1920;

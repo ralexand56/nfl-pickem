@@ -1,5 +1,5 @@
 import { AbsoluteFill, Series } from "remotion";
-import { C } from "./theme";
+import { C, VerticalContext } from "./theme";
 import { Hook, Intro, Invite, Leaderboard, Outro, Picks, Squares, StartGroup } from "./scenes";
 
 // Scene lengths in frames at 30 fps (about 49 seconds total).
@@ -15,8 +15,9 @@ export const SCENES = [
 ];
 export const PROMO_FRAMES = SCENES.reduce((n, s) => n + s.d, 0);
 
-export function Promo() {
+export function Promo({ vertical = false }: { vertical?: boolean }) {
   return (
+    <VerticalContext.Provider value={vertical}>
     <AbsoluteFill style={{ background: C.charcoal }}>
       <Series>
         {SCENES.map(({ C: Scene, d }, i) => (
@@ -26,5 +27,6 @@ export function Promo() {
         ))}
       </Series>
     </AbsoluteFill>
+    </VerticalContext.Provider>
   );
 }
