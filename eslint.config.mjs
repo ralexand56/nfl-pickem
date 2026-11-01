@@ -13,6 +13,8 @@ const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     ignores: [
+      // Separate Remotion project with its own dependencies.
+      "video/**",
       "node_modules/**",
       ".next/**",
       "out/**",
