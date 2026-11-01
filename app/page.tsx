@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { clsx } from "clsx";
 import type { ReactNode } from "react";
@@ -104,12 +105,21 @@ function NoGroupNotice() {
   );
 }
 
-function CtaButton({ className }: { className?: string }) {
+function CtaButton({
+  className,
+  light,
+}: {
+  className?: string;
+  light?: boolean;
+}) {
   return (
     <Link
       href="/start"
       className={clsx(
-        "inline-block rounded-control bg-brand-600 px-6 py-3 font-semibold text-white hover:bg-brand-700",
+        "inline-block rounded-control px-6 py-3 font-semibold shadow-sm",
+        light
+          ? "bg-white text-brand-800 hover:bg-brand-50"
+          : "bg-brand-600 text-white hover:bg-brand-700",
         className
       )}
     >
@@ -118,25 +128,39 @@ function CtaButton({ className }: { className?: string }) {
   );
 }
 
+// Game-day hero: a watch-party photo (Pexels, free commercial license) behind
+// a teal gradient so the white text stays readable at every width.
 function Hero() {
   return (
-    <section className="max-w-5xl mx-auto px-4 pt-16 pb-12 text-center">
-      <p className="text-sm font-semibold uppercase tracking-wide text-brand-600 mb-3">
-        The NFL pick&apos;em for family &amp; friends
-      </p>
-      <h1 className="text-4xl sm:text-5xl font-bold text-text leading-tight mb-4">
-        Run your NFL pick&apos;em with family &amp; friends.
-        <br className="hidden sm:block" /> Skip the spreadsheet.
-      </h1>
-      <p className="text-lg text-text-muted max-w-2xl mx-auto mb-8">
-        Pick every NFL game each week, with automatic scoring, a live
-        leaderboard and a Super Bowl squares board, all in one private group
-        for $10 per NFL season.
-      </p>
-      <CtaButton />
-      <p className="text-sm text-text-muted mt-3">
-        Members join free with your invite link.
-      </p>
+    <section className="relative isolate overflow-hidden bg-brand-900">
+      <Image
+        src="/images/hero-watch-party.jpg"
+        alt="Friends on a couch reacting to a big play on TV"
+        fill
+        priority
+        sizes="100vw"
+        className="-z-10 object-cover object-[65%_40%] max-md:object-[70%_50%]"
+      />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-brand-900/95 via-brand-900/80 to-brand-900/25 max-md:bg-gradient-to-b max-md:from-brand-900/90 max-md:via-brand-900/75 max-md:to-brand-900/50" />
+      <div className="max-w-6xl mx-auto px-4 py-20 sm:py-28">
+        <div className="max-w-xl text-white">
+          <p className="text-sm font-semibold uppercase tracking-wider text-brand-200 mb-3">
+            The NFL pick&apos;em for family &amp; friends
+          </p>
+          <h1 className="text-4xl sm:text-6xl font-extrabold leading-[1.05] mb-5">
+            Run your NFL pick&apos;em with family &amp; friends.
+          </h1>
+          <p className="text-lg text-brand-50/90 mb-8">
+            Pick every NFL game each week, with automatic scoring, a live
+            leaderboard and a Super Bowl squares board, all in one private group
+            for $10 per NFL season. Skip the spreadsheet.
+          </p>
+          <CtaButton light />
+          <p className="text-sm text-brand-100/80 mt-3">
+            Members join free with your invite link.
+          </p>
+        </div>
+      </div>
     </section>
   );
 }
