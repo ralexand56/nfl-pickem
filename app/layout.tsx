@@ -32,11 +32,20 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     url: "/",
     locale: "en_US",
+    images: [
+      {
+        url: `${SITE_URL}/og`,
+        width: 1200,
+        height: 630,
+        alt: `${SITE_NAME}: NFL pick’em for families & friends`,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: `${SITE_NAME} · ${SITE_TAGLINE}`,
     description: SITE_DESCRIPTION,
+    images: [`${SITE_URL}/og`],
   },
 };
 

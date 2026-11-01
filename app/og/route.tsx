@@ -1,12 +1,12 @@
 import { ImageResponse } from "next/og";
 
-// Link preview image (texts, social posts, search). Used site-wide unless a
-// page provides its own.
-export const alt = "The Pick'em Club: NFL pick'em for families & friends";
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+// Link preview image (texts, social posts, search) at /og. Referenced from
+// the root metadata with an absolute thepickemclub.com URL, rather than the
+// opengraph-image file convention, whose host Next.js picks from the Vercel
+// deployment (preview or "primary" domain) instead of metadataBase.
+const size = { width: 1200, height: 630 };
 
-export default function OpengraphImage() {
+export function GET() {
   return new ImageResponse(
     (
       <div
@@ -50,6 +50,9 @@ export default function OpengraphImage() {
         </div>
       </div>
     ),
-    size
+    {
+      ...size,
+      headers: { "Cache-Control": "public, max-age=86400, s-maxage=604800" },
+    }
   );
 }
