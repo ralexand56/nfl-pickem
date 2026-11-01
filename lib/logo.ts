@@ -6,10 +6,10 @@ type Palette = { card: string; amber: string; ink: string; line: string; empty: 
 
 // Charcoal sheet for light backgrounds; white sheet for dark ones.
 export const LOGO_ON_LIGHT: Palette = {
-  card: "#2a2826", amber: "#f2a33a", ink: "#1d1c1a", line: "#8c8882", empty: "#5a5753",
+  card: "#2a2826", amber: "#cf9a66", ink: "#1d1c1a", line: "#8c8882", empty: "#5a5753",
 };
 export const LOGO_ON_DARK: Palette = {
-  card: "#ffffff", amber: "#f2a33a", ink: "#1d1c1a", line: "#b5b1aa", empty: "#d7d4cf",
+  card: "#ffffff", amber: "#cf9a66", ink: "#1d1c1a", line: "#b5b1aa", empty: "#d7d4cf",
 };
 
 const check = (x: number, y: number, s: number, c: string) =>

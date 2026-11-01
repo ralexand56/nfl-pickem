@@ -34,7 +34,7 @@ export function GET() {
               fontSize: 26,
               fontWeight: 800,
               letterSpacing: 2,
-              background: "#f2a33a",
+              background: "#cf9a66",
               color: "#1d1c1a",
               padding: "6px 14px",
               borderRadius: 8,
@@ -49,7 +49,7 @@ export function GET() {
         <div style={{ fontSize: 34, marginTop: 28, color: "#d7d4cf", maxWidth: 980 }}>
           Weekly picks · automatic scoring · live leaderboard · Super Bowl squares
         </div>
-        <div style={{ fontSize: 30, marginTop: 44, fontWeight: 700, color: "#f2a33a" }}>
+        <div style={{ fontSize: 30, marginTop: 44, fontWeight: 700, color: "#cf9a66" }}>
           $10 per NFL season · thepickemclub.com
         </div>
       </div>

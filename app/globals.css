@@ -16,14 +16,14 @@
   --color-brand-800: #2a2826;
   --color-brand-900: #1d1c1a;
 
-  /* Accent: amber, for the main call to action and highlights */
-  --color-accent-50: #fff8ec;
-  --color-accent-100: #fdeccb;
-  --color-accent-300: #f8c77a;
-  --color-accent-400: #f5b04f;
-  --color-accent-500: #f2a33a;
-  --color-accent-600: #d9871c;
-  --color-accent-700: #a8650f;
+  /* Accent: tan/caramel, for the main call to action and highlights */
+  --color-accent-50: #fbf6ef;
+  --color-accent-100: #f3e7d6;
+  --color-accent-300: #e2c39d;
+  --color-accent-400: #d9ae7f;
+  --color-accent-500: #cf9a66;
+  --color-accent-600: #b37f4c;
+  --color-accent-700: #8c613a;
 
   /* Semantic (muted variants overridden for dark mode below, along with
      brand-50 - all three are used as tinted panel/badge backgrounds, so
