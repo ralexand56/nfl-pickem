@@ -75,9 +75,12 @@ export async function fulfillCheckout(
 ): Promise<string | null> {
   if (session.payment_status === "unpaid") return null;
   // Auto-renew sessions bill the season up front alongside a free period
-  // until the renewal date; never fulfill one that didn't actually charge.
-  if (session.mode === "subscription" && (session.amount_total ?? 0) < SEASON_PRICE_CENTS) {
-    throw new Error(`Subscription session ${session.id} charged nothing up front`);
+  // until the renewal date; never fulfill one that came in under price
+  // unless a promotion code accounts for the difference.
+  const charged = session.amount_total ?? 0;
+  const discount = session.total_details?.amount_discount ?? 0;
+  if (session.mode === "subscription" && charged + discount < SEASON_PRICE_CENTS) {
+    throw new Error(`Subscription session ${session.id} charged less than the season price`);
   }
 
   const existing = await groupForSession(session.id);
@@ -219,8 +222,8 @@ async function groupForSubscription(subscriptionId: string) {
 // metadata. The first invoice (billing_reason "subscription_create") is
 // handled by fulfillCheckout.
 export async function recordRenewalInvoice(invoice: Stripe.Invoice) {
-  if (invoice.billing_reason === "subscription_create") return;
-  if ((invoice.amount_paid ?? 0) < SEASON_PRICE_CENTS) return;
+  // Only the yearly renewals; a code that makes them free still renews.
+  if (invoice.billing_reason !== "subscription_cycle" || invoice.status !== "paid") return;
   const subscriptionId = idOf(invoice.parent?.subscription_details?.subscription);
   if (!subscriptionId || !invoice.id) return;
   const g = await groupForSubscription(subscriptionId);

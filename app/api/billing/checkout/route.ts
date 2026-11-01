@@ -107,6 +107,9 @@ export async function POST(req: NextRequest) {
       metadata: { ...metadata, ...sourceMetadata },
       success_url: `${origin}/start/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl,
+      // Shows Stripe's "Add promotion code" box. Codes are created in the
+      // Stripe Dashboard (e.g. 100% off for a free group).
+      allow_promotion_codes: true,
     };
     const session = autoRenew
       ? await getStripe().checkout.sessions.create({
