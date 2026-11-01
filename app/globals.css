@@ -4,17 +4,26 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  /* Brand */
-  --color-brand-50: #f0fdfa;
-  --color-brand-100: #ccfbf1;
-  --color-brand-200: #99f6e4;
-  --color-brand-300: #5eead4;
-  --color-brand-400: #2dd4bf;
-  --color-brand-500: #14b8a6;
-  --color-brand-600: #0f766e;
-  --color-brand-700: #0d5f58;
-  --color-brand-800: #0b4a45;
-  --color-brand-900: #073934;
+  /* Brand: warm graphite, the "classic" charcoal look */
+  --color-brand-50: #f6f5f3;
+  --color-brand-100: #ebe9e6;
+  --color-brand-200: #d7d4cf;
+  --color-brand-300: #b5b1aa;
+  --color-brand-400: #8c8882;
+  --color-brand-500: #6c6863;
+  --color-brand-600: #45423f;
+  --color-brand-700: #363431;
+  --color-brand-800: #2a2826;
+  --color-brand-900: #1d1c1a;
+
+  /* Accent: amber, for the main call to action and highlights */
+  --color-accent-50: #fff8ec;
+  --color-accent-100: #fdeccb;
+  --color-accent-300: #f8c77a;
+  --color-accent-400: #f5b04f;
+  --color-accent-500: #f2a33a;
+  --color-accent-600: #d9871c;
+  --color-accent-700: #a8650f;
 
   /* Semantic (muted variants overridden for dark mode below, along with
      brand-50 - all three are used as tinted panel/badge backgrounds, so
@@ -35,24 +44,24 @@
 
   /* Surface (overridden for dark mode below - values stay as CSS variables
      so prefers-color-scheme can swap them without regenerating utilities) */
-  --color-bg: #f8fafc;
+  --color-bg: #f4f3f1;
   --color-surface: #ffffff;
-  --color-surface-muted: #f1f5f9;
-  --color-border: #e2e8f0;
-  --color-text: #0f172a;
-  --color-text-muted: #475569;
+  --color-surface-muted: #efedea;
+  --color-border: #e1ded9;
+  --color-text: #1c1b19;
+  --color-text-muted: #4f4b46;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #0b1220;
-    --color-surface: #131c2e;
-    --color-surface-muted: #1a2439;
-    --color-border: #263248;
-    --color-text: #e2e8f0;
-    --color-text-muted: #94a3b8;
+    --color-bg: #151413;
+    --color-surface: #1e1d1b;
+    --color-surface-muted: #282624;
+    --color-border: #36332f;
+    --color-text: #edebe7;
+    --color-text-muted: #aba69f;
 
-    --color-brand-50: #042f2e;
+    --color-brand-50: #2a2826;
     --color-success: #4ade80;
     --color-success-muted: #052e1f;
     --color-danger: #f87171;

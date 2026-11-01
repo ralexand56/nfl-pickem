@@ -118,8 +118,8 @@ function CtaButton({
       className={clsx(
         "inline-block rounded-control px-6 py-3 font-semibold shadow-sm",
         light
-          ? "bg-white text-brand-800 hover:bg-brand-50"
-          : "bg-brand-600 text-white hover:bg-brand-700",
+          ? "bg-accent-500 text-brand-900 hover:bg-accent-400"
+          : "bg-brand-800 text-white hover:bg-brand-900",
         className
       )}
     >
@@ -144,7 +144,7 @@ function Hero() {
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-brand-900/95 from-30% via-brand-900/85 via-55% to-brand-900/30 max-md:bg-gradient-to-b max-md:from-brand-900/90 max-md:via-brand-900/75 max-md:to-brand-900/50" />
       <div className="max-w-6xl mx-auto px-4 py-20 sm:py-28">
         <div className="max-w-xl text-white">
-          <p className="text-sm font-semibold uppercase tracking-wider text-brand-200 mb-3 [text-shadow:0_1px_6px_rgb(0_0_0/0.5)]">
+          <p className="text-sm font-semibold uppercase tracking-wider text-accent-400 mb-3 [text-shadow:0_1px_6px_rgb(0_0_0/0.5)]">
             The NFL pick&apos;em for family &amp; friends
           </p>
           <h1 className="text-4xl sm:text-6xl font-extrabold leading-[1.05] mb-5 [text-shadow:0_2px_12px_rgb(0_0_0/0.35)]">
@@ -310,7 +310,7 @@ function SquaresPreview() {
             className={clsx(
               "aspect-square rounded-sm",
               mine.has(i)
-                ? "bg-success"
+                ? "bg-accent-500"
                 : claimed.has(i)
                   ? "bg-brand-300"
                   : "bg-surface-muted"

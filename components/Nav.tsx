@@ -98,7 +98,7 @@ export default function Nav({ groups }: { groups: NavGroup[] }) {
             className="font-bold text-lg text-text flex items-center gap-2"
           >
             The Pick&rsquo;em Club
-            <span className="rounded bg-brand-600 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+            <span className="rounded bg-accent-500 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-900">
               NFL
             </span>
           </Link>
