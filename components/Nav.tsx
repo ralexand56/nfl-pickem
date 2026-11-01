@@ -94,7 +94,7 @@ export default function Nav({ groups }: { groups: NavGroup[] }) {
       <nav className="flex-col sm:flex-row max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-4">
           <Link href={base ?? "/"} className="font-bold text-lg text-text">
-            Pick&rsquo;em
+            The Pick&rsquo;em Club
           </Link>
           {groups.length > 1 ? (
             <select

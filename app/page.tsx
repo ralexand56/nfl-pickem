@@ -56,7 +56,7 @@ function Hero() {
   return (
     <section className="max-w-5xl mx-auto px-4 pt-16 pb-12 text-center">
       <p className="text-sm font-semibold uppercase tracking-wide text-brand-600 mb-3">
-        NFL pick&apos;em for families &amp; friends
+        The Pick&apos;em Club · NFL pick&apos;em for families &amp; friends
       </p>
       <h1 className="text-4xl sm:text-5xl font-bold text-text leading-tight mb-4">
         Run your family&apos;s NFL pick&apos;em.

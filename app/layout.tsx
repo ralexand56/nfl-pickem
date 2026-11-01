@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NFL Pick’em for Families & Friends",
+  title: "The Pick’em Club · NFL Pick’em for Families & Friends",
   description:
     "Run a private NFL pick’em for your family or group: weekly picks, automatic scoring, leaderboard, buy-in tracking and Super Bowl squares. $10 a season.",
 };

@@ -1,7 +1,7 @@
 import Card from "@/components/ui/Card";
 
 export const metadata = {
-  title: "Privacy Policy - NFL Pick'em",
+  title: "Privacy Policy - The Pick'em Club",
 };
 
 export default function PrivacyPolicy() {
@@ -11,7 +11,7 @@ export default function PrivacyPolicy() {
 
       <Card className="space-y-4 text-text-muted">
         <p>
-          NFL Pick&apos;em is an invite-only app that lets families and groups
+          The Pick&apos;em Club is an invite-only app that lets families and groups
           run a private weekly NFL pick&apos;em. This page explains what
           information the app collects and how it&apos;s used.
         </p>
