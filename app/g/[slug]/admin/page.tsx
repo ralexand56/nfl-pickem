@@ -66,6 +66,7 @@ export default async function GroupAdminPage({
         members={members}
         seasons={seasons}
         currentSeason={currentSeason}
+        compedForever={ctx.group.compedForever}
       />
 
       {ctx.settings.squaresEnabled && (

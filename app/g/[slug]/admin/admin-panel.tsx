@@ -34,6 +34,7 @@ export default function AdminPanel({
   members,
   seasons,
   currentSeason,
+  compedForever,
 }: {
   viewerId: string;
   name: string;
@@ -42,10 +43,15 @@ export default function AdminPanel({
   members: Member[];
   seasons: Season[];
   currentSeason: number;
+  compedForever: boolean;
 }) {
   return (
     <>
-      <SeasonCard seasons={seasons} currentSeason={currentSeason} />
+      <SeasonCard
+        seasons={seasons}
+        currentSeason={currentSeason}
+        compedForever={compedForever}
+      />
       <InviteCard inviteToken={inviteToken} />
       <MembersCard members={members} viewerId={viewerId} />
       <SettingsCard name={name} settings={settings} />
@@ -75,14 +81,32 @@ function useAction() {
 function SeasonCard({
   seasons,
   currentSeason,
+  compedForever,
 }: {
   seasons: Season[];
   currentSeason: number;
+  compedForever: boolean;
 }) {
   const { slug } = useGroup();
   const toast = useToast();
   const [redirecting, setRedirecting] = useState(false);
   const active = seasons.find((s) => s.season === currentSeason);
+
+  if (compedForever) {
+    return (
+      <Card>
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="font-semibold text-text">{currentSeason} season</h2>
+            <p className="text-sm text-text-muted">
+              Free forever. This group never needs to renew.
+            </p>
+          </div>
+          <Badge tone="success">Active</Badge>
+        </div>
+      </Card>
+    );
+  }
 
   async function renew() {
     setRedirecting(true);

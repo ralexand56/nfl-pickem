@@ -37,6 +37,8 @@ export const groups = pgTable("groups", {
   name: text("name").notNull(),
   inviteToken: text("invite_token").notNull().unique(),
   settings: jsonb("settings").notNull().default({}),
+  // Never needs to pay for a season. Set only by migration (see 0007).
+  compedForever: boolean("comped_forever").notNull().default(false),
   createdBy: uuid("created_by").references(() => users.id, {
     onDelete: "set null",
   }),

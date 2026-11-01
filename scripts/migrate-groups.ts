@@ -1,6 +1,7 @@
 // scripts/migrate-groups.ts
 //
-// Applies migrations/0006_groups.sql in a single transaction.
+// Applies a migration file (default migrations/0006_groups.sql) in a single
+// transaction. Pass another with --file=migrations/0007_comped_forever.sql.
 //
 // Deliberately does NOT read .env.local, which points at the production
 // database. Pass the target explicitly and confirm its host:
@@ -24,7 +25,10 @@ if (confirmed !== host) {
   process.exit(1);
 }
 
-const statements = readFileSync("migrations/0006_groups.sql", "utf8")
+const file =
+  process.argv.find((a) => a.startsWith("--file="))?.split("=")[1] ??
+  "migrations/0006_groups.sql";
+const statements = readFileSync(file, "utf8")
   .split("--> statement-breakpoint")
   .map((s) => s.trim())
   .filter((s) => s.replace(/--.*$/gm, "").trim().length > 0);
@@ -34,7 +38,7 @@ const sql = neon(url);
 sql
   .transaction(statements.map((s) => sql.query(s)))
   .then(() => {
-    console.log(`Applied ${statements.length} statements to ${host}.`);
+    console.log(`Applied ${statements.length} statements from ${file} to ${host}.`);
   })
   .catch((err) => {
     console.error("Migration failed; nothing was applied.", err);

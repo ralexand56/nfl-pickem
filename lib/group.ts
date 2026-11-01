@@ -94,6 +94,11 @@ export async function requireGroupAdmin(slug: unknown): Promise<GroupContext> {
 }
 
 export async function isSeasonActive(groupId: string, season: number) {
+  const [g] = await db
+    .select({ compedForever: groups.compedForever })
+    .from(groups)
+    .where(eq(groups.id, groupId));
+  if (g?.compedForever) return true;
   const [row] = await db
     .select({ season: groupSeasons.season })
     .from(groupSeasons)
