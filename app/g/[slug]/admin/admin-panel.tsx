@@ -13,8 +13,10 @@ import {
   removeMemberAction,
   resetInviteAction,
   saveSettingsAction,
+  setAutoRenewAction,
   setRoleAction,
 } from "./actions";
+import { AutoRenewCheckbox } from "@/app/start/start-form";
 
 type Member = {
   id: string;
@@ -35,6 +37,9 @@ export default function AdminPanel({
   seasons,
   currentSeason,
   compedForever,
+  autoRenew,
+  hasSubscription,
+  renewsAt,
 }: {
   viewerId: string;
   name: string;
@@ -44,6 +49,9 @@ export default function AdminPanel({
   seasons: Season[];
   currentSeason: number;
   compedForever: boolean;
+  autoRenew: boolean;
+  hasSubscription: boolean;
+  renewsAt: string | null;
 }) {
   return (
     <>
@@ -51,6 +59,9 @@ export default function AdminPanel({
         seasons={seasons}
         currentSeason={currentSeason}
         compedForever={compedForever}
+        autoRenew={autoRenew}
+        hasSubscription={hasSubscription}
+        renewsAt={renewsAt}
       />
       <InviteCard inviteToken={inviteToken} />
       <MembersCard members={members} viewerId={viewerId} />
@@ -82,15 +93,30 @@ function SeasonCard({
   seasons,
   currentSeason,
   compedForever,
+  autoRenew,
+  hasSubscription,
+  renewsAt,
 }: {
   seasons: Season[];
   currentSeason: number;
   compedForever: boolean;
+  autoRenew: boolean;
+  hasSubscription: boolean;
+  renewsAt: string | null;
 }) {
   const { slug } = useGroup();
   const toast = useToast();
   const [redirecting, setRedirecting] = useState(false);
+  const [renewAuto, setRenewAuto] = useState(false);
+  const { pending, run } = useAction();
   const active = seasons.find((s) => s.season === currentSeason);
+  const renewDate = renewsAt
+    ? new Date(renewsAt).toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })
+    : null;
 
   if (compedForever) {
     return (
@@ -113,7 +139,7 @@ function SeasonCard({
     try {
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
-        body: JSON.stringify({ kind: "renew", group: slug }),
+        body: JSON.stringify({ kind: "renew", group: slug, autoRenew: renewAuto }),
       });
       const body = await res.json().catch(() => null);
       if (!res.ok || !body?.url) throw new Error(body?.error);
@@ -147,6 +173,34 @@ function SeasonCard({
           </Button>
         )}
       </div>
+
+      {!active && (
+        <div className="mt-3">
+          <AutoRenewCheckbox checked={renewAuto} onChange={setRenewAuto} />
+        </div>
+      )}
+
+      {hasSubscription && (
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-3">
+          <p className="text-sm text-text-muted">
+            {autoRenew
+              ? `Automatic renewal is on: $10 on ${renewDate ?? "August 15"} for next season.`
+              : `Automatic renewal is off. Nothing will be charged${renewDate ? ` on ${renewDate}` : ""}.`}
+          </p>
+          <Button
+            size="sm"
+            disabled={pending}
+            onClick={() =>
+              run(
+                () => setAutoRenewAction(slug, !autoRenew),
+                autoRenew ? "Automatic renewal turned off" : "Automatic renewal turned back on"
+              )
+            }
+          >
+            {autoRenew ? "Turn off" : "Turn back on"}
+          </Button>
+        </div>
+      )}
     </Card>
   );
 }
@@ -164,8 +218,8 @@ function InviteCard({ inviteToken }: { inviteToken: string }) {
     <Card>
       <h2 className="font-semibold text-text mb-1">Invite link</h2>
       <p className="text-sm text-text-muted mb-3">
-        Anyone with this link can join after signing in. Share it in your family
-        group chat. Reset it to stop the old link from working.
+        Anyone with this link can join after signing in. Share it in your group
+        chat. Reset it to stop the old link from working.
       </p>
       <div className="flex gap-2">
         <Input readOnly value={url} className="flex-1 text-sm" aria-label="Invite link" />

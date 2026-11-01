@@ -28,11 +28,11 @@ const FAQS: [string, string][] = [
   ],
   [
     "What happens next season?",
-    "Your group, members and history stay. When the new season starts you'll see a reminder to renew for another $10. It never charges you automatically.",
+    "Your group, members and history stay. You can renew for another $10 when the new season starts, or check \"automatically renew\" at signup and it renews every August 15 until you turn it off. Auto-renew is always optional and off unless you choose it.",
   ],
   [
     "Can I be in more than one group?",
-    "Yes. Join your family's group and your office's with the same login, and switch between them from the menu.",
+    "Yes. Play with your family, your friends and your office, all with the same login, and switch between groups from the menu.",
   ],
 ];
 
@@ -122,10 +122,10 @@ function Hero() {
   return (
     <section className="max-w-5xl mx-auto px-4 pt-16 pb-12 text-center">
       <p className="text-sm font-semibold uppercase tracking-wide text-brand-600 mb-3">
-        The NFL pick&apos;em for families &amp; friends
+        The NFL pick&apos;em for family &amp; friends
       </p>
       <h1 className="text-4xl sm:text-5xl font-bold text-text leading-tight mb-4">
-        Run your family&apos;s NFL pick&apos;em.
+        Run your NFL pick&apos;em with family &amp; friends.
         <br className="hidden sm:block" /> Skip the spreadsheet.
       </h1>
       <p className="text-lg text-text-muted max-w-2xl mx-auto mb-8">
@@ -210,7 +210,7 @@ function LeaderboardPreview() {
   const rows = [
     ["Grandma Jo", 12, 44],
     ["Marcus", 11, 38],
-    ["Aunt Lisa", 11, 51],
+    ["Lisa from work", 11, 51],
     ["Devin", 9, 47],
   ] as const;
   return (
@@ -243,9 +243,9 @@ function CheckInPreview() {
   const people = [
     ["Grandma Jo", true],
     ["Marcus", true],
-    ["Aunt Lisa", false],
+    ["Lisa from work", false],
     ["Devin", true],
-    ["Uncle Ray", false],
+    ["Coach Ray", false],
     ["Kayla", true],
   ] as const;
   return (
@@ -384,7 +384,7 @@ function Features() {
 function HowItWorks() {
   const steps = [
     ["Start your group", "Name it and pay $10 for the NFL season."],
-    ["Share your invite link", "Drop it in the family group chat."],
+    ["Share your invite link", "Drop it in your group chat."],
     ["Play all season", "Every NFL game, scored automatically, through the Super Bowl."],
   ];
   return (
@@ -420,7 +420,7 @@ function Pricing() {
           <li>Unlimited members, free for them</li>
           <li>Weekly picks, tiebreakers and leaderboard</li>
           <li>Optional Super Bowl squares and who&apos;s-in tracker</li>
-          <li>One-time payment. Nothing renews automatically.</li>
+          <li>Pay once per season, or opt in to auto-renew. Cancel anytime.</li>
         </ul>
         <CtaButton className="w-full" />
       </Card>

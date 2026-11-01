@@ -24,7 +24,7 @@ export default function TermsOfService() {
       <Card className="space-y-5 text-text-muted">
         <p>
           The Pick&apos;em Club (&quot;the app,&quot; &quot;we,&quot; &quot;us&quot;) is
-          operated by Rico Alexander. It helps families and groups of friends run a
+          operated by Rico Alexander. It helps family and friends run a
           private NFL pick&apos;em. By creating or joining a group, or otherwise
           using the app, you agree to these terms. If you don&apos;t agree, please
           don&apos;t use the app.
@@ -71,15 +71,33 @@ export default function TermsOfService() {
 
         <Section title="Season fee and refunds">
           <p>
-            Starting a group costs a one-time fee, shown at checkout, that covers the
-            current NFL season. Payments are processed by Stripe. Nothing renews
-            automatically: to keep playing the next season, an admin chooses to pay
+            Starting a group costs a fee, shown at checkout, that covers the current
+            NFL season. Payments are processed by Stripe. Unless you choose automatic
+            renewal, nothing renews: to keep playing the next season, an admin pays
             again.
           </p>
           <p>
             If you change your mind, email us within 14 days of paying and before
             your group has made any picks, and we&apos;ll refund the fee in full.
             After that, fees aren&apos;t refundable except where the law requires.
+          </p>
+        </Section>
+
+        <Section title="Automatic renewal (optional)">
+          <p>
+            Automatic renewal is off unless you check the box for it at checkout. If
+            you turn it on, you authorize us to charge the season fee (currently
+            $10) to your payment method every August 15, for the coming NFL season,
+            until you turn it off.
+          </p>
+          <p>
+            We&apos;ll email you a confirmation when you turn it on and a reminder
+            before each renewal. You can turn automatic renewal off at any time, in
+            one step, from your group&apos;s admin page, or by emailing us. Turning
+            it off stops future charges; the season you already paid for stays
+            active. If a renewal charges you and you didn&apos;t mean to keep playing,
+            email us within 14 days and before your group makes any picks that
+            season, and we&apos;ll refund it in full.
           </p>
         </Section>
 

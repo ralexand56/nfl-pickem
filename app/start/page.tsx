@@ -20,7 +20,7 @@ export default async function StartPage() {
         <h1 className="text-2xl font-bold text-text mb-1">Start your NFL pick&apos;em group</h1>
         <p className="text-text-muted mb-6">
           You&apos;ll be the admin. After checkout you&apos;ll get an invite link to
-          share with your family or friends. They play free.
+          share with your family and friends. They play free.
         </p>
         <StartForm />
       </Card>

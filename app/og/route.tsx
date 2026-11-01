@@ -40,7 +40,7 @@ export function GET() {
           </div>
         </div>
         <div style={{ fontSize: 76, fontWeight: 800, lineHeight: 1.05, maxWidth: 980 }}>
-          Run your family’s NFL pick’em.
+          NFL pick’em for family & friends.
         </div>
         <div style={{ fontSize: 34, marginTop: 28, color: "#ccfbf1", maxWidth: 980 }}>
           Weekly picks · automatic scoring · live leaderboard · Super Bowl squares

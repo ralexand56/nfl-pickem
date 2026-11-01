@@ -5,6 +5,7 @@ import { and, count, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { groupMembers, groups, type GroupRole } from "@/db/schema";
 import { newInviteToken, requireGroupAdmin } from "@/lib/group";
+import { getStripe } from "@/lib/stripe";
 import { groupSettingsSchema, type GroupSettings } from "@/lib/group-settings";
 
 function revalidateGroup(slug: string) {
@@ -101,4 +102,22 @@ export async function removeMemberAction(
       and(eq(groupMembers.groupId, group.id), eq(groupMembers.userId, userId))
     );
   revalidateGroup(slug);
+}
+
+// Turns automatic renewal off (or back on before it lapses). The current
+// season stays paid either way; Stripe just won't charge the next one.
+export async function setAutoRenewAction(slug: string, on: boolean): Promise<void> {
+  const { group } = await requireGroupAdmin(slug);
+  if (!group.stripeSubscriptionId) {
+    throw new Error(
+      on
+        ? "To turn automatic renewal on, renew with the box checked."
+        : "Automatic renewal is already off."
+    );
+  }
+  await getStripe().subscriptions.update(group.stripeSubscriptionId, {
+    cancel_at_period_end: !on,
+  });
+  await db.update(groups).set({ autoRenew: on }).where(eq(groups.id, group.id));
+  revalidatePath(`/g/${slug}/admin`);
 }

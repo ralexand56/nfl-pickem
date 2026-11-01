@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getStripe, SEASON_PRICE_CENTS } from "@/lib/stripe";
-import type { CheckoutMetadata } from "@/lib/billing";
+import { renewalDate, type CheckoutMetadata } from "@/lib/billing";
 import {
   getViewerId,
   isSeasonActive,
@@ -88,28 +88,53 @@ export async function POST(req: NextRequest) {
   }).catch(() => {});
 
   try {
-    const session = await getStripe().checkout.sessions.create({
-      mode: "payment",
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: "usd",
-            unit_amount: SEASON_PRICE_CENTS,
-            product_data: {
-              name: "The Pick'em Club · NFL season",
-              description,
-            },
-          },
-        },
-      ],
+    // Opt-in automatic renewal (the checkbox is off by default). The season
+    // is charged up front as a one-time item; the yearly subscription's
+    // first charge waits until the renewal date via trial_end.
+    const autoRenew = body.autoRenew === true;
+    const seasonItem = {
+      quantity: 1,
+      price_data: {
+        currency: "usd",
+        unit_amount: SEASON_PRICE_CENTS,
+        product_data: { name: "The Pick'em Club · NFL season", description },
+      },
+    };
+    const common = {
       client_reference_id: userId,
       // Labels these sessions in the Stripe Dashboard.
       integration_identifier: "pickem-season-qhtwmzrk",
       metadata: { ...metadata, ...sourceMetadata },
       success_url: `${origin}/start/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl,
-    });
+    };
+    const session = autoRenew
+      ? await getStripe().checkout.sessions.create({
+          ...common,
+          mode: "subscription",
+          line_items: [
+            seasonItem,
+            {
+              quantity: 1,
+              price_data: {
+                currency: "usd",
+                unit_amount: SEASON_PRICE_CENTS,
+                recurring: { interval: "year" },
+                product_data: { name: "The Pick'em Club · NFL season auto-renewal" },
+              },
+            },
+          ],
+          subscription_data: {
+            trial_end: Math.floor(renewalDate(Number(season)).getTime() / 1000),
+            description: `${description} · renews each August 15`,
+            metadata: { ...metadata },
+          },
+        })
+      : await getStripe().checkout.sessions.create({
+          ...common,
+          mode: "payment",
+          line_items: [seasonItem],
+        });
     return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error("Failed to create checkout session:", error);

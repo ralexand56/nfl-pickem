@@ -5,6 +5,6 @@ export const SITE_URL = (
 ).replace(/\/$/, "");
 
 export const SITE_NAME = "The Pick’em Club";
-export const SITE_TAGLINE = "NFL Pick’em for Families & Friends";
+export const SITE_TAGLINE = "NFL Pick’em for Family & Friends";
 export const SITE_DESCRIPTION =
-  "Run a private NFL pick’em for your family or group: pick every NFL game, automatic scoring, a live leaderboard and Super Bowl squares. $10 per NFL season.";
+  "Run a private NFL pick’em with your family and friends: pick every NFL game, automatic scoring, a live leaderboard and Super Bowl squares. $10 per NFL season.";

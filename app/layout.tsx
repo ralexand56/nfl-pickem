@@ -37,7 +37,7 @@ export const metadata: Metadata = {
         url: `${SITE_URL}/og`,
         width: 1200,
         height: 630,
-        alt: `${SITE_NAME}: NFL pick’em for families & friends`,
+        alt: `${SITE_NAME}: NFL pick’em for family & friends`,
       },
     ],
   },

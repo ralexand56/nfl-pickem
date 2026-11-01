@@ -14,7 +14,7 @@ export default function PrivacyPolicy() {
       <Card className="space-y-4 text-text-muted">
         <p>
           The Pick&apos;em Club, operated by Rico Alexander, is an invite-only
-          app that lets families and groups run a private weekly NFL pick&apos;em.
+          app that lets family and friends run a private weekly NFL pick&apos;em.
           This page explains what information the app collects and how it&apos;s
           used. Effective November 1, 2026.
         </p>

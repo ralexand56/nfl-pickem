@@ -43,6 +43,12 @@ export const groups = pgTable("groups", {
   compedForever: boolean("comped_forever").notNull().default(false),
   // Where the buyer first came from (see lib/attribution.ts, migration 0009).
   firstTouch: jsonb("first_touch"),
+  // Optional auto-renewal via a Stripe subscription (migration 0010).
+  autoRenew: boolean("auto_renew").notNull().default(false),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id").unique(),
+  renewsAt: timestamp("renews_at", { withTimezone: true }),
+  renewalReminderSeason: integer("renewal_reminder_season"),
   createdBy: uuid("created_by").references(() => users.id, {
     onDelete: "set null",
   }),
@@ -84,6 +90,8 @@ export const groupSeasons = pgTable(
     season: integer("season").notNull(),
     status: text("status").$type<"paid" | "comped">().notNull(),
     stripeCheckoutSessionId: text("stripe_checkout_session_id").unique(),
+    // Set instead for seasons paid by an automatic renewal.
+    stripeInvoiceId: text("stripe_invoice_id").unique(),
     paidAt: timestamp("paid_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.groupId, t.season] })],

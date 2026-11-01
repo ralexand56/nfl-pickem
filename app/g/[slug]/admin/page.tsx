@@ -67,6 +67,9 @@ export default async function GroupAdminPage({
         seasons={seasons}
         currentSeason={currentSeason}
         compedForever={ctx.group.compedForever}
+        autoRenew={ctx.group.autoRenew}
+        hasSubscription={!!ctx.group.stripeSubscriptionId}
+        renewsAt={ctx.group.renewsAt?.toISOString() ?? null}
       />
 
       {ctx.settings.squaresEnabled && (
