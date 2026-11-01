@@ -408,6 +408,11 @@ function Features() {
           holds each square. Turn it on from your admin page, and run more than one
           board if you like.
         </p>
+        <p>
+          <Link href="/super-bowl-squares" className="font-semibold text-text underline decoration-accent-500 underline-offset-4">
+            New to squares? Read the rules and get a free printable grid →
+          </Link>
+        </p>
       </Feature>
 
       <div className="grid sm:grid-cols-3 gap-4">

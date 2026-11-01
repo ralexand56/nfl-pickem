@@ -5,6 +5,7 @@ import { getCurrentNfl } from "@/lib/server";
 import { WEEK_LABELS, getWeekStatus } from "@/lib/weeks";
 import { getGroupContext } from "@/lib/group";
 import { notFound } from "next/navigation";
+import StartOwnGroupPrompt from "@/components/StartOwnGroupPrompt";
 
 export default async function GroupHome({
   params,
@@ -39,6 +40,7 @@ export default async function GroupHome({
   return (
     <main className="max-w-4xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-4 text-text">{ctx.group.name}</h1>
+      {!ctx.viewer.isAdmin && <StartOwnGroupPrompt />}
       <p className="text-text-muted mb-4">
         Choose a week to make your picks.
         {current.week != null && current.season === season && (

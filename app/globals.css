@@ -83,3 +83,20 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
 }
+
+/* Printing the Super Bowl squares guide prints only the grid. */
+@media print {
+  body:has(#printable-grid) * {
+    visibility: hidden;
+  }
+  body:has(#printable-grid) #printable-grid,
+  body:has(#printable-grid) #printable-grid * {
+    visibility: visible;
+  }
+  body:has(#printable-grid) #printable-grid {
+    position: absolute;
+    inset: 0;
+    border: none;
+    overflow: visible;
+  }
+}

@@ -7,6 +7,7 @@ import { getViewerId } from "@/lib/group";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { joinGroupAction } from "./actions";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -89,6 +90,21 @@ export default async function JoinPage({
           </Button>
         </form>
       </Card>
+      <div className="mt-6 text-center text-sm text-text-muted space-y-1">
+        <p>
+          The Pick’em Club runs private NFL pick’em groups for family and
+          friends: weekly picks, automatic scoring and a live leaderboard.
+        </p>
+        <p>
+          Want one for your office or friends?{" "}
+          <Link
+            href="/start?utm_source=invite_page&utm_medium=in_app"
+            className="font-semibold text-text underline decoration-accent-500 underline-offset-4"
+          >
+            Start your own group
+          </Link>
+        </p>
+      </div>
     </main>
   );
 }
