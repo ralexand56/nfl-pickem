@@ -6,6 +6,7 @@ import SessionProvider from "./providers";
 import { getUserGroups, getViewerId } from "@/lib/group";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 import SiteAnalytics from "@/components/SiteAnalytics";
+import SiteFooter from "@/components/SiteFooter";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -69,6 +70,7 @@ export default async function RootLayout({
         <SessionProvider>
           <Nav groups={groups} />
           <main>{children}</main>
+          <SiteFooter />
           <SiteAnalytics />
         </SessionProvider>
       </body>

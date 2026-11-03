@@ -67,10 +67,18 @@ const STRUCTURED_DATA = [
   },
 ];
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  // Members go straight to their group, unless they asked for this page
+  // (the footer's "About" link adds ?home).
   const viewerId = await getViewerId();
   const groups = viewerId ? await getUserGroups(viewerId) : [];
-  if (groups.length > 0) redirect(`/g/${groups[0].slug}`);
+  if (groups.length > 0 && !("home" in (await searchParams))) {
+    redirect(`/g/${groups[0].slug}`);
+  }
 
   return (
     <div className="bg-bg">
@@ -80,7 +88,7 @@ export default async function Home() {
           __html: JSON.stringify(STRUCTURED_DATA).replace(/</g, "\\u003c"),
         }}
       />
-      {viewerId && <NoGroupNotice />}
+      {viewerId && groups.length === 0 && <NoGroupNotice />}
       <Hero />
       <Tour />
       <Features />
@@ -501,23 +509,6 @@ function Faq() {
       </div>
       <div className="mt-10 text-center">
         <CtaButton />
-        <p className="mt-4 text-sm text-text-muted">
-          <Link href="/pick-sheets" className="underline">
-            Free pick sheets
-          </Link>
-          {" · "}
-          <Link href="/super-bowl-squares" className="underline">
-            Squares guide
-          </Link>
-          {" · "}
-          <Link href="/terms" className="underline">
-            Terms
-          </Link>
-          {" · "}
-          <Link href="/privacy" className="underline">
-            Privacy
-          </Link>
-        </p>
       </div>
     </section>
   );
