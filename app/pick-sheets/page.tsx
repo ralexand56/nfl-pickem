@@ -39,6 +39,16 @@ export default async function PickSheetsIndex() {
       </section>
 
       <div className="max-w-4xl mx-auto px-4 py-10 space-y-10">
+        <Link href="/pick-sheets/thanksgiving" className="block">
+          <Card className="flex flex-wrap items-center justify-between gap-3 border-accent-500 bg-accent-50 hover:bg-accent-100 transition-colors">
+            <div>
+              <div className="font-semibold text-text">Thanksgiving pick sheet</div>
+              <div className="text-sm text-text-muted">All three Thanksgiving Day games, plus house rules for the family table.</div>
+            </div>
+            <span className="font-semibold text-text">Print it →</span>
+          </Card>
+        </Link>
+
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {weeks.map((w) => {
             const status = getWeekStatus(season, w, current);
