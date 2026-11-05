@@ -10,6 +10,11 @@ export const PICK_DEADLINES = {
   game: "Before each game's own kickoff",
 } as const;
 
+export const TIEBREAKER_DEADLINES = {
+  game: "Before the tiebreaker game kicks off",
+  week: "Before the first kickoff of the week",
+} as const;
+
 export const groupSettingsSchema = z.object({
   // Super Bowl squares page and nav link.
   squaresEnabled: z.boolean().default(true),
@@ -22,6 +27,11 @@ export const groupSettingsSchema = z.object({
     .default(["Cash App", "Zelle"]),
   // Game rules.
   tiebreakerEnabled: z.boolean().default(true),
+  tiebreakerDeadline: z
+    .enum(Object.keys(TIEBREAKER_DEADLINES) as [keyof typeof TIEBREAKER_DEADLINES])
+    .default("game"),
+  // Keep other members' picks and tiebreaker guesses private until they lock.
+  hidePicksUntilLock: z.boolean().default(false),
   includePlayoffs: z.boolean().default(true),
   pickDeadline: z
     .enum(Object.keys(PICK_DEADLINES) as [keyof typeof PICK_DEADLINES])
@@ -45,6 +55,18 @@ export function pickDeadlineMs(
 ) {
   if (rule === "game") return new Date(game.date).getTime();
   return Math.min(...weekGames.map((g) => new Date(g.date).getTime()));
+}
+
+// When the tiebreaker locks under the group's rule. The tiebreaker game is the
+// flagged one, or the week's last game if none is flagged.
+export function tiebreakerDeadlineMs(
+  rule: GroupSettings["tiebreakerDeadline"],
+  weekGames: { date: Date | string; isTiebreaker?: boolean | null }[]
+) {
+  const kickoffs = weekGames.map((g) => new Date(g.date).getTime());
+  if (rule === "week") return Math.min(...kickoffs);
+  const flagged = weekGames.find((g) => g.isTiebreaker);
+  return flagged ? new Date(flagged.date).getTime() : Math.max(...kickoffs);
 }
 
 // New groups start with the money-related features off; admins opt in.

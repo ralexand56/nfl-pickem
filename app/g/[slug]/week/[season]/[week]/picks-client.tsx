@@ -17,14 +17,15 @@ import Badge from "@/components/ui/Badge";
 import { useToast } from "@/components/Toast";
 import WeekStatusBadge from "@/components/WeekStatusBadge";
 import { useGroup } from "@/components/GroupProvider";
-import { pickDeadlineMs } from "@/lib/group-settings";
-import type { WeekStatus } from "@/lib/weeks";
+import { pickDeadlineMs, tiebreakerDeadlineMs } from "@/lib/group-settings";
+import { getPickStatus } from "@/lib/pick-status";
+import { getWeekLabel, type WeekStatus } from "@/lib/weeks";
+import { PickStatusBar, WhosIn } from "./pick-progress";
 
 // Extend the session user type to include 'id'
 import type { DefaultSession } from "next-auth";
 import {
   SelectGame,
-  SelectUser,
   SelectPick,
   SelectWeeklyTiebreaker,
 } from "@/db/schema";
@@ -41,14 +42,21 @@ export default function PicksClient({
   games,
   allPicks,
   tiebreakers,
+  members,
   season,
   week,
   weekStatus,
   paymentTracker,
 }: {
   games: SelectGame[];
-  allPicks: { picks: SelectPick; users: SelectUser }[];
+  allPicks: { picks: SelectPick; users: { name: string | null } }[];
   tiebreakers: SelectWeeklyTiebreaker[];
+  members: {
+    id: string;
+    name: string;
+    pickedGameIds: string[];
+    hasTiebreaker: boolean;
+  }[];
   season: number;
   week: number;
   weekStatus?: WeekStatus | null;
@@ -58,7 +66,8 @@ export default function PicksClient({
   const router = useRouter();
   const toast = useToast();
   const group = useGroup();
-  const { tiebreakerEnabled, pickDeadline } = group.settings;
+  const { tiebreakerEnabled, pickDeadline, tiebreakerDeadline, hidePicksUntilLock } =
+    group.settings;
 
   const uid = session?.user?.id;
 
@@ -90,6 +99,21 @@ export default function PicksClient({
       .filter((p) => p.picks.userId === uid)
       .map((p) => [p.picks.gameId, p.picks.pick])
   );
+
+  const memberStatuses = members.map((m) => ({
+    id: m.id,
+    name: m.name,
+    status: getPickStatus({
+      games,
+      pickedGameIds: new Set(m.pickedGameIds),
+      hasTiebreaker: m.hasTiebreaker,
+      settings: group.settings,
+      nowMs,
+    }),
+  }));
+  const myStatus = memberStatuses.find((m) => m.id === uid)?.status;
+  const tiebreakerLocked =
+    games.length > 0 && nowMs >= tiebreakerDeadlineMs(tiebreakerDeadline, games);
 
   async function pick(gameId: string, pick: "HOME" | "AWAY") {
     const game = games.find((g) => g.id === gameId);
@@ -198,10 +222,12 @@ export default function PicksClient({
         </Card>
       )}
 
+      {games.length > 0 && <WhosIn members={memberStatuses} viewerId={uid} />}
+
       {paymentTracker}
 
       {tiebreakerEnabled && (
-      <Card className="mb-6">
+      <Card className="mb-6 scroll-mt-32" data-pick-target>
         <h3 className="font-semibold mb-2 text-text">
           Tiebreaker (total points in last game)
         </h3>
@@ -215,19 +241,24 @@ export default function PicksClient({
             value={myTB}
             placeholder="Enter total points"
             title="Tiebreaker Total Points"
-            disabled={!uid}
+            disabled={!uid || tiebreakerLocked}
             onChange={(e) => {
               tbDirtyRef.current = true;
               setMyTB(e.target.value === "" ? "" : Number(e.target.value));
             }}
           />
-          <Button variant="primary" onClick={saveTB} disabled={!uid || tbSaving}>
+          <Button variant="primary" onClick={saveTB} disabled={!uid || tbSaving || tiebreakerLocked}>
             {tbSaving ? "Saving…" : "Save"}
           </Button>
         </div>
         {!uid && (
           <div className="text-sm text-text-muted mt-2">
             Sign in to enter a tiebreaker.
+          </div>
+        )}
+        {tiebreakerLocked && (
+          <div className="text-sm text-text-muted mt-2">
+            The tiebreaker is locked for this week.
           </div>
         )}
       </Card>
@@ -257,7 +288,8 @@ export default function PicksClient({
             return (
               <Card
                 key={g.id}
-                className={clsx(g.isTiebreaker && "bg-surface-muted")}
+                id={`game-${g.id}`}
+                className={clsx("scroll-mt-32", g.isTiebreaker && "bg-surface-muted")}
               >
                 <div className="flex justify-between items-center">
                   <div>
@@ -322,11 +354,22 @@ export default function PicksClient({
                         {p.picks.pick}
                       </span>
                     ))}
+                  {hidePicksUntilLock && !locked && g.status !== "final" && (
+                    <span className="ml-1">Others stay hidden until picks lock.</span>
+                  )}
                 </div>
               </Card>
             );
           })}
       </div>
+
+      {myStatus && myStatus.total > 0 && (
+        <PickStatusBar
+          status={myStatus}
+          weekLabel={getWeekLabel(week)}
+          tiebreakerInputId="mnf-tiebreaker"
+        />
+      )}
     </div>
   );
 }

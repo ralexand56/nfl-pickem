@@ -1,19 +1,21 @@
 import { NextResponse } from "next/server";
 import { and, eq, ne } from "drizzle-orm";
 import { db } from "@/db";
-import { weeklyTiebreakers } from "@/db/schema";
+import { games, weeklyTiebreakers } from "@/db/schema";
 import {
   GroupAccessError,
   isSeasonActive,
   requireGroupMember,
 } from "@/lib/group";
 import { groupErrorResponse } from "@/lib/api";
+import { tiebreakerDeadlineMs, type GroupSettings } from "@/lib/group-settings";
 
 export async function POST(req: Request) {
   const { group: slug, season, week, mnfTotalPointsGuess } = await req.json();
 
   let userId: string;
   let groupId: string;
+  let deadlineRule: GroupSettings["tiebreakerDeadline"];
   try {
     const ctx = await requireGroupMember(slug);
     if (!ctx.settings.tiebreakerEnabled) {
@@ -24,6 +26,7 @@ export async function POST(req: Request) {
     }
     userId = ctx.viewer.id;
     groupId = ctx.group.id;
+    deadlineRule = ctx.settings.tiebreakerDeadline;
   } catch (error) {
     if (error instanceof GroupAccessError && error.status === 401) {
       return NextResponse.json(
@@ -38,6 +41,20 @@ export async function POST(req: Request) {
     return NextResponse.json(
       { error: `Your group isn't active for the ${season} season yet. Ask your admin to renew.` },
       { status: 402 }
+    );
+  }
+
+  const weekGames = await db
+    .select({ date: games.date, isTiebreaker: games.isTiebreaker })
+    .from(games)
+    .where(and(eq(games.season, season), eq(games.week, week)));
+  if (weekGames.length === 0) {
+    return NextResponse.json({ error: "Unknown week" }, { status: 400 });
+  }
+  if (Date.now() >= tiebreakerDeadlineMs(deadlineRule, weekGames)) {
+    return NextResponse.json(
+      { error: "The tiebreaker is locked for this week" },
+      { status: 403 }
     );
   }
 

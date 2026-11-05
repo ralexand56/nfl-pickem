@@ -8,7 +8,11 @@ import Badge from "@/components/ui/Badge";
 import { useToast } from "@/components/Toast";
 import { useGroup } from "@/components/GroupProvider";
 import type { GroupRole } from "@/db/schema";
-import { PICK_DEADLINES, type GroupSettings } from "@/lib/group-settings";
+import {
+  PICK_DEADLINES,
+  TIEBREAKER_DEADLINES,
+  type GroupSettings,
+} from "@/lib/group-settings";
 import {
   removeMemberAction,
   resetInviteAction,
@@ -379,6 +383,28 @@ function SettingsCard({ name, settings }: { name: string; settings: GroupSetting
             description="Players guess total points in the week's last game to break ties."
             checked={s.tiebreakerEnabled}
             onChange={(v) => set("tiebreakerEnabled", v)}
+          />
+          {s.tiebreakerEnabled && (
+            <fieldset className="space-y-1 pl-7">
+              <legend className="text-text mb-1">Tiebreaker deadline</legend>
+              {Object.entries(TIEBREAKER_DEADLINES).map(([value, label]) => (
+                <label key={value} className="flex items-center gap-2 text-sm text-text cursor-pointer">
+                  <input
+                    type="radio"
+                    name="tiebreakerDeadline"
+                    checked={s.tiebreakerDeadline === value}
+                    onChange={() => set("tiebreakerDeadline", value as GroupSettings["tiebreakerDeadline"])}
+                  />
+                  {label}
+                </label>
+              ))}
+            </fieldset>
+          )}
+          <Toggle
+            label="Hide picks until they lock"
+            description="Members can't see each other's picks or tiebreaker guesses until the deadline. Everyone can still see who's finished."
+            checked={s.hidePicksUntilLock}
+            onChange={(v) => set("hidePicksUntilLock", v)}
           />
           <Toggle
             label="Include playoff weeks"

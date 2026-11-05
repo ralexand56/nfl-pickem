@@ -15,6 +15,7 @@ import { notFound } from "next/navigation";
 import { getCurrentNfl } from "@/lib/server";
 import { getWeekLabel, getWeekStatus } from "@/lib/weeks";
 import WeekStatusBadge from "@/components/WeekStatusBadge";
+import { tiebreakerDeadlineMs } from "@/lib/group-settings";
 
 export default async function Leaderboard({
   params,
@@ -77,6 +78,12 @@ export default async function Leaderboard({
   const viewer = ctx.viewer;
   const paymentByUser = new Map(paymentPlayers.map((p) => [p.id, p]));
   const { buyInEnabled, tiebreakerEnabled, includePlayoffs } = ctx.settings;
+  // Other members' guesses stay private until the tiebreaker locks, if the
+  // group hides picks.
+  const guessesHidden =
+    ctx.settings.hidePicksUntilLock &&
+    gs.length > 0 &&
+    Date.now() < tiebreakerDeadlineMs(ctx.settings.tiebreakerDeadline, gs);
   // Picks from people who have since left the group stay in the DB but
   // don't show.
   const userIds = Array.from(new Set(ps.map((p) => p.userId))).filter(
@@ -161,7 +168,9 @@ export default async function Leaderboard({
                 <td className="p-2 text-text">{r.correct}</td>
                 {tiebreakerEnabled && (
                   <>
-                    <td className="p-2 text-text">{r.tb}</td>
+                    <td className="p-2 text-text">
+                      {guessesHidden && r.uid !== viewer.id ? "—" : r.tb}
+                    </td>
                     <td className="p-2 text-text">{r.tieDistance ?? "—"}</td>
                   </>
                 )}
