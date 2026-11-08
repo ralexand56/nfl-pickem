@@ -1,0 +1,24 @@
+# Runs the automatic pick reminders about an hour before picks lock. Vercel's
+# free plan only allows daily cron jobs, so this calls the site's endpoint
+# every 15 minutes during NFL game windows (times are UTC; ET is UTC-5 in
+# winter, UTC-4 in early season). The endpoint decides who, if anyone, is due.
+name: Pick reminders
+
+on:
+  schedule:
+    # Thursday through Monday, daytime and evening games.
+    - cron: "*/15 12-23 * * 0,1,4,5,6"
+    # Night games: Thursday, Sunday and Monday nights spill past midnight UTC.
+    - cron: "*/15 0-2 * * 1,2,5"
+  workflow_dispatch:
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Send due reminders
+        run: |
+          curl -fsS --max-time 120 \
+            -H "Authorization: Bearer ${{ secrets.PICK_REMINDER_SECRET }}" \
+            https://thepickemclub.com/api/cron/pick-reminders

@@ -11,13 +11,18 @@ function getTransport() {
   return transport;
 }
 
-async function send(to: string, subject: string, text: string) {
+async function send(
+  to: string,
+  subject: string,
+  text: string,
+  headers?: Record<string, string>
+) {
   const t = getTransport();
   if (!t) {
     console.warn(`EMAIL_SERVER not set; skipped "${subject}" to ${to}`);
     return;
   }
-  await t.sendMail({ from: process.env.EMAIL_FROM, to, subject, text });
+  await t.sendMail({ from: process.env.EMAIL_FROM, to, subject, text, headers });
 }
 
 const fmtDate = (d: Date) =>
@@ -78,7 +83,8 @@ Questions or refunds: write to ralexand56@gmail.com.
   );
 }
 
-// Sent when a group admin reminds a member who hasn't finished their picks.
+// Sent when a group admin reminds a member who hasn't finished their picks,
+// or automatically about an hour before picks lock (with an opt-out link).
 export async function sendPickReminder(opts: {
   to: string;
   groupName: string;
@@ -86,19 +92,35 @@ export async function sendPickReminder(opts: {
   summary: string;
   deadline: string;
   path: string;
+  automatic?: { stopUrl: string; oneClickUrl: string };
 }) {
+  const intro = opts.automatic
+    ? `Picks for ${opts.groupName} lock soon, and your ${opts.weekLabel} picks aren't finished yet.`
+    : `The admin of ${opts.groupName} sent you a reminder: your ${opts.weekLabel} picks aren't finished yet.`;
+  const footer = opts.automatic
+    ? `This is an automatic reminder because you started your ${opts.weekLabel} picks. To stop automatic reminders for ${opts.groupName}:
+${opts.automatic.stopUrl}`
+    : `You're getting this because you're a member of ${opts.groupName} on ${SITE_NAME}. To stop these reminders, ask your group's admin.`;
   await send(
     opts.to,
-    `${opts.groupName}: finish your ${opts.weekLabel} picks`,
-    `The admin of ${opts.groupName} sent you a reminder: your ${opts.weekLabel} picks aren't finished yet.
+    opts.automatic
+      ? `${opts.groupName}: your ${opts.weekLabel} picks lock soon`
+      : `${opts.groupName}: finish your ${opts.weekLabel} picks`,
+    `${intro}
 
 So far: ${opts.summary}
-Next deadline: ${opts.deadline}
+${opts.automatic ? "Picks lock" : "Next deadline"}: ${opts.deadline}
 
 Finish your picks:
 ${SITE_URL}${opts.path}
 
-You're getting this because you're a member of ${opts.groupName} on ${SITE_NAME}. To stop these reminders, ask your group's admin.
-`
+${footer}
+`,
+    opts.automatic
+      ? {
+          "List-Unsubscribe": `<${opts.automatic.oneClickUrl}>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        }
+      : undefined
   );
 }

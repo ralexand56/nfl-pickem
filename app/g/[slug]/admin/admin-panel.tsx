@@ -407,6 +407,12 @@ function SettingsCard({ name, settings }: { name: string; settings: GroupSetting
             onChange={(v) => set("hidePicksUntilLock", v)}
           />
           <Toggle
+            label="Automatic pick reminders"
+            description="About an hour before picks lock, emails members who started their picks but haven't finished. Each email has a link to opt out."
+            checked={s.autoRemindersEnabled}
+            onChange={(v) => set("autoRemindersEnabled", v)}
+          />
+          <Toggle
             label="Include playoff weeks"
             description="Wild Card through Conference Championship weeks."
             checked={s.includePlayoffs}

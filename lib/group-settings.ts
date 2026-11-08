@@ -30,6 +30,9 @@ export const groupSettingsSchema = z.object({
   tiebreakerDeadline: z
     .enum(Object.keys(TIEBREAKER_DEADLINES) as [keyof typeof TIEBREAKER_DEADLINES])
     .default("game"),
+  // Email members who started but haven't finished about an hour before
+  // picks lock.
+  autoRemindersEnabled: z.boolean().default(true),
   // Keep other members' picks and tiebreaker guesses private until they lock.
   hidePicksUntilLock: z.boolean().default(false),
   includePlayoffs: z.boolean().default(true),

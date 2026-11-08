@@ -69,6 +69,8 @@ export const groupMembers = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     role: text("role").$type<GroupRole>().notNull().default("member"),
+    // Set from the "stop automatic reminders" link in a reminder email.
+    autoRemindersOff: boolean("auto_reminders_off").notNull().default(false),
     joinedAt: timestamp("joined_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -135,6 +137,22 @@ export const picks = pgTable(
 );
 
 // db/schema.ts
+// One row per member per lock they got an automatic reminder for.
+export const autoPickReminders = pgTable(
+  "auto_pick_reminders",
+  {
+    groupId: uuid("group_id")
+      .notNull()
+      .references(() => groups.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    lockAt: timestamp("lock_at", { withTimezone: true }).notNull(),
+    sentAt: timestamp("sent_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.groupId, t.userId, t.lockAt] })]
+);
+
 // When an admin last reminded a member about a week's picks.
 export const pickReminders = pgTable(
   "pick_reminders",
