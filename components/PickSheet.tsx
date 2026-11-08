@@ -16,10 +16,11 @@ export default function PickSheet({ name, games, note }: { name: string; games: 
           </div>
         </div>
         <div className="text-sm">
-          Name: <span className="inline-block w-56 border-b border-black align-bottom" />
+          Name: <span className="inline-block w-40 sm:w-56 border-b border-black align-bottom" />
         </div>
       </div>
 
+      <div className="overflow-x-auto">
       <table className="w-full border-collapse text-sm">
         <thead>
           <tr className="border-b-2 border-black text-left">
@@ -51,6 +52,7 @@ export default function PickSheet({ name, games, note }: { name: string; games: 
           })}
         </tbody>
       </table>
+      </div>
 
       <div className="mt-5 flex flex-wrap items-end justify-between gap-4 text-sm">
         <div>

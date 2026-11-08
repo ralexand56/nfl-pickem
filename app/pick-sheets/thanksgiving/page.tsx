@@ -3,6 +3,7 @@ import Link from "next/link";
 import Card from "@/components/ui/Card";
 import PickSheet from "@/components/PickSheet";
 import PrintButton from "@/components/PrintButton";
+import PdfDownloadButton from "@/components/PdfDownloadButton";
 import { getThanksgivingGames, thanksgivingDay } from "@/lib/pick-sheets";
 import { getCurrentNfl } from "@/lib/server";
 
@@ -87,6 +88,12 @@ export default async function ThanksgivingPickSheet() {
             one for everyone at the table, from Grandma to the kids.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
+            {games.length > 0 && (
+              <PdfDownloadButton
+                href="/pick-sheets/thanksgiving/pdf"
+                filename={`thanksgiving-nfl-pick-sheet-${s}.pdf`}
+              />
+            )}
             <PrintButton label="Print the Thanksgiving sheet" />
             <Link
               href="/start"

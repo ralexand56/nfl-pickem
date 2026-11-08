@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import PrintButton from "@/components/PrintButton";
+import PdfDownloadButton from "@/components/PdfDownloadButton";
 import PickSheet from "@/components/PickSheet";
 import { getWeekGames } from "@/lib/pick-sheets";
 import { getWeekLabel } from "@/lib/weeks";
@@ -52,6 +53,10 @@ export default async function WeeklyPickSheet({ params }: { params: Promise<Para
             happen automatically.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
+            <PdfDownloadButton
+              href={`/pick-sheets/${p.s}/${p.w}/pdf`}
+              filename={`${name.toLowerCase().replace(/\s+/g, "-")}.pdf`}
+            />
             <PrintButton label="Print this pick sheet" />
             <Link
               href="/start"

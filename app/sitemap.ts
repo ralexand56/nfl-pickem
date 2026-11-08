@@ -15,11 +15,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/super-bowl-squares`, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE_URL}/pick-sheets`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE_URL}/pick-sheets/thanksgiving`, changeFrequency: "weekly", priority: 0.7 },
-    ...weeks.map((w) => ({
-      url: `${SITE_URL}/pick-sheets/${season}/${w}`,
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
-    })),
+    ...weeks.flatMap((w) => [
+      {
+        url: `${SITE_URL}/pick-sheets/${season}/${w}`,
+        changeFrequency: "weekly" as const,
+        priority: 0.6,
+      },
+      {
+        url: `${SITE_URL}/pick-sheets/${season}/${w}/pdf`,
+        changeFrequency: "weekly" as const,
+        priority: 0.5,
+      },
+    ]),
     { url: `${SITE_URL}/terms`, changeFrequency: "yearly", priority: 0.2 },
     { url: `${SITE_URL}/privacy`, changeFrequency: "yearly", priority: 0.2 },
   ];
