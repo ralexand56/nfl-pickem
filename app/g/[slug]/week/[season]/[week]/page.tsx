@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { games, picks, weeklyTiebreakers, users } from "@/db/schema";
+import { games, picks, pickReminders, weeklyTiebreakers, users } from "@/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import PicksClient from "./picks-client";
 import PaymentTracker from "@/components/PaymentTracker";
@@ -10,6 +10,7 @@ import { getCurrentNfl } from "@/lib/server";
 import { getWeekStatus } from "@/lib/weeks";
 import { getUserMap } from "@/lib/users";
 import { pickDeadlineMs, tiebreakerDeadlineMs } from "@/lib/group-settings";
+import { REMINDER_COOLDOWN_MS } from "./reminder-rules";
 
 export default async function WeekPage({
   params,
@@ -93,6 +94,36 @@ export default async function WeekPage({
       (t) => tiebreakersRevealed || t.userId === viewer.id
     );
 
+    // Admin-only: who has played this season (the sensible people to remind)
+    // and who was reminded recently.
+    const reminders = viewer.isAdmin
+      ? await (async () => {
+          const [played, recent] = await Promise.all([
+            db
+              .selectDistinct({ userId: picks.userId })
+              .from(picks)
+              .innerJoin(games, eq(picks.gameId, games.id))
+              .where(and(eq(picks.groupId, groupId), eq(games.season, seasonNumber))),
+            db
+              .select({ userId: pickReminders.userId, sentAt: pickReminders.sentAt })
+              .from(pickReminders)
+              .where(
+                and(
+                  eq(pickReminders.groupId, groupId),
+                  eq(pickReminders.season, seasonNumber),
+                  eq(pickReminders.week, weekNumber)
+                )
+              ),
+          ]);
+          return {
+            playedThisSeason: played.map((p) => p.userId),
+            remindedRecently: recent
+              .filter((r) => now - r.sentAt.getTime() < REMINDER_COOLDOWN_MS)
+              .map((r) => r.userId),
+          };
+        })()
+      : null;
+
     return (
       <PicksClient
         paymentTracker={
@@ -110,6 +141,8 @@ export default async function WeekPage({
         allPicks={visiblePicks}
         tiebreakers={visibleTiebreakers}
         members={members}
+        initialNowMs={now}
+        reminders={reminders}
         season={seasonNumber}
         week={weekNumber}
         weekStatus={getWeekStatus(seasonNumber, weekNumber, current)}

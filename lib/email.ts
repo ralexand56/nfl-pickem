@@ -77,3 +77,28 @@ Questions or refunds: write to ralexand56@gmail.com.
 `
   );
 }
+
+// Sent when a group admin reminds a member who hasn't finished their picks.
+export async function sendPickReminder(opts: {
+  to: string;
+  groupName: string;
+  weekLabel: string;
+  summary: string;
+  deadline: string;
+  path: string;
+}) {
+  await send(
+    opts.to,
+    `${opts.groupName}: finish your ${opts.weekLabel} picks`,
+    `The admin of ${opts.groupName} sent you a reminder: your ${opts.weekLabel} picks aren't finished yet.
+
+So far: ${opts.summary}
+Next deadline: ${opts.deadline}
+
+Finish your picks:
+${SITE_URL}${opts.path}
+
+You're getting this because you're a member of ${opts.groupName} on ${SITE_NAME}. To stop these reminders, ask your group's admin.
+`
+  );
+}

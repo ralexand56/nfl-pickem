@@ -135,6 +135,23 @@ export const picks = pgTable(
 );
 
 // db/schema.ts
+// When an admin last reminded a member about a week's picks.
+export const pickReminders = pgTable(
+  "pick_reminders",
+  {
+    groupId: uuid("group_id")
+      .notNull()
+      .references(() => groups.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    season: integer("season").notNull(),
+    week: integer("week").notNull(),
+    sentAt: timestamp("sent_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.groupId, t.userId, t.season, t.week] })]
+);
+
 export const weeklyTiebreakers = pgTable(
   "weekly_tiebreakers",
   {

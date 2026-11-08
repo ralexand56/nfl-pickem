@@ -6,6 +6,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   useTransition,
   type ReactNode,
 } from "react";
@@ -38,11 +39,15 @@ declare module "next-auth" {
   }
 }
 
+const noopSubscribe = () => () => {};
+
 export default function PicksClient({
   games,
   allPicks,
   tiebreakers,
   members,
+  initialNowMs,
+  reminders,
   season,
   week,
   weekStatus,
@@ -57,6 +62,9 @@ export default function PicksClient({
     pickedGameIds: string[];
     hasTiebreaker: boolean;
   }[];
+  // The server's clock, so the first render matches on server and browser.
+  initialNowMs: number;
+  reminders: { playedThisSeason: string[]; remindedRecently: string[] } | null;
   season: number;
   week: number;
   weekStatus?: WeekStatus | null;
@@ -75,7 +83,13 @@ export default function PicksClient({
   const [myTB, setMyTB] = useState<number | "">(
     tiebreakers.find((t) => t.userId === uid)?.mnfTotalPointsGuess ?? ""
   );
-  const [nowMs, setNowMs] = useState<number>(Date.now());
+  const [nowMs, setNowMs] = useState<number>(initialNowMs);
+  // Kickoffs show in the viewer's time zone, which only the browser knows.
+  const inBrowser = useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false
+  );
   const [tbSaving, setTbSaving] = useState(false);
   const tbDirtyRef = useRef(false);
 
@@ -222,7 +236,15 @@ export default function PicksClient({
         </Card>
       )}
 
-      {games.length > 0 && <WhosIn members={memberStatuses} viewerId={uid} />}
+      {games.length > 0 && (
+        <WhosIn
+          members={memberStatuses}
+          viewerId={uid}
+          reminders={reminders}
+          season={season}
+          week={week}
+        />
+      )}
 
       {paymentTracker}
 
@@ -241,6 +263,7 @@ export default function PicksClient({
             value={myTB}
             placeholder="Enter total points"
             title="Tiebreaker Total Points"
+            className="min-w-0 flex-1 sm:flex-none"
             disabled={!uid || tiebreakerLocked}
             onChange={(e) => {
               tbDirtyRef.current = true;
@@ -291,12 +314,12 @@ export default function PicksClient({
                 id={`game-${g.id}`}
                 className={clsx("scroll-mt-32", g.isTiebreaker && "bg-surface-muted")}
               >
-                <div className="flex justify-between items-center">
-                  <div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
                     <div className="text-sm text-text-muted">
-                      {new Date(g.date).toLocaleString()}
+                      {inBrowser ? new Date(g.date).toLocaleString() : "\u00a0"}
                     </div>
-                    <div className="font-semibold text-text flex items-center gap-2">
+                    <div className="font-semibold text-text flex flex-wrap items-center gap-x-2">
                       {g.awayTeam} @ {g.homeTeam}
                       {g.isTiebreaker && <Badge tone="brand">tiebreaker</Badge>}
                     </div>
@@ -306,7 +329,7 @@ export default function PicksClient({
                       </div>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="grid grid-cols-2 gap-2 sm:flex sm:shrink-0">
                     <button
                       disabled={!uid || g.status === "final" || pending || locked}
                       onClick={() => pick(g.id, "AWAY")}

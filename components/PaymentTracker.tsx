@@ -122,7 +122,7 @@ function DollarButton({
   const status = paid ? `Paid${method ? ` via ${method}` : ""}` : "Not paid";
   const by =
     player.updatedByName && player.updatedAt
-      ? ` · marked by ${player.updatedByName} on ${new Date(player.updatedAt).toLocaleDateString()}`
+      ? ` · marked by ${player.updatedByName} on ${new Date(player.updatedAt).toLocaleDateString("en-US", { timeZone: "America/Los_Angeles" })}`
       : "";
   const hint = editable ? ` (click to mark ${paid ? "not paid" : "paid"})` : "";
 
