@@ -70,7 +70,7 @@ export default async function RootLayout({
         <SessionProvider>
           <Nav groups={groups} />
           <main>{children}</main>
-          <SiteFooter />
+          <SiteFooter signedIn={!!viewerId} />
           <SiteAnalytics />
         </SessionProvider>
       </body>
