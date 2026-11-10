@@ -9,7 +9,11 @@ import { notFound } from "next/navigation";
 import { getCurrentNfl } from "@/lib/server";
 import { getWeekStatus } from "@/lib/weeks";
 import { getUserMap } from "@/lib/users";
-import { pickDeadlineMs, tiebreakerDeadlineMs } from "@/lib/group-settings";
+import {
+  hidesTiebreakerGuesses,
+  pickDeadlineMs,
+  tiebreakerDeadlineMs,
+} from "@/lib/group-settings";
 import { REMINDER_COOLDOWN_MS } from "./reminder-rules";
 
 export default async function WeekPage({
@@ -88,7 +92,7 @@ export default async function WeekPage({
       return !!game && (game.status === "final" || now >= pickDeadlineMs(pickDeadline, game, gs));
     });
     const tiebreakersRevealed =
-      !hidePicksUntilLock ||
+      !hidesTiebreakerGuesses(ctx.settings) ||
       (gs.length > 0 && now >= tiebreakerDeadlineMs(tiebreakerDeadline, gs));
     const visibleTiebreakers = tbs.filter(
       (t) => tiebreakersRevealed || t.userId === viewer.id

@@ -406,6 +406,14 @@ function SettingsCard({ name, settings }: { name: string; settings: GroupSetting
             checked={s.hidePicksUntilLock}
             onChange={(v) => set("hidePicksUntilLock", v)}
           />
+          {s.tiebreakerEnabled && !s.hidePicksUntilLock && (
+            <Toggle
+              label="Hide tiebreaker guesses until they lock"
+              description="Picks stay visible, but members only see their own tiebreaker guess until the tiebreaker locks. Then everyone's is shown."
+              checked={s.hideTiebreakersUntilLock}
+              onChange={(v) => set("hideTiebreakersUntilLock", v)}
+            />
+          )}
           <Toggle
             label="Automatic pick reminders"
             description="About an hour before picks lock, emails members who started their picks but haven't finished. Each email has a link to opt out."

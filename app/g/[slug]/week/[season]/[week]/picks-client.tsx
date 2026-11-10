@@ -18,7 +18,11 @@ import Badge from "@/components/ui/Badge";
 import { useToast } from "@/components/Toast";
 import WeekStatusBadge from "@/components/WeekStatusBadge";
 import { useGroup } from "@/components/GroupProvider";
-import { pickDeadlineMs, tiebreakerDeadlineMs } from "@/lib/group-settings";
+import {
+  hidesTiebreakerGuesses,
+  pickDeadlineMs,
+  tiebreakerDeadlineMs,
+} from "@/lib/group-settings";
 import { getPickStatus } from "@/lib/pick-status";
 import { getWeekLabel, type WeekStatus } from "@/lib/weeks";
 import { PickStatusBar, WhosIn } from "./pick-progress";
@@ -282,6 +286,11 @@ export default function PicksClient({
         {tiebreakerLocked && (
           <div className="text-sm text-text-muted mt-2">
             The tiebreaker is locked for this week.
+          </div>
+        )}
+        {!tiebreakerLocked && hidesTiebreakerGuesses(group.settings) && (
+          <div className="text-sm text-text-muted mt-2">
+            Only you can see your guess until the tiebreaker locks.
           </div>
         )}
       </Card>

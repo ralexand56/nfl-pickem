@@ -35,6 +35,9 @@ export const groupSettingsSchema = z.object({
   autoRemindersEnabled: z.boolean().default(true),
   // Keep other members' picks and tiebreaker guesses private until they lock.
   hidePicksUntilLock: z.boolean().default(false),
+  // Keep other members' tiebreaker guesses private until the tiebreaker
+  // locks, even when picks are visible.
+  hideTiebreakersUntilLock: z.boolean().default(false),
   includePlayoffs: z.boolean().default(true),
   pickDeadline: z
     .enum(Object.keys(PICK_DEADLINES) as [keyof typeof PICK_DEADLINES])
@@ -78,3 +81,10 @@ export const NEW_GROUP_SETTINGS: Partial<GroupSettings> = {
   buyInEnabled: false,
   squaresEnabled: false,
 };
+
+/** Whether other members' tiebreaker guesses stay private until it locks. */
+export function hidesTiebreakerGuesses(
+  settings: Pick<GroupSettings, "hidePicksUntilLock" | "hideTiebreakersUntilLock">
+): boolean {
+  return settings.hidePicksUntilLock || settings.hideTiebreakersUntilLock;
+}
