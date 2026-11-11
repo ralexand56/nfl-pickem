@@ -15,7 +15,7 @@ const LINKS: [string, string][] = [
 export default function SiteFooter({ signedIn }: { signedIn: boolean }) {
   return (
     <footer className="border-t border-border bg-surface print:hidden">
-      <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm text-text-muted">
+      <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 text-sm text-text-muted">
         <nav className="flex flex-wrap gap-x-4 gap-y-2">
           <GroupRulesLink />
           {LINKS.map(([href, label]) => (
@@ -28,7 +28,7 @@ export default function SiteFooter({ signedIn }: { signedIn: boolean }) {
             </Link>
           ))}
         </nav>
-        <p>Not affiliated with the NFL.</p>
+        <p className="lg:whitespace-nowrap">Not affiliated with the NFL.</p>
       </div>
     </footer>
   );
