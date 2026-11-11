@@ -378,6 +378,13 @@ function SettingsCard({ name, settings }: { name: string; settings: GroupSetting
           <h3 className="text-sm font-semibold text-text uppercase tracking-wide">
             Game rules
           </h3>
+          <p className="text-sm text-text-muted">
+            Members see these settings written out on the{" "}
+            <a href={`/g/${slug}/rules`} className="text-brand-600 hover:underline">
+              group rules page
+            </a>
+            .
+          </p>
           <Toggle
             label="Monday night tiebreaker"
             description="Players guess total points in the week's last game to break ties."
