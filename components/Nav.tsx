@@ -92,40 +92,45 @@ export default function Nav({ groups }: { groups: NavGroup[] }) {
 
   return (
     <header className="sticky top-0 z-40 bg-surface/80 backdrop-blur border-b border-border print:hidden">
-      <nav className="flex-col sm:flex-row max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-4">
-          <Link
-            href={base ?? "/"}
-            className="font-display font-semibold text-xl text-text flex items-center gap-2"
+      {/* Wraps instead of overflowing: brand, group and account share the top
+          row; the page links drop to their own row until there's room
+          (lg+) for everything on one line. */}
+      <nav className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <Link
+          href={base ?? "/"}
+          className="font-display font-semibold text-xl text-text flex items-center gap-2 whitespace-nowrap shrink-0"
+        >
+          <LogoMark size={34} />
+          The Pick&rsquo;em Club
+          <span className="rounded bg-accent-500 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-900">
+            NFL
+          </span>
+        </Link>
+        {groups.length > 1 ? (
+          <select
+            title="Switch group"
+            value={group?.slug ?? ""}
+            onChange={(e) => router.push(`/g/${e.target.value}`)}
+            className="min-w-0 max-w-full px-2 py-1 rounded-control border border-border bg-surface text-sm text-text"
           >
-            <LogoMark size={34} />
-            The Pick&rsquo;em Club
-            <span className="rounded bg-accent-500 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-900">
-              NFL
-            </span>
-          </Link>
-          {groups.length > 1 ? (
-            <select
-              title="Switch group"
-              value={group?.slug ?? ""}
-              onChange={(e) => router.push(`/g/${e.target.value}`)}
-              className="px-2 py-1 rounded-control border border-border bg-surface text-sm text-text"
-            >
-              {!group && <option value="">Choose a group</option>}
-              {groups.map((g) => (
-                <option key={g.slug} value={g.slug}>
-                  {g.name}
-                </option>
-              ))}
-            </select>
-          ) : (
-            group && <span className="text-sm text-text-muted">{group.name}</span>
-          )}
-          <div className="hidden sm:flex items-center gap-3 text-sm text-text-muted">
+            {!group && <option value="">Choose a group</option>}
+            {groups.map((g) => (
+              <option key={g.slug} value={g.slug}>
+                {g.name}
+              </option>
+            ))}
+          </select>
+        ) : (
+          group && (
+            <span className="min-w-0 truncate text-sm text-text-muted">{group.name}</span>
+          )
+        )}
+        {links && (
+          <div className="order-last basis-full lg:order-none lg:basis-auto flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-text-muted">
             {links}
           </div>
-        </div>
-        <div className="flex-col flex items-center gap-3">
+        )}
+        <div className="ml-auto flex items-center gap-3 shrink-0">
           {status === "loading" && (
             <span className="text-sm text-text-muted">…</span>
           )}
@@ -135,8 +140,8 @@ export default function Nav({ groups }: { groups: NavGroup[] }) {
             </Button>
           )}
           {user && (
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-text hidden sm:inline">
+            <>
+              <span className="text-sm text-text hidden xl:inline">
                 {user.name ?? user.email}
               </span>
               {user.image && (
@@ -151,12 +156,7 @@ export default function Nav({ groups }: { groups: NavGroup[] }) {
               <Button size="sm" onClick={() => signOut({ callbackUrl: "/" })}>
                 Sign out
               </Button>
-            </div>
-          )}
-          {links && (
-            <div className="sm:hidden flex justify-between items-center gap-3 text-sm text-text-muted">
-              {links}
-            </div>
+            </>
           )}
         </div>
       </nav>
