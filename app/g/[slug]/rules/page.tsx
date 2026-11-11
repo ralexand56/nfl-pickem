@@ -29,7 +29,7 @@ export default async function RulesPage({
       ? "when the first game of the week kicks off"
       : "when the tiebreaker game kicks off";
 
-  const methods = s.paymentMethods.join(", ");
+  const methods = new Intl.ListFormat("en", { type: "disjunction" }).format(s.paymentMethods);
 
   return (
     <main className="max-w-3xl mx-auto p-6">
