@@ -1,9 +1,10 @@
 "use server";
 
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, ne } from "drizzle-orm";
 import { db } from "@/db";
 import { games, groupMembers, picks, pickReminders, users, weeklyTiebreakers } from "@/db/schema";
 import { isSeasonActive, requireGroupAdmin } from "@/lib/group";
+import { gameStillOpen, tiebreakerGameKickoffMs } from "./admin-entry-rules";
 import { sendPickReminder } from "@/lib/email";
 import { pickDeadlineMs, tiebreakerDeadlineMs } from "@/lib/group-settings";
 import { kickoffLabel } from "@/lib/pick-sheets";
@@ -152,4 +153,94 @@ export async function sendPickRemindersAction(
     skipped: wanted.length - queue.length,
     failed: queue.length - sent,
   };
+}
+
+// Shared checks for an admin filling in something a member missed: an active
+// season, a real member who isn't the admin themselves (no getting around the
+// lock for your own picks), and the week's games.
+async function loadEntryContext(slug: string, season: number, week: number, userId: string) {
+  const ctx = await requireGroupAdmin(slug);
+  const { group, viewer } = ctx;
+  if (userId === viewer.id) {
+    throw new Error("Ask another admin to enter your own missed picks.");
+  }
+  if (!(await isSeasonActive(group.id, season))) {
+    throw new Error(`This group isn't active for the ${season} season.`);
+  }
+  const [member] = await db
+    .select({ userId: groupMembers.userId })
+    .from(groupMembers)
+    .where(and(eq(groupMembers.groupId, group.id), eq(groupMembers.userId, userId)));
+  if (!member) throw new Error("That person isn't in this group.");
+  const weekGames = await db
+    .select()
+    .from(games)
+    .where(and(eq(games.season, season), eq(games.week, week)));
+  if (weekGames.length === 0) throw new Error("Unknown week");
+  return { ...ctx, weekGames };
+}
+
+// Admin only: enter a pick a member missed. Works after the group's pick
+// deadline, but only for a game that hasn't kicked off, and only if the
+// member has no pick for it; an existing pick is never changed.
+export async function enterMissedPickAction(
+  slug: string,
+  season: number,
+  week: number,
+  userId: string,
+  gameId: string,
+  pick: "HOME" | "AWAY"
+): Promise<void> {
+  if (pick !== "HOME" && pick !== "AWAY") throw new Error("Invalid pick");
+  const { group, weekGames } = await loadEntryContext(slug, season, week, userId);
+  const game = weekGames.find((g) => g.id === gameId);
+  if (!game) throw new Error("That game isn't in this week.");
+  if (!gameStillOpen(game, Date.now())) {
+    throw new Error("That game has already started.");
+  }
+  const inserted = await db
+    .insert(picks)
+    .values({ groupId: group.id, userId, gameId, pick })
+    .onConflictDoNothing()
+    .returning({ id: picks.id });
+  if (inserted.length === 0) throw new Error("They already have a pick for that game.");
+}
+
+// Admin only: enter a member's missing tiebreaker guess, until the
+// tiebreaker game kicks off. An existing guess is never changed.
+export async function enterMissedTiebreakerAction(
+  slug: string,
+  season: number,
+  week: number,
+  userId: string,
+  guess: number
+): Promise<void> {
+  if (!Number.isInteger(guess) || guess < 0 || guess > 200) {
+    throw new Error("Enter a whole number of points.");
+  }
+  const { group, settings, weekGames } = await loadEntryContext(slug, season, week, userId);
+  if (!settings.tiebreakerEnabled) throw new Error("This group doesn't use a tiebreaker.");
+  if (Date.now() >= tiebreakerGameKickoffMs(weekGames)) {
+    throw new Error("The tiebreaker game has already started.");
+  }
+  const [taken] = await db
+    .select({ id: weeklyTiebreakers.id })
+    .from(weeklyTiebreakers)
+    .where(
+      and(
+        eq(weeklyTiebreakers.groupId, group.id),
+        eq(weeklyTiebreakers.season, season),
+        eq(weeklyTiebreakers.week, week),
+        eq(weeklyTiebreakers.mnfTotalPointsGuess, guess),
+        ne(weeklyTiebreakers.userId, userId)
+      )
+    )
+    .limit(1);
+  if (taken) throw new Error("Someone already has that number. Choose a different one.");
+  const inserted = await db
+    .insert(weeklyTiebreakers)
+    .values({ groupId: group.id, userId, season, week, mnfTotalPointsGuess: guess })
+    .onConflictDoNothing()
+    .returning({ id: weeklyTiebreakers.id });
+  if (inserted.length === 0) throw new Error("They already have a tiebreaker guess.");
 }

@@ -13,6 +13,7 @@ import {
   type PickStatus,
 } from "@/lib/pick-status";
 import { sendPickRemindersAction } from "./actions";
+import { AdminPickEntry, missedEntries, type EntryMember } from "./admin-pick-entry";
 
 // Stays in view at the bottom of the screen while the viewer works through
 // the week, and jumps to whatever they've skipped.
@@ -74,7 +75,7 @@ export function PickStatusBar({
   );
 }
 
-type MemberProgress = { id: string; name: string; status: PickStatus };
+type MemberProgress = EntryMember & { status: PickStatus };
 
 // Every member of the group and how far along they are. Counts only.
 export function WhosIn({
@@ -83,14 +84,29 @@ export function WhosIn({
   reminders,
   season,
   week,
+  games,
+  nowMs,
 }: {
   members: MemberProgress[];
   viewerId?: string;
   reminders: { playedThisSeason: string[]; remindedRecently: string[] } | null;
   season: number;
   week: number;
+  games: Parameters<typeof missedEntries>[1];
+  nowMs: number;
 }) {
-  const [reminding, setReminding] = useState(false);
+  const group = useGroup();
+  const [panel, setPanel] = useState<"remind" | "enter" | null>(null);
+  const reminding = panel === "remind";
+  // Admins only (reminders is null for everyone else). Never the admin
+  // themselves: another admin enters theirs.
+  const missing = reminders
+    ? members.filter((m) => {
+        if (m.id === viewerId) return false;
+        const e = missedEntries(m, games, group.settings.tiebreakerEnabled, nowMs);
+        return e.openGames.length > 0 || e.tiebreakerOpen;
+      })
+    : [];
   const allIn = members.filter((m) => m.status.complete).length;
   const unfinished = members.filter(
     (m) => !m.status.complete && m.status.canStillFinish
@@ -126,15 +142,19 @@ export function WhosIn({
         </ul>
       </details>
 
-      {reminders && unfinished.length > 0 && !reminding && (
-        <Button
-          variant="secondary"
-          size="sm"
-          className="mt-3"
-          onClick={() => setReminding(true)}
-        >
-          Remind members
-        </Button>
+      {reminders && panel === null && (unfinished.length > 0 || missing.length > 0) && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {unfinished.length > 0 && (
+            <Button variant="secondary" size="sm" onClick={() => setPanel("remind")}>
+              Remind members
+            </Button>
+          )}
+          {missing.length > 0 && (
+            <Button variant="secondary" size="sm" onClick={() => setPanel("enter")}>
+              Enter a missed pick
+            </Button>
+          )}
+        </div>
       )}
       {reminders && reminding && (
         <RemindPanel
@@ -142,7 +162,17 @@ export function WhosIn({
           reminders={reminders}
           season={season}
           week={week}
-          onClose={() => setReminding(false)}
+          onClose={() => setPanel(null)}
+        />
+      )}
+      {reminders && panel === "enter" && (
+        <AdminPickEntry
+          members={missing}
+          games={games}
+          nowMs={nowMs}
+          season={season}
+          week={week}
+          onClose={() => setPanel(null)}
         />
       )}
     </div>

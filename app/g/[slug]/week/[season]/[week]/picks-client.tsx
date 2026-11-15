@@ -121,6 +121,8 @@ export default function PicksClient({
   const memberStatuses = members.map((m) => ({
     id: m.id,
     name: m.name,
+    pickedGameIds: m.pickedGameIds,
+    hasTiebreaker: m.hasTiebreaker,
     status: getPickStatus({
       games,
       pickedGameIds: new Set(m.pickedGameIds),
@@ -247,6 +249,8 @@ export default function PicksClient({
           reminders={reminders}
           season={season}
           week={week}
+          games={games}
+          nowMs={nowMs}
         />
       )}
 
