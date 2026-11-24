@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { GroupProvider } from "@/components/GroupProvider";
+import GroupNote from "@/components/GroupNote";
 import { getGroupContext, getViewerId, isSeasonActive } from "@/lib/group";
 import { getCurrentNfl } from "@/lib/server";
 
@@ -58,6 +59,11 @@ export default async function GroupLayout({
           )}
         </div>
       )}
+      <GroupNote
+        slug={ctx.group.slug}
+        note={ctx.settings.groupNote}
+        rulesHref={`/g/${slug}/rules`}
+      />
       {children}
     </GroupProvider>
   );

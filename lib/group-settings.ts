@@ -15,7 +15,12 @@ export const TIEBREAKER_DEADLINES = {
   week: "Before the first kickoff of the week",
 } as const;
 
+export const GROUP_NOTE_MAX = 1000;
+
 export const groupSettingsSchema = z.object({
+  // Free-form note from the admins (house rules, payouts, announcements),
+  // shown at the top of the group's pages and on its rules page. Plain text.
+  groupNote: z.string().trim().max(GROUP_NOTE_MAX).default(""),
   // Super Bowl squares page and nav link.
   squaresEnabled: z.boolean().default(true),
   // Weekly buy-in tracker on the picks and leaderboard pages.

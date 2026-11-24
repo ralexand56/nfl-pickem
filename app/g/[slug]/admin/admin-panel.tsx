@@ -12,6 +12,7 @@ import {
   PICK_DEADLINES,
   TIEBREAKER_DEADLINES,
   type GroupSettings,
+  GROUP_NOTE_MAX,
 } from "@/lib/group-settings";
 import {
   removeMemberAction,
@@ -372,6 +373,29 @@ function SettingsCard({ name, settings }: { name: string; settings: GroupSetting
             onChange={(e) => setGroupName(e.target.value)}
             className="w-full"
           />
+        </section>
+
+        <section className="space-y-2">
+          <label className="block text-sm font-medium text-text" htmlFor="group-note">
+            Note to members
+          </label>
+          <p className="text-sm text-text-muted">
+            Shown as a short note at the top of group pages (first two lines) and in full on the rules page. Use it
+            for house rules, payouts or announcements. Members can hide it, and
+            it shows again whenever you change it. Leave it empty for no note.
+          </p>
+          <textarea
+            id="group-note"
+            value={s.groupNote}
+            maxLength={GROUP_NOTE_MAX}
+            rows={4}
+            onChange={(e) => set("groupNote", e.target.value)}
+            placeholder="e.g. Winner of the week takes the pot. Season champ gets an extra $50."
+            className="w-full rounded-control border border-border bg-surface px-3 py-2 text-sm text-text"
+          />
+          <p className="text-xs text-text-muted text-right tabular-nums">
+            {s.groupNote.length} / {GROUP_NOTE_MAX}
+          </p>
         </section>
 
         <section className="space-y-3">

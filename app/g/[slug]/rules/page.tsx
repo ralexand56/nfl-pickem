@@ -48,6 +48,12 @@ export default async function RulesPage({
       </p>
 
       <div className="grid gap-4">
+        {s.groupNote && (
+          <Card className="border-l-4 border-l-accent-500">
+            <h2 className="text-lg font-semibold text-text mb-2">From your admin</h2>
+            <p className="whitespace-pre-line break-words text-text">{s.groupNote}</p>
+          </Card>
+        )}
         <Section title="Making picks">
           <Rule>Pick the winner of every game each week.</Rule>
           <Rule>
