@@ -76,7 +76,7 @@ export default function PrivacyPolicy() {
           <h2 className="font-semibold text-text mb-1">Data deletion</h2>
           <p>
             To have your account and data removed, contact the app owner at{" "}
-            <a href="mailto:ralexand56@gmail.com" className="text-brand-600 hover:underline">
+            <a href="mailto:ralexand56@gmail.com" className="text-link hover:underline">
               ralexand56@gmail.com
             </a>
             .
@@ -87,7 +87,7 @@ export default function PrivacyPolicy() {
           <h2 className="font-semibold text-text mb-1">Contact</h2>
           <p>
             Questions about this policy or the app can be sent to{" "}
-            <a href="mailto:ralexand56@gmail.com" className="text-brand-600 hover:underline">
+            <a href="mailto:ralexand56@gmail.com" className="text-link hover:underline">
               ralexand56@gmail.com
             </a>
             .

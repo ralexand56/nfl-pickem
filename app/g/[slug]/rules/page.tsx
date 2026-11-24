@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import Card from "@/components/ui/Card";
+import LinkifiedText from "@/components/LinkifiedText";
 import { getGroupContext } from "@/lib/group";
 import { hidesTiebreakerGuesses } from "@/lib/group-settings";
 
@@ -39,7 +40,7 @@ export default async function RulesPage({
         {ctx.viewer.isAdmin && (
           <>
             {" "}
-            <a href={`${base}/admin`} className="text-brand-600 hover:underline">
+            <a href={`${base}/admin`} className="text-link hover:underline">
               Change them in Admin
             </a>
             .
@@ -51,7 +52,9 @@ export default async function RulesPage({
         {s.groupNote && (
           <Card className="border-l-4 border-l-accent-500">
             <h2 className="text-lg font-semibold text-text mb-2">From your admin</h2>
-            <p className="whitespace-pre-line break-words text-text">{s.groupNote}</p>
+            <p className="whitespace-pre-line break-words text-text">
+              <LinkifiedText text={s.groupNote} />
+            </p>
           </Card>
         )}
         <Section title="Making picks">
@@ -121,7 +124,7 @@ export default async function RulesPage({
           <Section title="Super Bowl squares">
             <Rule>
               The group runs a Super Bowl squares board.{" "}
-              <a href={`${base}/squares`} className="text-brand-600 hover:underline">
+              <a href={`${base}/squares`} className="text-link hover:underline">
                 See the board
               </a>{" "}
               for the price per square, how the numbers are drawn, and the payouts.

@@ -404,7 +404,7 @@ function SettingsCard({ name, settings }: { name: string; settings: GroupSetting
           </h3>
           <p className="text-sm text-text-muted">
             Members see these settings written out on the{" "}
-            <a href={`/g/${slug}/rules`} className="text-brand-600 hover:underline">
+            <a href={`/g/${slug}/rules`} className="text-link hover:underline">
               group rules page
             </a>
             .

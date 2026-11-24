@@ -76,7 +76,7 @@ export default async function JoinPage({
             <span>
               I&apos;m 18 or older (or joining with a parent or guardian&apos;s
               permission) and I agree to the{" "}
-              <a href="/terms" target="_blank" className="text-brand-600 underline">
+              <a href="/terms" target="_blank" className="text-link underline">
                 Terms of Service
               </a>
               .

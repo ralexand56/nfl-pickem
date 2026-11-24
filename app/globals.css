@@ -51,6 +51,9 @@
   --color-border: #e1ded9;
   --color-text: #1c1b19;
   --color-text-muted: #4f4b46;
+  /* Text links: graphite on light, warm gold on dark (brand-600 is too dark
+     to read there, and buttons still need it dark behind white text). */
+  --color-link: #45423f;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -61,6 +64,7 @@
     --color-border: #36332f;
     --color-text: #edebe7;
     --color-text-muted: #aba69f;
+    --color-link: #d9ae7f;
 
     --color-brand-50: #2a2826;
     --color-success: #4ade80;

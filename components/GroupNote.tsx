@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
+import LinkifiedText from "@/components/LinkifiedText";
 
 // Which note a member hid, so it stays hidden until the admins change it.
 const storageKey = (slug: string) => `group-note-hidden:${slug}`;
@@ -58,7 +59,7 @@ export default function GroupNote({
       >
         <p className="min-w-0 flex-1 line-clamp-2 whitespace-pre-line break-words">
           <span className="font-medium text-text">Note: </span>
-          {note}
+          <LinkifiedText text={note} />
         </p>
         <span className="flex shrink-0 gap-3">
           <a href={rulesHref} className="hover:underline">

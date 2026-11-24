@@ -207,7 +207,7 @@ export default function GameAdmin({
       <div className="border rounded-lg p-4 bg-surface-muted">
         <Link
           href={`/g/${slug}/squares/${gameId}`}
-          className="text-brand-600 hover:underline font-semibold"
+          className="text-link hover:underline font-semibold"
         >
           → View Public Squares Page
         </Link>

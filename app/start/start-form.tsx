@@ -56,7 +56,7 @@ export default function StartForm() {
         />
         <span>
           I&apos;m 18 or older and I agree to the{" "}
-          <a href="/terms" target="_blank" className="text-brand-600 underline">
+          <a href="/terms" target="_blank" className="text-link underline">
             Terms of Service
           </a>
           .

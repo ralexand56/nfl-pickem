@@ -162,11 +162,11 @@ export default function TermsOfService() {
         <Section title="Contact">
           <p>
             Questions or refund requests:{" "}
-            <a href="mailto:ralexand56@gmail.com" className="text-brand-600 hover:underline">
+            <a href="mailto:ralexand56@gmail.com" className="text-link hover:underline">
               ralexand56@gmail.com
             </a>
             . See also our{" "}
-            <a href="/privacy" className="text-brand-600 hover:underline">
+            <a href="/privacy" className="text-link hover:underline">
               Privacy Policy
             </a>
             .

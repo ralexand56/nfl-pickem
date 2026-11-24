@@ -48,7 +48,7 @@ export default async function GroupHome({
             {" "}
             <a
               href={`${base}/week/${season}/${current.week}`}
-              className="text-brand-600 hover:underline"
+              className="text-link hover:underline"
             >
               Jump to this week →
             </a>

@@ -300,7 +300,7 @@ export default function GamesEditor({
                       {game.isMondayNight && (
                         <>
                           {" · "}
-                          <span className="text-brand-600 font-medium">
+                          <span className="text-link font-medium">
                             Monday Night
                           </span>
                         </>

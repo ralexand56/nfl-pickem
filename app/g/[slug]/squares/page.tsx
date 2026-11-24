@@ -33,7 +33,7 @@ export default async function SquaresPage({
           {ctx.viewer.isAdmin ? (
             <>
               No squares board yet.{" "}
-              <a href={`/g/${slug}/admin/squares`} className="text-brand-600 hover:underline">
+              <a href={`/g/${slug}/admin/squares`} className="text-link hover:underline">
                 Create one
               </a>
               .

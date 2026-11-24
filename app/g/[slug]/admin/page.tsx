@@ -80,7 +80,7 @@ export default async function GroupAdminPage({
           </p>
           <Link
             href={`/g/${slug}/admin/squares`}
-            className="text-brand-600 hover:underline text-sm"
+            className="text-link hover:underline text-sm"
           >
             Manage squares boards →
           </Link>
